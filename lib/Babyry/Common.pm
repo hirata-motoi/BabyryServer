@@ -37,10 +37,7 @@ sub _load_keyvault {
     croakf( sprintf('keyvault config file not found. path: %s', $config_full_path))
         unless -f $config_full_path;
 
-infof($config_full_path);
     $__KEYVAULT = do( $config_full_path );
-use YAML;
-infof(Dump $__KEYVAULT);
 }
 
 sub db_config { Babyry::ConfigLoader->new(env())->db_config }

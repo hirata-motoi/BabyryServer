@@ -13,5 +13,12 @@ sub execute {
     return $service->execute($params);
 }
 
+sub verify {
+    my ($self, $params) = @_;
+
+    my $service = Babyry::Service::Register->new;
+    return $service->verify($params);
+}
+
 1;
 

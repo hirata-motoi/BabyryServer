@@ -19,6 +19,7 @@ sub execute {
         email => $c->req->param('email') || '',
         password => $c->req->param('password') || '',
         password_confirm => $c->req->param('password_confirm') || '',
+        invite_code => $c->req->param('invite_code') || '',
     };
 
     my $logic = Babyry::Logic::Register->new;
@@ -35,7 +36,21 @@ critf($ret->{error});
 #        $c->render_500();
     }
 
-    $c->redirect('/');
+    $c->redirect('/register/invite_code/index.tx');
+}
+
+sub verify {
+    my ($self, $c) = @_;
+
+    my $token = $c->req->param('token') || '';
+    my $logic = Babyry::Logic::Register->new;
+
+    my $ret = eval { $logic->verify($token) };
+    if ( my $e = $@ ) {
+        critf('Failed to verify registered email token:%s', $token);
+        return $c->render_500();
+    }
+    return $c->render('/', +{});
 }
  
 1;
