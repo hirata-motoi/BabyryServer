@@ -19,7 +19,6 @@ sub execute {
         email => $c->req->param('email') || '',
         password => $c->req->param('password') || '',
     };
-infof("$params->{email} $params->{password}");
 
     my $logic = Babyry::Logic::Login->new;
 
@@ -36,6 +35,7 @@ critf($ret->{error});
     }
 
     if ($ret->{user_id}) {
+        $c->session->set('session_id' => $ret->{session_id});
         return $c->redirect('/');
     } else {
         return $c->render('/login/index.tx', {error => 'INVALID_PASSWORD'});

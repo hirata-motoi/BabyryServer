@@ -24,7 +24,6 @@ sub create {
 sub login {
     my ($self, $teng, $params) = @_;
 
-infof("$params->{email} $params->{enc_pass}");
     my $res = $teng->single(
         'user_auth',
         { 
@@ -33,7 +32,6 @@ infof("$params->{email} $params->{enc_pass}");
         }
     );
     my $user_id = $res->user_id;
-infof("$user_id");
 
     return $user_id;
 }

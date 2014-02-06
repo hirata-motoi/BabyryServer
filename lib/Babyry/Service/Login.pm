@@ -8,6 +8,7 @@ use parent qw/Babyry::Base/;
 
 use Babyry::Logic::Common;
 use Babyry::Model::User_Auth;
+use Babyry::Model::Session;
 
 sub execute {
     my ($self, $params) = @_;
@@ -16,22 +17,31 @@ sub execute {
     # login
     my $common = Babyry::Logic::Common->new;
     my $enc_pass = $common->enc_password($params->{password});
-    my $teng = $self->teng('BABYRY_MAIN_R');
+    my $teng_r = $self->teng('BABYRY_MAIN_R');
     my $user_id = $user_auth->login(
-        $teng, 
+        $teng_r, 
         { email => $params->{email}, enc_pass => $enc_pass}
     );
-    $teng->disconnect();
-infof("user_id : $user_id");
-    if ($user_id) {
-        # if user_id session set
-        return { user_id => $user_id};
-    } else {
-        # uness user_id redirect to index with error message
-        return { user_id => $user_id};
-    }
+    $teng_r->disconnect();
 
-    return;
+    if ($user_id) {
+        my $teng_w = $self->teng('BABYRY_MAIN_W');
+        $teng_w->txn_begin;
+        # if user_id session set
+        my $session = Babyry::Model::Session->new();
+        my $session_id = $session->set(
+            $teng_w,
+            {
+                user_id => $user_id,
+            }
+        );
+        $teng_w->txn_commit;
+        $teng_w->disconnect();
+        return { user_id => $user_id, session_id => $session_id };
+    } else {
+        # unless user_id redirect to index with error message
+        return { error => 'LOGIN_ERROR' };
+    }
 }
 
 1;
