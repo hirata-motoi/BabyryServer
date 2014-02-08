@@ -40,20 +40,6 @@ critf($ret->{error});
     } else {
         return $c->render('/login/index.tx', {error => 'INVALID_PASSWORD'});
     }
-
-=pot
-    my $user_id = $login->login($email, $password);
-
-    if ($user_id) {
-        my $session = Babyry::Logic::Session->new();
-        my $session_id = $session->create($user_id);
-        $c->session->set('session_id' => $session_id);
-        $session->set($user_id, $session_id);
-        return $c->redirect('/');
-    } else {
-        return $c->render('/login/index.tx', {error => 'INVALID_PASSWORD'});
-    }
-=cut
 }
 
 sub logout {

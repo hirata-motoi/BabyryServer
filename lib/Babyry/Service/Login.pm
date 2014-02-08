@@ -9,6 +9,7 @@ use parent qw/Babyry::Base/;
 use Babyry::Logic::Common;
 use Babyry::Model::User_Auth;
 use Babyry::Model::Session;
+use Babyry::Model::User;
 
 sub execute {
     my ($self, $params) = @_;
@@ -22,9 +23,19 @@ sub execute {
         $teng_r, 
         { email => $params->{email}, enc_pass => $enc_pass}
     );
-    $teng_r->disconnect();
 
     if ($user_id) {
+        # check user status
+        my $user = Babyry::Model::User->new();
+        my $user_status = $user->get_status(
+            $teng_r,
+            { user_id => $user_id },
+        );
+        if ($user_status == 0) {
+            return { error => 'USER_NOT_VERIFIED' };
+        }
+        $teng_r->disconnect();
+
         my $teng_w = $self->teng('BABYRY_MAIN_W');
         $teng_w->txn_begin;
         # if user_id session set

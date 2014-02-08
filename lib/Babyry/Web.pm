@@ -61,12 +61,14 @@ __PACKAGE__->add_trigger(
 
         my $path = $c->req->env->{PATH_INFO};
         if ( ! $session_id  ) {
-            if ( ! grep { $_ eq $path } @session_not_required_paths ) {
+            if ( ! grep { $path =~ m{^$_} } @session_not_required_paths ) {
+                infof('redirect to /login');
                 return $c->redirect('/login');
             }
             return;
         } else {
             if ( grep { $_ eq $path } @session_not_required_paths ) {
+                infof('redirect to /');
                 return $c->redirect('/');
             }
         }

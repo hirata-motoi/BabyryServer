@@ -28,5 +28,32 @@ sub verify {
     return $row ? $row->get_columns : undef;
 }
 
+sub get_user_id {
+    my ($self, $teng, $params) = @_;
+
+    my $res = $teng->single(
+        'register_token',
+        {
+            token       => $params->{token},
+        }
+    );
+
+    return $res->user_id;
+}
+
+sub delete {
+    my ($self, $teng, $params) = @_;
+
+    $teng->delete(
+        'register_token',
+        {
+            token => $params->{token},
+        },
+    );
+
+    return;
+}
+
+
 1;
 
