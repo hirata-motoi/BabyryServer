@@ -6,6 +6,7 @@ use utf8;
 use parent qw/Babyry::Base/;
 use String::Random;
 use Log::Minimal;
+use Carp;
 
 use constant {
     INVITE_CODE_LENGTH => 8,
@@ -14,7 +15,7 @@ use constant {
 };
 
 sub create {
-    my ($self, $params, $now) = @_;
+    my ($self, $teng, $params, $now) = @_;
 
     $now ||= time;
 
@@ -23,7 +24,7 @@ sub create {
     for (1 .. 3) {
 
         $row = eval {
-            $self->teng->insert(
+            $teng->insert(
                 'invite',
                 {
                     user_id     => $params->{user_id},
@@ -40,7 +41,7 @@ sub create {
     }
 
     if (! $row ) {
-        croakf('Failed to invite params:%s error:%s', $self->dump($params), $@);
+        croak('Failed to invite params:%s error:%s', $self->dump($params), $@);
     }
     return $row->get_columns;
 }
@@ -76,9 +77,9 @@ sub get_by_invited_user {
 }
 
 sub admit {
-    my ($self, $invite_record) = @_;
+    my ($self, $teng, $invite_record) = @_;
 
-    my $ret = $self->tengw->update(
+    my $ret = $teng->update(
         'invite',
         {
             status => STATUS_ADMITTED,
@@ -88,7 +89,23 @@ sub admit {
             user_id         => $invite_record->{user_id},
             status          => STATUS_REQUESTED,
         }
-    ) or croakf('Failed to admit invite row:%s', $self->dump($invite_record));
+    ) or croak('Failed to admit invite row:%s', $self->dump($invite_record));
+}
+
+# token
+sub acknowledge {
+    my ($self, $teng, $user_id, $invite_code) = @_;
+
+    my $ret = $teng->update(
+        'invite',
+        {
+            invited_user_id => $user_id,
+            status          => STATUS_ADMITTED,
+        },
+        {
+            invite_code => $invite_code,
+        }
+    ) or croak('Failed to acknowledge invite user_id:%d invite_code:%s', $user_id, $invite_code);
 }
 
 1;

@@ -13,6 +13,8 @@ use Babyry::Model::User_Auth;
 use Babyry::Model::RegisterToken;
 use Babyry::Model::Common;
 use Babyry::Model::AmazonSES;
+use Babyry::Model::Invite;
+use Babyry::Model::Relatives;
 
 sub execute {
     my ($self, $params) = @_;
@@ -38,9 +40,9 @@ sub execute {
     my $expired_at = $self->get_expired_at($unixtime);
     my $token = $self->create_token($user_id);
 
-    my $invite        = Babyry::Model::Invite->new(tengw => $teng);
+    my $invite        = Babyry::Model::Invite->new();
     my $invite_record = $invite->get_by_invite_code($params->{invite_code});
-    my $relatives     = Babyry::Model::Relatives->new(tengw => $teng);
+    my $relatives     = Babyry::Model::Relatives->new();
 
     $teng->txn_begin;
     eval {
@@ -74,8 +76,9 @@ sub execute {
         );
 
         if ( $invite_record ) {
-            $invite->acknowledge($user_id, $token);
+            $invite->acknowledge($teng, $user_id, $invite_record->{invite_code});
             $relatives->request(
+                $teng,
                 {
                     user_id         => $invite_record->{user_id},
                     relative_id     => $user_id,
@@ -157,19 +160,22 @@ sub verify {
     my $teng = $self->teng('BABYRY_MAIN_W');
     $teng->txn_begin;
 
-    my $register_token  = Babyry::Model::RegisterToken->new(tengw => $teng);
-    my $relatives       = Babyry::Model::Relatives->new(tengw => $teng);
-    my $invite          = Babyry::Model::Invite->new(tengw => $teng);
+    my $register_token  = Babyry::Model::RegisterToken->new();
+    my $relatives       = Babyry::Model::Relatives->new();
+    my $invite          = Babyry::Model::Invite->new();
     eval {
-        my $row = $register_token->verify($token);
-        critf('register_token is invalid token:%s', $token) if ! $row;
+        my $deleted_register_token = $register_token->verify($teng, $token);
+        critf('register_token is invalid token:%s', $token) if ! $deleted_register_token;
 
-        my $invite_record = $invite->get_by_invited_user($row->{user_id}) or return;
+        my $invite_record = $invite->get_by_invited_user($deleted_register_token->{user_id}) or return;
 
-        $invite->admit($invite_record);
-        $relatives->admit( $row->{user_id}, $invite_record );
+        $invite->admit($teng, $invite_record);
+        $relatives->admit($teng, $deleted_register_token->{user_id}, $invite_record );
 
         $teng->txn_commit;
+
+        # logging
+        infof('register_token was deleted : %s', $self->dump($deleted_register_token));
     };
     if ( my $e = $@ ) {
         $teng->txn_rollback;

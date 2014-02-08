@@ -8,7 +8,7 @@ use parent qw/Babyry::Base/;
 sub get_id {
     my ($self, $table) = @_;
 
-    my $dbh = $self->dbh('TEST_W');
+    my $dbh = $self->dbh('BABYRY_MAIN_W');
     my $sth = $dbh->prepare("update $table set id=LAST_INSERT_ID(id+1)");
     $sth->execute();
     my $row = $dbh->selectrow_hashref('select LAST_INSERT_ID()');

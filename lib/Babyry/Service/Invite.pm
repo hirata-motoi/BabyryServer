@@ -15,9 +15,9 @@ sub execute {
 
     my $teng = $self->teng('BABYRY_MAIN_W');
     $teng->txn_begin;
-    my $model = Babyry::Model::Invite->new(teng => $teng);
+    my $model = Babyry::Model::Invite->new();
     my $row = eval {
-        my $row = $model->create($params);
+        my $row = $model->create($teng, $params);
         $teng->txn_commit;
         $row;
     };
@@ -37,7 +37,7 @@ sub _create_invite_mail_params {
     );
 
     my $body_tmpl = Babyry::Common->config->{invite}{mail}{body};
-    $mail_params{body} = uri_escape( sprintf($body_tmpl, $invite_code, $invite_code) );
+    $mail_params{body} = uri_escape( sprintf($body_tmpl, $invite_code) );
 
     return \%mail_params;
 }

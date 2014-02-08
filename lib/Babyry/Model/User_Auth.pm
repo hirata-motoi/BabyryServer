@@ -36,5 +36,25 @@ sub login {
     return $user_id;
 }
 
+sub get_by_ids {
+    my ($self, $user_ids) = @_;
+
+    return {} unless ( $user_ids && scalar @$user_ids );
+
+    my $itr = $self->teng('BABYRY_MAIN_R')->search(
+        'user_auth',
+        {
+            user_id => $user_ids,
+        }
+    );
+    my %user_auth = ();
+    while ( my $r = $itr->next ) {
+        $user_auth{ $r->user_id } = $r->get_columns;
+    }
+    return \%user_auth;
+}
+
+
+
 1;
 
