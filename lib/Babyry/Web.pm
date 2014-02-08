@@ -57,7 +57,7 @@ __PACKAGE__->add_trigger(
         my $session_id = $c->session->get('session_id');
 
         # TODO move to config
-        my @session_not_required_paths = qw| /login /login/execute /register /register/execute |;
+        my @session_not_required_paths = qw| /login /login/execute /register /register/execute /register/verify |;
 
         my $path = $c->req->env->{PATH_INFO};
         if ( ! $session_id  ) {
