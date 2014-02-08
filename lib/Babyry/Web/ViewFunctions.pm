@@ -5,6 +5,7 @@ use utf8;
 use parent qw(Exporter);
 use Module::Functions;
 use File::Spec;
+use JSON;
 
 our @EXPORT = get_public_functions();
 
@@ -33,6 +34,13 @@ sub uri_for { Babyry->context()->uri_for(@_) }
             }
         );
     }
+}
+
+
+sub encode_json_kolon {
+    my ( $text ) = @_;
+    return "[]" if ( !$text );
+    return JSON->new->utf8(0)->encode($text)
 }
 
 1;
