@@ -27,6 +27,10 @@ sub do_form_validate {
     $validator->check(%$form_validator_conf);
 }
 
+sub form_validator_conf {
+    # Please implement form_validator_conf to override me.
+}
+
 sub do_logic_validate {
     # Please implement do_logic_validate to override me.
 }
