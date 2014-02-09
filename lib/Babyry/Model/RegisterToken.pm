@@ -1,4 +1,4 @@
-package Babyry::Model::Register_Token;
+package Babyry::Model::RegisterToken;
 
 use strict;
 use warnings;
@@ -19,6 +19,15 @@ sub create {
     );
 }
 
+sub delete {
+    my ($self, $teng, $token) = @_;
+
+    my $row = $teng->single('register_token', { token => $token }) or return;
+    $row->delete;
+
+    return $row->get_columns;
+}
+
 sub get_user_id {
     my ($self, $teng, $params) = @_;
 
@@ -31,20 +40,6 @@ sub get_user_id {
 
     return $res->user_id;
 }
-
-sub delete {
-    my ($self, $teng, $params) = @_;
-
-    $teng->delete(
-        'register_token',
-        {
-            token => $params->{token},
-        },
-    );
-
-    return;
-}
-
 
 1;
 

@@ -7,6 +7,10 @@ use parent qw/Babyry::Base/;
 
 use Log::Minimal;
 
+use constant {
+    IS_VERIFIED => 1,
+};
+
 sub create {
     my ($self, $teng, $params) = @_;
 
@@ -20,7 +24,7 @@ sub create {
     );
 }
 
-sub get_status {
+sub is_verified {
     my ($self, $teng, $params) = @_;
 
     my $res = $teng->single(
@@ -30,23 +34,21 @@ sub get_status {
         }
     );
 
-    return $res->user_status;
+    return $res->is_verified;
 }
 
-sub update_status {
+sub update_to_verified {
     my ($self, $teng, $params) = @_;
 
-    my $res = $teng->update(
-        'user' => {
-            user_status => $params->{status},
-        }, {
+    return $teng->update(
+        'user',
+        {
+            is_verified => IS_VERIFIED,
+        },
+        {
             user_id => $params->{user_id},
         },
     );
-    if (!$res) {
-        return {error => 'UPDATE_FAILED'};
-    }
-    return; 
 }
 
 1;

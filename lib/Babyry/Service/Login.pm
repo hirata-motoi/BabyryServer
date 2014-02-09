@@ -27,11 +27,11 @@ sub execute {
     if ($user_id) {
         # check user status
         my $user = Babyry::Model::User->new();
-        my $user_status = $user->get_status(
+        my $is_verified = $user->is_verified(
             $teng_r,
             { user_id => $user_id },
         );
-        if ($user_status == 0) {
+        if ( ! $is_verified ) {
             return { error => 'USER_NOT_VERIFIED' };
         }
         $teng_r->disconnect();

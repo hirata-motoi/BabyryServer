@@ -29,6 +29,7 @@ sub dx {
 sub teng {
     my ($self, $label) = @_;
 
+    $self->{teng} ||= {};
     return $self->{teng}{$label} if $self->{teng}{$label};
 
     my $teng = Teng::Schema::Loader->load(

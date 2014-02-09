@@ -1,0 +1,20 @@
+: cascade base
+: around content -> {
+<p>TODO このページでメーラーを起動する</p>
+
+<div style="display:none" id="subject"> <: $subject :> </div>
+<div style="display:none" id="body"> <: $body :> </div>
+
+<script type="text/javascript">
+var mailerActivate = function() {
+    var subject = $("#subject").text(),
+        body    = $("#body").text(),
+        query   = "?subject=" + subject + "&body=" + body,
+        mailto  = "mailto:" + query;
+
+    location.href=mailto;
+ };
+setTimeout(mailerActivate, 300);
+
+</script>
+: }
