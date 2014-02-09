@@ -7,13 +7,13 @@ use Log::Minimal;
 use parent qw/Babyry::Base/;
 
 use Babyry::Logic::Common;
-use Babyry::Model::User_Auth;
+use Babyry::Model::UserAuth;
 use Babyry::Model::Session;
 use Babyry::Model::User;
 
 sub execute {
     my ($self, $params) = @_;
-    my $user_auth = Babyry::Model::User_Auth->new();
+    my $user_auth = Babyry::Model::UserAuth->new();
 
     # login
     my $common = Babyry::Logic::Common->new;

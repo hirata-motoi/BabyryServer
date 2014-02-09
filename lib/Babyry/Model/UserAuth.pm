@@ -1,4 +1,4 @@
-package Babyry::Model::User_Auth;
+package Babyry::Model::UserAuth;
 
 use strict;
 use warnings;

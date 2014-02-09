@@ -10,7 +10,7 @@ use Log::Minimal;
 use Carp;
 use Babyry::Model::Sequence;
 use Babyry::Model::User;
-use Babyry::Model::User_Auth;
+use Babyry::Model::UserAuth;
 use Babyry::Model::RegisterToken;
 use Babyry::Model::Common;
 use Babyry::Model::AmazonSES;
@@ -34,7 +34,7 @@ sub execute {
     my $user_id = Babyry::Model::Sequence->new()->get_id('seq_user');
     my $teng = $self->teng('BABYRY_MAIN_W');
     my $user = Babyry::Model::User->new();
-    my $user_auth = Babyry::Model::User_Auth->new();
+    my $user_auth = Babyry::Model::UserAuth->new();
     my $register_token = Babyry::Model::RegisterToken->new();
     my $mail = Babyry::Model::AmazonSES->new();
     my $unixtime = time();
