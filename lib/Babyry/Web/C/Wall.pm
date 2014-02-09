@@ -15,8 +15,6 @@ sub index {
     my $user_id = $c->stash->{'user_id'};
 
     my $wall = Babyry::Logic::Wall->new->show($user_id);
-use YAML;
-warnf( Dump $wall );
     return $c->render('index.tx', {
         user_id  => $user_id,
         wall     => $wall,
