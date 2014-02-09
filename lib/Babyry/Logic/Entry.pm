@@ -6,6 +6,12 @@ use parent qw/Babyry::Logic/;
 
 use Babyry::Service::Entry;
 
+#params
+# stamp_id:    int(default: 0)
+# uploaded_by: int(default: 0)
+# count:       int(default: 10)
+# page:        int(default: 1)
+
 sub search {
     my ($self, $params) = @_;
 
@@ -14,4 +20,3 @@ sub search {
 }
 
 1;
-

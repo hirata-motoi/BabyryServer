@@ -9,12 +9,32 @@ use Babyry::Logic::Entry;
 sub search {
     my ($self, $c) = @_;
 
+    my $stamp_id    = $c->req->param('stamp_id')    || 0;
+    my $uploaded_by = $c->req->param('uploaded_by') || $c->stash->{user_id};
+    my $count       = $c->req->param('count')       || 10;
+    my $page        = $c->req->param('page')        || 1;
+
     my $params = {
+        stamp_id    => $stamp_id,
+        uploaded_by => $uploaded_by,
+        count       => $count,
+        page        => $page,
     };
 
     my $logic = Babyry::Logic::Entry->new;
 
-    my $ret = eval { $logic->search($params); };
+    my $ret = {};
+
+    $ret->{data} = $logic->search($params);
+
+    $ret->{metadata} = {
+        count => $count,
+        page  => $page,
+        condition => {
+            stamp_id    => $stamp_id,
+            uploaded_by => $uploaded_by
+        },
+    };
     if ( my $e = $@ ) {
 critf($e);
 #        critf('Failed to register params:%s error:%s', $self->dump($params), $e);
