@@ -52,7 +52,7 @@ sub _log_exception {
     my $request_uri = sprintf('REQ=%s %s', $req->method, $req->request_uri);
     my $user_agent  = sprintf('UA=%s', $req->user_agent);
 
-    my $parameters  = sprintf('PARAMS=%s', dump $req->parameters); # hash_ref
+    my $parameters  = sprintf('PARAMS=%s', dump $req->parameters->as_hashref); # hash_ref
     my $user        = sprintf('USER_ID=%d', $c->stash->{user_id});
 
     my $str = join "\t", $error, $user, $request_uri, $user_agent, $parameters;
