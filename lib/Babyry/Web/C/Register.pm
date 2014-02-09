@@ -30,31 +30,11 @@ critf($e);
 #        critf('Failed to register params:%s error:%s', $self->dump($params), $e);
 #        $c->render_500();
     }
-    if ( $ret->{error} ) {
-critf($ret->{error});
-#        critf('Failed to register params:%s error:%s', $self->dump($params), $self->dump( $ret->{error} ));
-#        $c->render_500();
-    }
-
-    $c->redirect('/register/invite_code/index.tx');
+    $c->redirect('/login');
 }
 
 sub verify {
-    my ($self, $c) = @_;
-
-    my $token = $c->req->param('token') || '';
-    my $logic = Babyry::Logic::Register->new;
-
-    my $ret = eval { $logic->verify($token) };
-    if ( my $e = $@ ) {
-        critf('Failed to verify registered email token:%s', $token);
-        return $c->render_500();
-    }
-    return $c->render('/', +{});
-}
-
-sub verify {
-    my ($self, $c) = @_;
+    my ($self, $c, $p, $v) = @_;
 
     my $params = {
         token => $c->req->param('token') || '',
@@ -62,15 +42,13 @@ sub verify {
 
     my $logic = Babyry::Logic::Register->new;
 
-    my $ret = eval { $logic->verify($params); };
+    eval { $logic->verify($params) };
     if ( my $e = $@ ) {
-        critf($e);
+        critf('Failed to verify registered email token:%s error:%s', $params->{token}, $e);
+        return $c->res_500();
     }
-    if ( $ret->{error} ) {
-        critf($ret->{error});
-    }
-
-    $c->redirect('/login');
+    return $c->redirect('/login', +{});
 }
- 
+
 1;
+

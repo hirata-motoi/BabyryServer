@@ -76,10 +76,11 @@ sub get_by_invited_user {
     return $row ? $row->get_columns : undef;
 }
 
+# TODO modify method name
 sub admit {
     my ($self, $teng, $invite_record) = @_;
 
-    my $ret = $teng->update(
+    return $teng->update(
         'invite',
         {
             status => STATUS_ADMITTED,
@@ -89,14 +90,14 @@ sub admit {
             user_id         => $invite_record->{user_id},
             status          => STATUS_REQUESTED,
         }
-    ) or croak('Failed to admit invite row:%s', $self->dump($invite_record));
+    );
 }
 
 # token
 sub acknowledge {
     my ($self, $teng, $user_id, $invite_code) = @_;
 
-    my $ret = $teng->update(
+    return $teng->update(
         'invite',
         {
             invited_user_id => $user_id,
@@ -105,7 +106,7 @@ sub acknowledge {
         {
             invite_code => $invite_code,
         }
-    ) or croak('Failed to acknowledge invite user_id:%d invite_code:%s', $user_id, $invite_code);
+    );
 }
 
 1;
