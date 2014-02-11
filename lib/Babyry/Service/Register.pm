@@ -8,14 +8,6 @@ use Digest::MD5 qw/md5_hex/;
 use Log::Minimal;
 
 use Carp;
-use Babyry::Model::Sequence;
-use Babyry::Model::User;
-use Babyry::Model::UserAuth;
-use Babyry::Model::RegisterToken;
-use Babyry::Model::Common;
-use Babyry::Model::AmazonSES;
-use Babyry::Model::Invite;
-use Babyry::Model::Relatives;
 
 sub execute {
     my ($self, $params) = @_;
@@ -34,17 +26,17 @@ sub execute {
     my $teng   = $self->teng('BABYRY_MAIN_W');
     my $teng_r = $self->teng('BABYRY_MAIN_R');
 
-    my $user_id    = Babyry::Model::Sequence->new()->get_id($teng, 'seq_user');
+    my $user_id    = $self->model('Sequence')->get_id($teng, 'seq_user');
     my $unixtime   = time();
     my $expired_at = $self->get_expired_at($unixtime);
     my $token      = $self->create_token($user_id);
 
-    my $user           = Babyry::Model::User->new();
-    my $user_auth      = Babyry::Model::UserAuth->new();
-    my $register_token = Babyry::Model::RegisterToken->new();
-    my $mail           = Babyry::Model::AmazonSES->new();
-    my $invite         = Babyry::Model::Invite->new();
-    my $relatives      = Babyry::Model::Relatives->new();
+    my $user           = $self->model('User');
+    my $user_auth      = $self->model('UserAuth');
+    my $register_token = $self->model('RegisterToken');
+    my $mail           = $self->model('AmazonSES');
+    my $invite         = $self->model('Invite');
+    my $relatives      = $self->model('Relatives');
 
     my $invite_record = $invite->get_by_invite_code($teng_r, $params->{invite_code});
 
@@ -64,7 +56,7 @@ sub execute {
             {
                 user_id => $user_id,
                 email         => $params->{email},
-                password_hash => Babyry::Model::Common->new->enc_password($params->{password}),
+                password_hash => $self->model('Common')->enc_password($params->{password}),
                 created_at => $unixtime,
                 updated_at => $unixtime,
             }
@@ -124,10 +116,10 @@ sub verify {
     $teng->txn_begin;
 
     # TODO create instances by Service::factory
-    my $register_token  = Babyry::Model::RegisterToken->new();
-    my $relatives       = Babyry::Model::Relatives->new();
-    my $invite          = Babyry::Model::Invite->new();
-    my $user            = Babyry::Model::User->new();
+    my $register_token  = $self->model('RegisterToken');
+    my $relatives       = $self->model('Relatives');
+    my $invite          = $self->model('Invite');
+    my $user            = $self->model('User');
 
     eval {
         my $deleted_register_token = $register_token->delete($teng, $params->{token})

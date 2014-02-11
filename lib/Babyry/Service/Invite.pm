@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use utf8;
 use parent qw/Babyry::Service::Base/;
-use Babyry::Model::Invite;
 use Log::Minimal;
 use URI::Escape;
 
@@ -15,7 +14,7 @@ sub execute {
 
     my $teng = $self->teng('BABYRY_MAIN_W');
     $teng->txn_begin;
-    my $model = Babyry::Model::Invite->new();
+    my $model = $self->model('Invite');
     my $row = eval {
         my $row = $model->create($teng, $params);
         $teng->txn_commit;
