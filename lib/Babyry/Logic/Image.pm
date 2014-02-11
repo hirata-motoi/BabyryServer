@@ -6,7 +6,7 @@ use warnings;
 use utf8;
 use Log::Minimal;
 
-use parent qw/Babyry::Logic/;
+use parent qw/Babyry::Logic::Base/;
 
 use Babyry::Logic::Sequence;
 

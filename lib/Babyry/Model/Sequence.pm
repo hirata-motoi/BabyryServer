@@ -3,19 +3,14 @@ use strict;
 use warnings;
 use utf8;
 
-use parent qw/Babyry::Base/;
+use parent qw/Babyry::Model::Base/;
 
 sub get_id {
-    my ($self, $table) = @_;
+    my ($self, $teng, $table) = @_;
 
-    my $dbh = $self->dbh('BABYRY_MAIN_W');
-    my $sth = $dbh->prepare("update $table set id=LAST_INSERT_ID(id+1)");
-    $sth->execute();
-    my $row = $dbh->selectrow_hashref('select LAST_INSERT_ID()');
-    my $id = $row->{'LAST_INSERT_ID()'};
-    $dbh->disconnect();
-
-    return $id;
+    $teng->do("UPDATE $table SET id=LAST_INSERT_ID(id+1)");
+    my $row = $teng->dbh->selectall_hashref("SELECT LAST_INSERT_ID() AS id", 'id', undef);
+    return $row->{id};
 }
 
 1;

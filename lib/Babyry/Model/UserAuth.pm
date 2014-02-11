@@ -3,7 +3,7 @@ package Babyry::Model::UserAuth;
 use strict;
 use warnings;
 use utf8;
-use parent qw/Babyry::Base/;
+use parent qw/Babyry::Model::Base/;
 use Log::Minimal;
 
 sub create {
@@ -37,11 +37,11 @@ sub login {
 }
 
 sub get_by_ids {
-    my ($self, $user_ids) = @_;
+    my ($self, $teng, $user_ids) = @_;
 
     return {} unless ( $user_ids && scalar @$user_ids );
 
-    my $itr = $self->teng('BABYRY_MAIN_R')->search(
+    my $itr = $teng->search(
         'user_auth',
         {
             user_id => $user_ids,
@@ -53,8 +53,6 @@ sub get_by_ids {
     }
     return \%user_auth;
 }
-
-
 
 1;
 

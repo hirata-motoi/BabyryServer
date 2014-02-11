@@ -73,14 +73,14 @@ __PACKAGE__->add_trigger(
             }
         }
 
-
         my $base_info = Babyry::Web::Root->new->certify($session_id);
         for my $key (keys %$base_info) {
             $c->stash->{$key} = $base_info->{$key};
         }
 
-        # when session is invalid
+        # clear session when session is invalid
         if ( ! $c->stash->{user_id} ) {
+            $c->session->remove('session_id');
             return $c->redirect('/login');
         }
     },

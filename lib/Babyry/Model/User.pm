@@ -3,7 +3,7 @@ package Babyry::Model::User;
 use strict;
 use warnings;
 use utf8;
-use parent qw/Babyry::Base/;
+use parent qw/Babyry::Model::Base/;
 
 use Log::Minimal;
 
@@ -30,10 +30,9 @@ sub is_verified {
     my $res = $teng->single(
         'user',
         {
-            user_id     => $params->{user_id},
+            user_id => $params->{user_id},
         }
     );
-
     return $res->is_verified;
 }
 

@@ -3,7 +3,7 @@ package Babyry::Service::Entry;
 use strict;
 use warnings;
 use utf8;
-use parent qw/Babyry::Base/;
+use parent qw/Babyry::Service::Base/;
 use Log::Minimal;
 use Babyry::Model::Image;
 use Babyry::Model::ImageStampMap;

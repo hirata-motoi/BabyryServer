@@ -2,7 +2,7 @@ package Babyry::Web::C::Entry;
 
 use strict;
 use warnings;
-use parent qw/Babyry::Web::C Babyry::Base/;
+use parent qw/Babyry::Web::C/;
 use Log::Minimal;
 use Babyry::Logic::Entry;
 

@@ -3,7 +3,7 @@ package Babyry::Model::Invite;
 use strict;
 use warnings;
 use utf8;
-use parent qw/Babyry::Base/;
+use parent qw/Babyry::Model::Base/;
 use String::Random;
 use Log::Minimal;
 use Carp;
@@ -51,9 +51,8 @@ sub _create_invite_code {
 }
 
 sub get_by_invite_code {
-    my ($self, $invite_code) = @_;
+    my ($self, $teng, $invite_code) = @_;
 
-    my $teng = $self->teng('BABYRY_MAIN_R');
     my $invite = $teng->single(
         'invite',
         {
@@ -64,9 +63,8 @@ sub get_by_invite_code {
 }
 
 sub get_by_invited_user {
-    my ($self, $invited_user_id) = @_;
+    my ($self, $teng, $invited_user_id) = @_;
 
-    my $teng = $self->teng('BABYRY_MAIN_R');
     my $row = $teng->single(
         'invite',
         {

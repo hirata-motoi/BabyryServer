@@ -4,7 +4,7 @@ package Babyry::Logic::Common;
 use strict;
 use warnings;
 
-use parent qw/Babyry/;
+use parent qw/Babyry::Logic::Base/;
 use Log::Minimal;
 use Babyry::Common;
 use Digest::SHA qw/hmac_sha256_hex/;
