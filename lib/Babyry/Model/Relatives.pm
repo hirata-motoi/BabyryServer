@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 use Log::Minimal;
-use parent qw/Babyry::Base/;
+use parent qw/Babyry::Model::Base/;
 
 use constant {
     RELATIVE_STATUS_UNADMITTED => 0,
@@ -12,9 +12,8 @@ use constant {
 };
 
 sub get_by_user_id {
-    my ($self, $user_id) = @_;
+    my ($self, $teng, $user_id) = @_;
 
-    my $teng = $self->teng('BABYRY_MAIN_R');
     my $itr = $teng->search(
         'relatives',
         {
@@ -24,7 +23,6 @@ sub get_by_user_id {
     );
     my %relatives = ();
     while ( my $r = $itr->next ) {
-        warnf("relatives.get");
         $relatives{ $r->relative_id } = $r->get_columns;
     }
     return \%relatives;
@@ -39,7 +37,6 @@ sub request {
 
 sub admit {
     my ($self, $teng, $user_id, $invite_record) = @_;
-warnf('user_id:%d relative_id:%d', $user_id, $invite_record->{user_id});
 
     my $ret = $teng->update(
         'relatives',

@@ -4,8 +4,9 @@ package Babyry::Model::Common;
 use strict;
 use warnings;
 
-use parent qw/Babyry::Base/;
+use parent qw/Babyry::Model::Base/;
 use Digest::SHA qw/hmac_sha256_hex/;
+use Babyry::Common;
 
 # TODO implement more strictly
 sub enc_password {

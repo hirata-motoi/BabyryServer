@@ -3,7 +3,7 @@ package Babyry::Model::RegisterToken;
 use strict;
 use warnings;
 use utf8;
-use parent qw/Babyry::Base/;
+use parent qw/Babyry::Model::Base/;
 
 
 sub create {

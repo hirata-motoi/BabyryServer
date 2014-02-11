@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-use parent qw/Babyry::Base/;
+use parent qw/Babyry::Logic::Base/;
 use Babyry::Service::Wall;
 
 sub show {

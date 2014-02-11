@@ -3,7 +3,7 @@ package Babyry::Service::Invite;
 use strict;
 use warnings;
 use utf8;
-use parent qw/Babyry::Base/;
+use parent qw/Babyry::Service::Base/;
 use Babyry::Model::Invite;
 use Log::Minimal;
 use URI::Escape;

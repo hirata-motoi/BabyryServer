@@ -7,7 +7,7 @@ use Log::Minimal;
 use AWS::CLIWrapper;
 use Jcode;
 
-use parent qw/Babyry::Base/;
+use parent qw/Babyry::Model::Base/;
 
 sub set_subject {
     my ($self, $subject) = @_;

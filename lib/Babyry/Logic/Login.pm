@@ -2,7 +2,7 @@ package Babyry::Logic::Login;
 use strict;
 use warnings;
 use utf8;
-use parent qw/Babyry::Logic/;
+use parent qw/Babyry::Logic::Base/;
 
 use Babyry::Service::Login;
 

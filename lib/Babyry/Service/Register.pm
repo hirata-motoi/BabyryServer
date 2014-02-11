@@ -3,7 +3,7 @@ package Babyry::Service::Register;
 use strict;
 use warnings;
 use utf8;
-use parent qw/Babyry::Base/;
+use parent qw/Babyry::Service::Base/;
 use Digest::MD5 qw/md5_hex/;
 use Log::Minimal;
 
@@ -31,19 +31,22 @@ sub execute {
     return { error => $error } if ($error);
 
     # insert user table
-    my $user_id = Babyry::Model::Sequence->new()->get_id('seq_user');
-    my $teng = $self->teng('BABYRY_MAIN_W');
-    my $user = Babyry::Model::User->new();
-    my $user_auth = Babyry::Model::UserAuth->new();
-    my $register_token = Babyry::Model::RegisterToken->new();
-    my $mail = Babyry::Model::AmazonSES->new();
-    my $unixtime = time();
-    my $expired_at = $self->get_expired_at($unixtime);
-    my $token = $self->create_token($user_id);
+    my $teng   = $self->teng('BABYRY_MAIN_W');
+    my $teng_r = $self->teng('BABYRY_MAIN_R');
 
-    my $invite        = Babyry::Model::Invite->new();
-    my $invite_record = $invite->get_by_invite_code($params->{invite_code});
-    my $relatives     = Babyry::Model::Relatives->new();
+    my $user_id    = Babyry::Model::Sequence->new()->get_id($teng, 'seq_user');
+    my $unixtime   = time();
+    my $expired_at = $self->get_expired_at($unixtime);
+    my $token      = $self->create_token($user_id);
+
+    my $user           = Babyry::Model::User->new();
+    my $user_auth      = Babyry::Model::UserAuth->new();
+    my $register_token = Babyry::Model::RegisterToken->new();
+    my $mail           = Babyry::Model::AmazonSES->new();
+    my $invite         = Babyry::Model::Invite->new();
+    my $relatives      = Babyry::Model::Relatives->new();
+
+    my $invite_record = $invite->get_by_invite_code($teng_r, $params->{invite_code});
 
     $teng->txn_begin;
     eval {
@@ -136,7 +139,7 @@ sub verify {
             or croak( sprintf('Failed to update_to_verified user_id:%d', $user_id) );
 
         # not invited user
-        my $invite_record = $invite->get_by_invited_user($user_id) or return;
+        my $invite_record = $invite->get_by_invited_user($teng, $user_id) or return;
 
         $invite->admit($teng, $invite_record);
         $relatives->admit($teng, $user_id, $invite_record );

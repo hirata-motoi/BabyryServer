@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 use Log::Minimal;
-use parent qw/Babyry::Base/;
+use parent qw/Babyry::Service::Base/;
 
 use Babyry::Logic::Common;
 use Babyry::Model::UserAuth;

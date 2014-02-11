@@ -1,8 +1,9 @@
-package Babyry::Base;
+package Babyry::Service::Base;
 use strict;
 use warnings;
 use utf8;
-use parent qw/Babyry/;
+
+use parent qw/Class::Accessor::Fast/;
 
 use Babyry::DBI;
 use DBIx::Simple;
@@ -50,7 +51,6 @@ sub dump {
     my ($self, $params) = @_;
     return Data::Dump::dump($params);
 }
-
 
 1;
 

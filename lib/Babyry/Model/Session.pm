@@ -4,7 +4,7 @@ use warnings;
 use utf8;
 
 use Digest::MD5 qw/md5_hex/;
-use parent qw/Babyry::Base/;
+use parent qw/Babyry::Model::Base/;
 
 sub set {
     my ($self, $teng, $params) = @_;
@@ -26,8 +26,17 @@ sub set {
 }
 
 sub get {
-    my ($self, $teng, $params) = @_;
-    return;# $session_id;
+    my ($self, $teng, $session_id, $now) = @_;
+
+    my $row = $teng->single(
+        'session',
+        {
+            session_id => $session_id,
+            expired_at => { '>' => ( $now || time ) },
+        }
+    ) or return;
+
+    return $row->user_id;
 }
 
 sub create {
