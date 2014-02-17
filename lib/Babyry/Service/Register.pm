@@ -131,10 +131,12 @@ sub verify {
             or croak( sprintf('Failed to update_to_verified user_id:%d', $user_id) );
 
         # not invited user
-        my $invite_record = $invite->get_by_invited_user($teng, $user_id) or return;
+        my $invite_record = $invite->get_by_invited_user($teng, $user_id);
 
-        $invite->admit($teng, $invite_record);
-        $relatives->admit($teng, $user_id, $invite_record );
+        if ($invite_record) {
+            $invite->admit($teng, $invite_record);
+            $relatives->admit($teng, $user_id, $invite_record );
+        }
 
         $teng->txn_commit;
 
