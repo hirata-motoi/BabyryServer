@@ -40,5 +40,29 @@ sub image_upload {
     return $c->render_json(+{path=>$path});
 }
 
+sub web_upload {
+    my ($self, $c) = @_;
+
+    return $c->render_500() if ! $c->stash->{user_id};
+
+    my $file = $c->req->uploads->get_all('file');
+
+    my $params = {
+        user_id => $c->stash->{user_id},
+        path    => $file->path,
+    };
+
+    my $logic = Babyry::Logic::Image->new;
+    my $ret = eval { $logic->web_upload($params) } || {};
+    $c->render_json($ret);
+}
+
+sub web_submit {
+    my ($self, $c) = @_;
+
+    my $ret = {};
+    $c->render_json($ret);
+}
+
 1;
 
