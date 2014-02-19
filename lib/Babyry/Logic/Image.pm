@@ -56,6 +56,13 @@ sub web_upload {
     return $service->web_upload($params);
 }
 
+sub web_submit {
+    my ($self, $params) = @_;
+
+    my $service = Babyry::Service::Image->new;
+    return $service->web_submit($params);
+}
+
 
 1;
 

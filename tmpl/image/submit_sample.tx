@@ -1,0 +1,21 @@
+: cascade base
+: around content -> {
+<style>
+  .image {
+    margin: 0 auto;
+    max-width: 320px;
+    padding: 10px;
+  }
+  .image img {
+    width: 100%;
+    max-width: 320px;
+  }
+</style>
+<form action="http://babyryserver5001/image/web/submit.json" method="post" enctype="multipart/form-data">sample submit:</br>
+  user id    <input type="text" name="user[]"/><br/>
+  user id    <input type="text" name="user[]"/><br/>
+  image name <input type="text" name="image[]"/><br/>
+  image name <input type="text" name="image[]"/><br/>
+  <input type="submit" value="sumbit"/>
+</form>
+: }
