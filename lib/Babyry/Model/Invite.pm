@@ -29,6 +29,7 @@ sub create {
                 {
                     user_id     => $params->{user_id},
                     invite_code => _create_invite_code(),
+                    status      => STATUS_REQUESTED,
                     created_at  => $now,
                 }
             );
