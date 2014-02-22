@@ -24,6 +24,12 @@ sub image_submit_sample_form {
     $c->render('/image/submit_sample.tx');
 }
 
+sub image_comment_sample_form {
+    my ($class, $c) = @_;
+
+    $c->render('/image/comment_sample.tx');
+}
+
 sub web_upload {
     my ($self, $c) = @_;
 
@@ -55,6 +61,23 @@ sub web_submit {
 
     my $logic = Babyry::Logic::Image->new;
     my $ret = eval { $logic->web_submit($params) } || {};
+    $c->render_json($ret);
+}
+
+sub comment {
+    my ($self, $c) = @_;
+
+    my $params = {
+        user_id  => $c->stash->{'user_id'},
+        image_id => $c->req->param('image_id'),
+        comment  => $c->req->param('comment'),
+    };
+    return $c->render_json({error => 'NO IMAGE'}) if (!$params->{'image_id'});
+    return $c->render_json({error => 'NO_COMMENT'}) if (!$params->{'comment'});
+
+    my $logic = Babyry::Logic::Image->new;
+    my $ret = eval { $logic->comment($params) } || {};
+    infof($@) if($@);
     $c->render_json($ret);
 }
 
