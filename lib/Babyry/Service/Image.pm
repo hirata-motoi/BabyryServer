@@ -12,6 +12,7 @@ use Babyry::Model::Relatives;
 use Babyry::Model::User;
 use Babyry::Model::Sequence;
 use Babyry::Model::Image;
+use Babyry::Model::ImageUserMap;
 
 sub web_upload {
     my ($self, $params) = @_;
@@ -56,6 +57,7 @@ sub web_submit {
     # get image_id insert database, then mv to upload dir
     my $image_seq = Babyry::Model::Sequence->new();
     my $image = Babyry::Model::Image->new();
+    my $image_user_map = Babyry::Model::ImageUserMap->new();
     my $unixtime = time();
     $teng->txn_begin;
     for my $img (@images) {
@@ -68,6 +70,15 @@ sub web_submit {
                 updated_at   => $unixtime, 
             }
         );
+        for my $relative_id (@relatives_array_list, $params->{'user_id'}) {
+            $image_user_map->add($teng, {
+                image_id   => $id,
+                user_id    => $relative_id,
+                disabled   => 0,
+                created_at => $unixtime,
+                updated_at => $unixtime,
+            });
+        }
         system("touch /data/image/uploaded/${id}_${img}");
     }
     $teng->txn_commit;

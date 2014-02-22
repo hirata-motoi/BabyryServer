@@ -38,6 +38,7 @@ sub web_upload {
 
     my $logic = Babyry::Logic::Image->new;
     my $ret = eval { $logic->web_upload($params) } || {};
+    infof($@) if($@);
     $c->render_json($ret);
 }
 
@@ -55,6 +56,7 @@ sub web_submit {
 
     my $logic = Babyry::Logic::Image->new;
     my $ret = eval { $logic->web_submit($params) } || {};
+    infof($@) if($@);
     $c->render_json($ret);
 }
 
