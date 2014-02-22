@@ -56,4 +56,18 @@ sub get_image_ids_by_rows{
     return \@image_ids;
 }
 
+sub set_new_image {
+    my ($self, $teng, $params) = @_;
+
+    $teng->insert(
+        'image',
+        {
+            image_id     => $params->{image_id},
+            uploaded_by  => $params->{uploaded_by},
+            created_at   => $params->{created_at},
+            updated_at   => $params->{updated_at},
+        }
+    );
+}
+
 1;
