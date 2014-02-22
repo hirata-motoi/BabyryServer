@@ -83,7 +83,7 @@
       </div>
       <div class="modal-body">
         : for $relatives.keys() -> $key {
-          <input type="checkbox" class="js-shared-relatives" value=<: $key :>> <: $key :> : <: $relatives[$key].email :>
+          <input type="checkbox" class="js-shared-relatives" value=<: $key :>> <: $key :> : <: $relatives[$key].email :><br>
         : }
       </div>
       <div class="modal-footer">
