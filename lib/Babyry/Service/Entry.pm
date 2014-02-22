@@ -68,7 +68,7 @@ sub get_url_by_image_ids {
 
     my $home_dir = Babyry->base_dir;
     my $bucket = 'bebyry-image-upload';
-    my $ruby = "/home/babyry/.rbenv/shims/ruby $home_dir/lib/Babyry/Logic/get_onetime_url.rb";
+    my $ruby = "/home/babyry/.rbenv/shims/ruby $home_dir/lib/Babyry/Model/get_onetime_url.rb";
     my $url = `$ruby $bucket ${id}.jpg`;
     chomp($url);
 
