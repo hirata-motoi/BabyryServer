@@ -27,6 +27,12 @@ sub image_submit_sample_form {
 sub web_upload {
     my ($self, $c) = @_;
 
+    $c->render('/image/upload.tx');
+}
+
+sub web_upload_execute {
+    my ($self, $c) = @_;
+
     return $c->render_500() if ! $c->stash->{user_id};
 
     my $file = $c->req->uploads->get_all('file');
@@ -38,24 +44,24 @@ sub web_upload {
 
     my $logic = Babyry::Logic::Image->new;
     my $ret = eval { $logic->web_upload($params) } || {};
-    $c->render_json($ret);
+    $self->output_response_json($c, $ret, $@);
 }
 
 sub web_submit {
     my ($self, $c) = @_;
 
-    my $user_list = $c->req->env->{'plack.request.http.body'}->param->{'user[]'};
-    my $image_list = $c->req->env->{'plack.request.http.body'}->param->{'image[]'};
+    my @image_list = $c->req->param('image_tmp_names[]');
+    my @user_list  = $c->req->param('shared_user_ids[]');
 
     my $params = {
         user_id => $c->stash->{'user_id'},
-        user    => $user_list,
-        image   => $image_list,
+        user    => \@user_list,
+        image   => \@image_list,
     };
 
     my $logic = Babyry::Logic::Image->new;
     my $ret = eval { $logic->web_submit($params) } || {};
-    $c->render_json($ret);
+    $self->output_response_json($c, $ret, $@);
 }
 
 1;

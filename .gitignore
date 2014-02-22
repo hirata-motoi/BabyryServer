@@ -28,4 +28,5 @@ static/.sass-cache/
 static/*/*.map
 static/*/*/*.map
 log/*
+static/tmp_uploaded_image/*
 !.gitkeep
