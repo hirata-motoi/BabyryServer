@@ -12,6 +12,7 @@ use Babyry::Model::Relatives;
 use Babyry::Model::User;
 use Babyry::Model::Sequence;
 use Babyry::Model::Image;
+use Babyry::Model::Comment;
 
 sub web_upload {
     my ($self, $params) = @_;
@@ -77,6 +78,32 @@ sub web_submit {
 
     return {url => $image_url};
 }
+
+sub comment {
+    my ($self, $params) = @_;
+
+    my $teng = $self->teng('BABYRY_MAIN_W');
+    my $teng_r = $self->teng('BABYRY_MAIN_R');
+
+    # image_id check
+    my $image = Babyry::Model::Image->new();
+    my $res = $image->get_by_image_id($teng_r, $params->{'image_id'});
+    return {error => 'NO_TARGET_IMAGE'} unless ($res->{row_data});
+    # insert comment
+    my $comment = Babyry::Model::Comment->new();
+    my $comment_seq = Babyry::Model::Sequence->new();
+    $teng->txn_begin;
+    my $id = $comment_seq->get_id($teng, 'seq_comment');
+    my $unixtime = time();
+    $params->{'comment_id'} = $id;
+    $params->{'created_at'} = $unixtime;
+    $params->{'updated_at'} = $unixtime;
+    $comment->add($teng, $params);
+    $teng->txn_commit;
+
+    return;
+}
+
 
 1;
 

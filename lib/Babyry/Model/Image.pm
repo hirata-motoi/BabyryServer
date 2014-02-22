@@ -8,7 +8,7 @@ use utf8;
 
 #class method
 sub get_by_image_id {
-    my ($teng, $image_id) = @_;
+    my ($self, $teng, $image_id) = @_;
 
     return $teng->single(
         'image',

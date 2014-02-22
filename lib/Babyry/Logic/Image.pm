@@ -63,6 +63,13 @@ sub web_submit {
     return $service->web_submit($params);
 }
 
+sub comment {
+    my ($self, $params) = @_;
+
+    my $service = Babyry::Service::Image->new;
+    return $service->comment($params);
+}
+
 
 1;
 

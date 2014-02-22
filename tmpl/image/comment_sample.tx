@@ -1,0 +1,19 @@
+: cascade base
+: around content -> {
+<style>
+  .image {
+    margin: 0 auto;
+    max-width: 320px;
+    padding: 10px;
+  }
+  .image img {
+    width: 100%;
+    max-width: 320px;
+  }
+</style>
+<form action="http://babyryserver5001/image/comment.json" method="post" enctype="multipart/form-data">sample submit:</br>
+  image id <input type="text" name="image_id"/><br/>
+  comment <textarea name="comment" cols=40 rows=4></textarea>
+  <input type="submit" value="sumbit"/>
+</form>
+: }
