@@ -8,4 +8,5 @@ DAEMON=/home/babyry/BabyryServer5001/script/babyry-server
 
 exec \
   envdir ./env \
+  setuidgid babyry \
   $PERL $DAEMON

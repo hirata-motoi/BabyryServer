@@ -57,7 +57,6 @@ sub web_submit {
     my $image_seq = Babyry::Model::Sequence->new();
     my $image = Babyry::Model::Image->new();
     my $unixtime = time();
-    my $image_url = [];
     $teng->txn_begin;
     for my $img (@images) {
         my $id = $image_seq->get_id($teng, 'seq_image');
@@ -69,13 +68,13 @@ sub web_submit {
                 updated_at   => $unixtime, 
             }
         );
-        push @{$image_url}, "http://babyryserver5001/tmp_uploaded_image/$img.jpg"
+        system("touch /data/image/uploaded/${id}_${img}");
     }
     $teng->txn_commit;
 
     # return json
 
-    return {url => $image_url};
+    return;
 }
 
 1;
