@@ -6,7 +6,7 @@ use parent qw/Babyry::Model::Base/;
 use Babyry;
 use Log::Minimal;
 use File::Spec;
-use Imager;
+use Imager::ExifOrientation;
 use Image::Info qw/image_type/;
 use Babyry::Common;
 
@@ -20,8 +20,8 @@ sub make_thumbnail {
     croakf('Invalid file type : %s', $params->{path})
         if ! grep { $format eq $_ } @{ Babyry::Common->config->{allowed_image_format} };
 
-    my $img = Imager->new;
-    $img->read(file => $params->{path}) or return { error1 => $img->errstr, path => $params->{path} };
+    my $img = Imager::ExifOrientation->rotate( path => $params->{path} )
+        or return { error1 => "Can't read $params->{path}", path => $params->{path} };
 
     my $time    = time();
     my $user_id = $params->{user_id};
