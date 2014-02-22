@@ -15,7 +15,7 @@ use Babyry::Model::Image;
 use Babyry::Model::ImageUserMap;
 use Babyry::Model::Comment;
 
-sub web_upload {
+sub web_upload_execute {
     my ($self, $params) = @_;
 
     # make thumbnail
@@ -46,13 +46,18 @@ sub web_submit {
     # post auth ok? (??TODO??)
 
     # tmp image exist?
-    my $tmp_dir = '/var/www/html/tmp_uploaded_image';
+    my $tmpdir  = Babyry::Common->config->{tmp_uploaded_image_dir};
+    # TODO define config or %ENV
+    if ($tmpdir !~ m|^/|) {
+        $tmpdir = File::Spec->catdir( Babyry->base_dir, $tmpdir );
+    }
+
     my @images;
     for my $img (@{$params->{image}}) {
-        return {error => 'INVALID FORMAT'} unless ($img =~ /^(.+)_thumb.jpg$/);
-        my $img_name = $1;
+        return {error => 'INVALID FORMAT'} unless ($img =~ /^(.+)_thumb.(jpg|jpeg|png)$/);
+        my ($img_name, $format) = ($1, $2);
         push @images, $img_name;
-        return {error => 'NO TMP IMAGE'} unless (-f "$tmp_dir/$img" and -f "$tmp_dir/$img_name.jpg");
+        return {error => 'NO TMP IMAGE'} unless (-f "$tmpdir/$img" and -f "$tmpdir/$img_name.$format");
     }
 
     # get image_id insert database, then mv to upload dir

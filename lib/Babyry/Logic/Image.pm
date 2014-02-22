@@ -10,6 +10,7 @@ use parent qw/Babyry::Logic::Base/;
 
 use Babyry::Logic::Sequence;
 use Babyry::Service::Image;
+use Babyry::Service::Wall;
 
 sub set_image_info {
     my ($self, $file) = @_;
@@ -50,10 +51,17 @@ sub get_image_url_image_id {
 }
 
 sub web_upload {
+    my ($self, $user_id) = @_;
+    # TODO move to common class
+    my $relatives = Babyry::Service::Wall->new->show($user_id);
+    return $relatives;
+}
+
+sub web_upload_execute {
     my ($self, $params) = @_;
 
     my $service = Babyry::Service::Image->new;
-    return $service->web_upload($params);
+    return $service->web_upload_execute($params);
 }
 
 sub web_submit {

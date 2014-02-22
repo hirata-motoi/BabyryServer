@@ -17,7 +17,7 @@ sub commify {
 
 sub c { Babyry->context() }
 sub uri_with { Babyry->context()->req->uri_with(@_) }
-sub uri_for { Babyry->context()->uri_for(@_) }
+sub uri_for { sprintf('%s?%d', Babyry->context()->uri_for(@_), time) }
 
 {
     my %static_file_cache;

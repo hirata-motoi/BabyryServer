@@ -33,6 +33,13 @@ sub image_comment_sample_form {
 sub web_upload {
     my ($self, $c) = @_;
 
+    my $data = Babyry::Logic::Image->new->web_upload($c->stash->{user_id});
+    $c->render('/image/upload.tx', $data);
+}
+
+sub web_upload_execute {
+    my ($self, $c) = @_;
+
     return $c->render_500() if ! $c->stash->{user_id};
 
     my $file = $c->req->uploads->get_all('file');
@@ -43,27 +50,25 @@ sub web_upload {
     };
 
     my $logic = Babyry::Logic::Image->new;
-    my $ret = eval { $logic->web_upload($params) } || {};
-    infof($@) if($@);
-    $c->render_json($ret);
+    my $ret = eval { $logic->web_upload_execute($params) } || {};
+    $self->output_response_json($c, $ret, $@);
 }
 
 sub web_submit {
     my ($self, $c) = @_;
 
-    my $user_list = $c->req->env->{'plack.request.http.body'}->param->{'user[]'};
-    my $image_list = $c->req->env->{'plack.request.http.body'}->param->{'image[]'};
+    my @image_list = $c->req->param('image_tmp_names[]');
+    my @user_list  = $c->req->param('shared_user_ids[]');
 
     my $params = {
         user_id => $c->stash->{'user_id'},
-        user    => $user_list,
-        image   => $image_list,
+        user    => \@user_list,
+        image   => \@image_list,
     };
 
     my $logic = Babyry::Logic::Image->new;
     my $ret = eval { $logic->web_submit($params) } || {};
-    infof($@) if($@);
-    $c->render_json($ret);
+    $self->output_response_json($c, $ret, $@);
 }
 
 sub comment {

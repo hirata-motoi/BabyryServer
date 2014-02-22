@@ -1,0 +1,97 @@
+: cascade base
+
+: around head -> {
+<style>
+  .image {
+    margin: 0 auto;
+    max-width: 320px;
+    padding: 10px;
+  }
+  .image img {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .item {
+    border: 1px solid #eee;
+    border-radius: 2px;
+    padding: 4px;
+    margin: 4px;
+  }
+
+  /* salvattore */
+  .timeline[data-columns]::before {
+    content: '2 .column.size-1of2';
+  }
+  .column {
+    float: left;
+  }
+  .size-1of2 {
+    width: 50%;
+  }
+  [data-columns]::before {
+    display: none;
+  }
+  #add-image-icon {
+    width: 80px;
+    height: 80px;
+  }
+  .disabled-iframe {
+    display: none;
+  }
+  #image-post-form {
+    display: none;
+  }
+</style>
+: }
+
+: around javascript -> {
+<script type="text/javascript" src="<: uri_for('/static/backbone/js/backbone-min.js') :>"></script>
+<!-- grid layout
+  http://salvattore.com/
+  http://suprb.com/apps/nested/
+-->
+<script type="text/javascript" src="<: uri_for('/static/salvattore/js/salvattore.min.js') :>"></script>
+<script type="text/javascript" src="<: uri_for('/static/js/image/upload.js') :>"></script>
+: }
+
+: around content -> {
+
+<div>
+  <span class="js-image-container"></span>
+  <span class="add-image">
+    <img src="/static/img/add-image-icon.jpg" id="add-image-icon">
+  </span>
+</div>
+
+<a href="#relativesModal" class="btn btn-default btn-lg btn-block" id="post-button" data-toggle="modal" role="button" data-backdrop="true">
+  投稿
+</a>
+
+
+<form method="post" action="/image/web/upload_execute.json" enctype="multipart/form-data" target="next-ajax-post-Image" id="image-post-form">
+  <input type="file" name="file">
+  <input type="submit" value="hoge">
+</form>
+
+<div id="relativesModal" class="modal fade" style="position: relative; top: auto; left: auto; right: auto; margin: 0 auto 20px; max-width: 100%;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>pick relatives</h3>
+      </div>
+      <div class="modal-body">
+        : for $relatives.keys() -> $key {
+          <input type="checkbox" class="js-shared-relatives" value=<: $key :>> <: $key :> : <: $relatives[$key].email :><br>
+        : }
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Close</a>
+        <a href="#" class="btn btn-primary" id="submit-button">Save changes</a>
+      </div>
+    </div>
+  </div>
+</div>
+         
+: }

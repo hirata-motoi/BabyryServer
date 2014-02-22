@@ -31,12 +31,11 @@ requires 'Imager',                          '0.98';
 requires 'Module::Install::Repository',     '0.06';
 requires 'git@github.com:zentooo/Amon2-Plugin-Web-Stash.git';
 requires 'FormValidator::Lite',             '0.37';
-requires 'String::Random',                  '0.25';
 
-requires 'Amon2::Plugin::Web::FormValidator::Simple', '0.0.4';
 requires 'Plack::Middleware::BetterStackTrace', '0.02';
-requires 'Data::Dump', '1.22';
-require 'String::Random',                    '0.26';
+requires 'Data::Dump',                          '1.22';
+requires 'String::Random',                      '0.26';
+requires 'Image::Info',                         '1.36';
 
 on configure => sub {
     requires 'Module::Build', '0.38';
