@@ -36,6 +36,7 @@ requires 'Plack::Middleware::BetterStackTrace', '0.02';
 requires 'Data::Dump',                          '1.22';
 requires 'String::Random',                      '0.26';
 requires 'Image::Info',                         '1.36';
+requires 'Imager::ExifOrientation',             '0.07';
 
 on configure => sub {
     requires 'Module::Build', '0.38';
