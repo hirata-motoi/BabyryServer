@@ -9,6 +9,7 @@ use Log::Minimal;
 use parent qw/Babyry::Logic::Base/;
 
 use Babyry::Logic::Sequence;
+use Babyry::Service::Image;
 
 sub set_image_info {
     my ($self, $file) = @_;
@@ -47,6 +48,21 @@ sub get_image_url_image_id {
 
     return $url;
 }
+
+sub web_upload {
+    my ($self, $params) = @_;
+
+    my $service = Babyry::Service::Image->new;
+    return $service->web_upload($params);
+}
+
+sub web_submit {
+    my ($self, $params) = @_;
+
+    my $service = Babyry::Service::Image->new;
+    return $service->web_submit($params);
+}
+
 
 1;
 

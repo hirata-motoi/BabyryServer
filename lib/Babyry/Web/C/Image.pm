@@ -18,26 +18,44 @@ sub image_upload_sample_form {
     $c->render('/image/upload_sample.tx');
 }
 
-sub image_upload {
+sub image_submit_sample_form {
     my ($class, $c) = @_;
 
-    my $upload = $c->req->uploads->get_all('file');
-    my $path = $upload->path;
+    $c->render('/image/submit_sample.tx');
+}
 
-    my $img = Imager->new;
-    $img->read(file => $upload->path) or warn $img->errstr;
-    print $img->getwidth() . "\n";
-    print $img->getheight() . "\n";
+sub web_upload {
+    my ($self, $c) = @_;
 
-    my $time = time();
-    my $session = Babyry::Logic::Session->new();
-    my $user_id = $session->get($c->session->get('session_id'));
+    return $c->render_500() if ! $c->stash->{user_id};
 
-    if ($path =~ m{\.(jpg|jpeg)$}) {
-        $img->write(file => "/data/image/${user_id}_${time}.jpg", jpegquality => 20) or warn $img->errstr;
-    }
+    my $file = $c->req->uploads->get_all('file');
 
-    return $c->render_json(+{path=>$path});
+    my $params = {
+        user_id => $c->stash->{user_id},
+        path    => $file->path,
+    };
+
+    my $logic = Babyry::Logic::Image->new;
+    my $ret = eval { $logic->web_upload($params) } || {};
+    $c->render_json($ret);
+}
+
+sub web_submit {
+    my ($self, $c) = @_;
+
+    my $user_list = $c->req->env->{'plack.request.http.body'}->param->{'user[]'};
+    my $image_list = $c->req->env->{'plack.request.http.body'}->param->{'image[]'};
+
+    my $params = {
+        user_id => $c->stash->{'user_id'},
+        user    => $user_list,
+        image   => $image_list,
+    };
+
+    my $logic = Babyry::Logic::Image->new;
+    my $ret = eval { $logic->web_submit($params) } || {};
+    $c->render_json($ret);
 }
 
 1;
