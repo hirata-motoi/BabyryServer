@@ -41,7 +41,7 @@ showTmpImage = (data) ->
   box.append image
   $(".js-image-container").append box
 
-$("#submit-button").on("click", () ->
+submit = () ->
   filenames = []
   $(".js-uploaded-image-box").each( () ->
     filenames.push $(this).attr("filename")
@@ -50,9 +50,12 @@ $("#submit-button").on("click", () ->
   # TODO define common method in main.js
   token = getXSRFToken() 
 
+  relatives = pickedSharedRelatives()
+
   $.ajax( "/image/web/submit.json", {
       type: "post",
       data: {
+        "shared_user_ids": relatives,
         "image_tmp_names": filenames,
         "XSRF-TOKEN": token
       },
@@ -61,7 +64,6 @@ $("#submit-button").on("click", () ->
       error: showErrorMessage,
     }
   )
-)
 
 redirectToWall = (data) ->
   location.href = "/"
@@ -77,4 +79,11 @@ getXSRFToken = ->
     matched = c.match(/^XSRF-TOKEN=(.*)$/)
     token = matched[1] if matched?
   return token
+
+pickedSharedRelatives = () ->
+  for elem in $(".js-shared-relatives")
+    continue if $(elem).prop("checked") isnt true
+    $(elem).val()
+
+$("#submit-button").on("click", submit)
 

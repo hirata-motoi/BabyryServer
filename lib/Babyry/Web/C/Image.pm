@@ -27,7 +27,8 @@ sub image_submit_sample_form {
 sub web_upload {
     my ($self, $c) = @_;
 
-    $c->render('/image/upload.tx');
+    my $data = Babyry::Logic::Image->new->web_upload($c->stash->{user_id});
+    $c->render('/image/upload.tx', $data);
 }
 
 sub web_upload_execute {
@@ -43,7 +44,7 @@ sub web_upload_execute {
     };
 
     my $logic = Babyry::Logic::Image->new;
-    my $ret = eval { $logic->web_upload($params) } || {};
+    my $ret = eval { $logic->web_upload_execute($params) } || {};
     $self->output_response_json($c, $ret, $@);
 }
 

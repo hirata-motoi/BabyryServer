@@ -13,7 +13,7 @@ use Babyry::Model::User;
 use Babyry::Model::Sequence;
 use Babyry::Model::Image;
 
-sub web_upload {
+sub web_upload_execute {
     my ($self, $params) = @_;
 
     # make thumbnail

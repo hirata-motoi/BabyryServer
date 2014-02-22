@@ -64,11 +64,34 @@
   </span>
 </div>
 
-<button class="btn btn-default btn-lg btn-block" id="submit-button">投稿</button>
+<a href="#relativesModal" class="btn btn-default btn-lg btn-block" id="post-button" data-toggle="modal" role="button" data-backdrop="true">
+  投稿
+</a>
+
 
 <form method="post" action="/image/web/upload_execute.json" enctype="multipart/form-data" target="next-ajax-post-Image" id="image-post-form">
   <input type="file" name="file">
   <input type="submit" value="hoge">
 </form>
 
+<div id="relativesModal" class="modal fade" style="position: relative; top: auto; left: auto; right: auto; margin: 0 auto 20px; max-width: 100%;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>pick relatives</h3>
+      </div>
+      <div class="modal-body">
+        : for $relatives.keys() -> $key {
+          <input type="checkbox" class="js-shared-relatives" value=<: $key :>> <: $key :> : <: $relatives[$key].email :>
+        : }
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Close</a>
+        <a href="#" class="btn btn-primary" id="submit-button">Save changes</a>
+      </div>
+    </div>
+  </div>
+</div>
+         
 : }
