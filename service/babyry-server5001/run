@@ -9,4 +9,5 @@ export APP_ENV=development
 
 exec \
   envdir ./env \
+  setuidgid babyry \
   $PERL $DAEMON
