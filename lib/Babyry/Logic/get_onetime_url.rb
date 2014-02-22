@@ -6,4 +6,4 @@ AWS.config(
 )
 
 object = AWS::S3.new.buckets[ARGV[0]].objects[ARGV[1]]
-puts object.url_for(:read, :expires => 60)
+puts object.url_for(:read, :expires => 86400)

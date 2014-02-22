@@ -50,13 +50,29 @@ sub get_entries_by_images{
         # stamp_idsのリストを$stampsから抜き出して、まとめて取るようにする。
         my $stamps = Babyry::Model::ImageStampMap::get_stamp_ids_by_rows($stamps->{$image->image_id});
 
+        # temporary url
+        my $url = $self->get_url_by_image_ids($image->image_id);
+
         push(@entries,{
             %$columns,
             stamps => $stamps,
+            fullsize_image_url => $url,
         });
     }
     
     return \@entries;
+}
+
+sub get_url_by_image_ids {
+    my ($self, $id) = @_;
+
+    my $home_dir = Babyry->base_dir;
+    my $bucket = 'bebyry-image-upload';
+    my $ruby = "/home/babyry/.rbenv/shims/ruby $home_dir/lib/Babyry/Logic/get_onetime_url.rb";
+    my $url = `$ruby $bucket ${id}.jpg`;
+    chomp($url);
+
+    return $url;
 }
 
 1;
