@@ -5,6 +5,7 @@ PERL=/home/babyry/perl5/perlbrew/perls/perl-5.16.3/bin/perl
 DAEMON=/home/babyry/BabyryServer5001/script/babyry-server
 
 . /home/babyry/aws/credential
+export APP_ENV=development
 
 exec \
   envdir ./env \
