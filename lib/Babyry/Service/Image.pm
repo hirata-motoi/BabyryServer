@@ -12,6 +12,8 @@ use Babyry::Model::Relatives;
 use Babyry::Model::User;
 use Babyry::Model::Sequence;
 use Babyry::Model::Image;
+use Babyry::Model::ImageUserMap;
+use Babyry::Model::Comment;
 
 sub web_upload {
     my ($self, $params) = @_;
@@ -56,8 +58,8 @@ sub web_submit {
     # get image_id insert database, then mv to upload dir
     my $image_seq = Babyry::Model::Sequence->new();
     my $image = Babyry::Model::Image->new();
+    my $image_user_map = Babyry::Model::ImageUserMap->new();
     my $unixtime = time();
-    my $image_url = [];
     $teng->txn_begin;
     for my $img (@images) {
         my $id = $image_seq->get_id($teng, 'seq_image');
@@ -69,14 +71,49 @@ sub web_submit {
                 updated_at   => $unixtime, 
             }
         );
-        push @{$image_url}, "http://babyryserver5001/tmp_uploaded_image/$img.jpg"
+        for my $relative_id (@relatives_array_list, $params->{'user_id'}) {
+            $image_user_map->add($teng, {
+                image_id   => $id,
+                user_id    => $relative_id,
+                disabled   => 0,
+                created_at => $unixtime,
+                updated_at => $unixtime,
+            });
+        }
+        system("touch /data/image/uploaded/${id}_${img}");
     }
     $teng->txn_commit;
 
     # return json
 
-    return {url => $image_url};
+    return;
 }
+
+sub comment {
+    my ($self, $params) = @_;
+
+    my $teng = $self->teng('BABYRY_MAIN_W');
+    my $teng_r = $self->teng('BABYRY_MAIN_R');
+
+    # image_id check
+    my $image = Babyry::Model::Image->new();
+    my $res = $image->get_by_image_id($teng_r, $params->{'image_id'});
+    return {error => 'NO_TARGET_IMAGE'} unless ($res->{row_data});
+    # insert comment
+    my $comment = Babyry::Model::Comment->new();
+    my $comment_seq = Babyry::Model::Sequence->new();
+    $teng->txn_begin;
+    my $id = $comment_seq->get_id($teng, 'seq_comment');
+    my $unixtime = time();
+    $params->{'comment_id'} = $id;
+    $params->{'created_at'} = $unixtime;
+    $params->{'updated_at'} = $unixtime;
+    $comment->add($teng, $params);
+    $teng->txn_commit;
+
+    return;
+}
+
 
 1;
 
