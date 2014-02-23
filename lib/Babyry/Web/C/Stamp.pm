@@ -28,5 +28,16 @@ sub attach {
     return $self->output_response_json($c, $ret, $@);
 }
 
+sub list {
+    my ($self, $c, $p) = @_;
+
+    my $logic = Babyry::Logic::Stamp->new;
+    my $ret = eval {
+        $logic->list( $c->stash->{user_id} );
+    } || {};
+
+    return $self->output_response_json($c, $ret, $@);
+}
+
 1;
 

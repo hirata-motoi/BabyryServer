@@ -16,5 +16,13 @@ sub attach {
     return $service->attach($image_id, $stamp_id);
 }
 
+sub list {
+    my ($self, $user_id) = @_;
+
+    my $service = Babyry::Service::Stamp->new;
+
+    return $service->list($user_id);
+}
+
 1;
 
