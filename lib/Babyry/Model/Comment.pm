@@ -17,10 +17,33 @@ sub add {
             comment      => $params->{comment},
             created_at   => $params->{created_at},
             updated_at   => $params->{updated_at},
+            commented_by => $params->{user_id},
         }
     );
 
     return;
+}
+
+sub get_by_image_id {
+    my ($teng, $image_id, $from, $limit) = @_;
+
+my $sql = <<QUERY;
+    SELECT
+        *
+    FROM
+        comment
+    WHERE
+        image_id = ?
+    ORDER BY
+        created_at DESC
+    LIMIT ?, ?
+QUERY
+    my @records =$teng->search_by_sql(
+        $sql,
+        [$image_id, $from, $limit]
+    );
+
+    return \@records;
 }
 
 
