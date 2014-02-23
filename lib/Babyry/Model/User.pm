@@ -50,5 +50,30 @@ sub update_to_verified {
     );
 }
 
+sub get_by_user_id {
+    my ($self, $teng, $params) = @_;
+
+    my $res = $teng->single(
+        'user',
+        {
+            user_id => $params->{user_id},
+        }
+    );
+    return $res;
+}
+
+sub update_by_user_id {
+    my ($self, $teng, $user_id, $params) = @_;
+
+    my $res = $teng->update(
+        'user',
+        $params,
+        {
+            user_id => $user_id,
+        },
+    );
+    return {user_id =>$user_id, params => $params};
+}
+
 1;
 

@@ -1,0 +1,20 @@
+: cascade base
+: around content -> {
+<style>
+  .image {
+    margin: 0 auto;
+    max-width: 320px;
+    padding: 10px;
+  }
+  .image img {
+    width: 100%;
+    max-width: 320px;
+  }
+</style>
+<form action="http://babyryserver5001/profile/edit_child.json" method="post" enctype="multipart/form-data">edit child sample:</br>
+  child_id <input type="text" name="child_id"/><br/>
+  child_name <input type="text" name="child_name"/><br/>
+  stamp_id <input type="text" name="stamp_id"/><br/>
+  <input type="submit" value="sumbit"/>
+</form>
+: }
