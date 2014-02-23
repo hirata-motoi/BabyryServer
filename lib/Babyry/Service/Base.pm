@@ -11,6 +11,7 @@ use Teng::Schema::Loader;
 use SQL::Abstract;
 use Data::Dump;
 use Class::Load qw/load_class/;
+use String::CamelCase qw/camelize/;
 
 sub dbh {
     my ($self, $label) = @_;
@@ -56,7 +57,7 @@ sub dump {
 sub model {
     my ($self, $model_name) = @_;
 
-    my $class = 'Babyry::Model::' . $model_name;
+    my $class = 'Babyry::Model::' . camelize($model_name);
     load_class($class);
     return $class->new;
 }
