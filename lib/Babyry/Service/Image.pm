@@ -15,6 +15,29 @@ use Babyry::Model::Image;
 use Babyry::Model::ImageUserMap;
 use Babyry::Model::Comment;
 
+sub is_valid_image_id {
+   my ($self, $image_id) = @_;
+   my $model = $self->model('image');
+   my $teng  = $self->teng('BABYRY_MAIN_R');
+
+   return $model->get_by_image_id($teng, $image_id) ? 1 : 0;
+}
+
+sub has_authorization {
+    my ($self, $user_id, $image_id) = @_;
+
+    return ( grep { $image_id == $_ } @{ $self->get_authorized_image_ids($user_id) } )
+        ? 1 : 0;
+}
+
+sub get_authorized_image_ids {
+   my ($self, $user_id) = @_;
+   my $model = $self->model('image_user_map');
+   my $teng  = $self->teng('BABYRY_MAIN_R');
+
+   return $model->get_image_ids_by_user_id($teng, $user_id);
+}
+
 sub web_upload_execute {
     my ($self, $params) = @_;
 

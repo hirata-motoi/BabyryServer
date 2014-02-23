@@ -22,4 +22,22 @@ sub add{
     return;
 }
 
+sub get_image_ids_by_user_id {
+    my ($self, $teng, $user_id) = @_;
+
+    my $itr = $teng->search(
+        'image_user_map',
+        {
+            user_id  => $user_id,
+            disabled => 0,
+        }
+    );
+
+    my @image_ids = ();
+    while ( my $r = $itr->next ) {
+        push @image_ids, $r->image_id;
+    }
+    return \@image_ids;
+}
+
 1;

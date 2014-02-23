@@ -2,7 +2,7 @@ package Babyry::Validator;
 
 use strict;
 use warnings;
-use parent qw/Babyry/;
+use parent qw/Class::Accessor::Fast/;
 use Carp;
 use Babyry::FormValidator;
 

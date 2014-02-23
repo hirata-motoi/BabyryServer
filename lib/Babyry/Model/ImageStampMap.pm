@@ -1,12 +1,25 @@
 package Babyry::Model::ImageStampMap;
 
-use parent qw/Babyry::Model::Base/;
-
 use strict;
 use warnings;
 use utf8;
 
 use Data::Dump qw/dump/;
+
+
+sub create {
+    my ($teng, $image_id, $stamp_id) = @_;
+
+    my $row = $teng->insert(
+        'image_stamp_map',
+        {
+            image_id => $image_id,
+            stamp_id => $stamp_id,
+        },
+        'INSERT IGNORE'
+    ) or return;
+    $row->get_columns;
+}
 
 #class method
 # {
@@ -41,7 +54,6 @@ sub get_by_image_ids{
 
 sub get_stamp_ids_by_rows{
     my($rows) = @_;
-    my ($rows) = @_;
     return [] if (!$rows || ref($rows) ne "ARRAY" || !scalar(@$rows));
 
     my @stamp_ids;

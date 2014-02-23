@@ -13,7 +13,8 @@ sub get_by_image_id {
     return $teng->single(
         'image',
         {
-            image_id  => $image_id
+            image_id => $image_id,
+            disabled => 0,
         }
     );
 }
