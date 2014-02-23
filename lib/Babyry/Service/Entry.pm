@@ -7,6 +7,7 @@ use parent qw/Babyry::Service::Base/;
 use Log::Minimal;
 use Babyry::Model::Image;
 use Babyry::Model::ImageStampMap;
+use Babyry::Model::Comment;
 use Data::Dump;
 
 
@@ -51,11 +52,25 @@ sub get_entries_by_images{
         my $stamps = Babyry::Model::ImageStampMap::get_stamp_ids_by_rows($stamps->{$image->image_id});
 
         # temporary url
-        my $url = $self->get_url_by_image_ids($image->image_id);
+        my $url = $self->get_url_by_image_id($image->image_id);
+
+        # comments
+        my $comments = Babyry::Model::Comment::get_by_image_id($teng, $image->image_id, 0, 10);
+        my $cmt_array = [];
+        for my $cmt (@{$comments}) {
+            push @{$cmt_array}, {
+                comment_id => $cmt->comment_id,
+                image_id => $cmt->image_id,
+                comment => $cmt->comment,
+                created_at => $cmt->created_at,
+                user_id => $cmt->commented_by,
+            };
+        }
 
         push(@entries,{
             %$columns,
             stamps => $stamps,
+            comments => $cmt_array,
             fullsize_image_url => $url,
         });
     }
@@ -63,7 +78,7 @@ sub get_entries_by_images{
     return \@entries;
 }
 
-sub get_url_by_image_ids {
+sub get_url_by_image_id {
     my ($self, $id) = @_;
 
     my $home_dir = Babyry->base_dir;
