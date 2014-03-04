@@ -11,69 +11,88 @@ $ENV{APP_ENV} = "development";
 
 use Log::Minimal;
 use AWS::CLIWrapper;
+use Data::Dumper;
 
-use Babyry::Logic::Image;
+use Babyry::Common;
+use Babyry::Model::ImageQueue;
+use Babyry::Model::Image;
 
 my $aws = AWS::CLIWrapper->new();
 
-my $BUCKET = 'bebyry-image-upload';
-my $QUEUE_DIR = '/data/image/uploaded';
-my $IMAGE_DIR = '/var/www/html/tmp_uploaded_image';
+my $TMP_BUCKET = Babyry::Common->config->{'tmp_bucket'};
+my $BUCKET = Babyry::Common->config->{'bucket'};
 
+require Babyry::Service::Base;
+my $teng = Babyry::Service::Base->new()->teng('BABYRY_MAIN_W');
+my $teng_r = Babyry::Service::Base->new()->teng('BABYRY_MAIN_R');
+my $image_queue = Babyry::Model::ImageQueue->new();
+my $image = Babyry::Model::Image->new();
 while(1) {
-    opendir my $dh, $QUEUE_DIR or die "$!:$QUEUE_DIR";
-    while (my $file = readdir $dh) {
-        next if ($file =~ /^\./);
-        next if ($file !~ /^(\d+)_([^\s]+)$/);
-        my $image_id = $1;
-        my $image_prefix = $2;
-        my @image_path = `ls $IMAGE_DIR/${image_prefix}*`;
-        
-	for my $path (@image_path) {
-            chomp($path);
-            infof("send $path, image_id $image_id");
-            next unless ($path =~ /$image_prefix([^\s]+)$/);
-            my $s3_name = $image_id . $1;
-            &send_to_s3($path, $s3_name, "$QUEUE_DIR/$file");
-        }
+    my $queue = $image_queue->dequeue($teng_r);
+    for (@{$queue}) {
+        &send_to_s3($_->image_id, $_->image_name);
     }
-    closedir $dh;
     sleep 1;
 }
 
 sub send_to_s3 {
-    my $path = shift;
-    my $file = shift;
-    my $queue_file = shift;
+    my $image_id = shift;
+    my $image_name = shift;
     
-    my $params = +{
-        body => $path,
-        key => $file,
-        bucket => $BUCKET,
-    };
-    my $res = $aws->s3api('put-object', $params);
-    if (!$res) {
-        warnf( $AWS::CLIWrapper::Error->{Code});
-        warnf( $AWS::CLIWrapper::Error->{Message});
-        return;
-    }
+    my $queue = $image->get_by_image_id($teng_r, $image_id);
+    my $format = $queue->format;
 
-    my $local_size = -s $path;
-    my $s3_size = 0;
-    $params = +{
-        prefix => $file,
-        bucket => $BUCKET,
-    };
-    $res = $aws->s3api('list-objects', $params);
-    if($res) {
-        $s3_size = $res->{Contents}[0]->{Size};
-        if($local_size == $s3_size) {
-            unlink($path);
-            unlink($queue_file);
+    my $params = [
+        {
+            key => "${image_id}.${format}",
+            bucket => $BUCKET,
+            'copy-source' => "${TMP_BUCKET}/${image_name}.${format}",
+        },
+        {
+            key => "${image_id}_thumb.${format}",
+            bucket => $BUCKET,
+            'copy-source' => "${TMP_BUCKET}/${image_name}_thumb.${format}",
         }
+    ];
+
+    for my $param (@{$params}) {
+        my $res = $aws->s3api('copy-object', $param);
+        if (!$res) {
+            critf("$AWS::CLIWrapper::Error->{Code}, $AWS::CLIWrapper::Error->{Message}");
+            next;
+        } else {
+            my $tmp_size;
+            my $size;
+            my $source_name = $1 if ($param->{'copy-source'} =~ m{^[^\s]+/([^\s]+)$});
+            # list object of tmp
+            my $res1 = $aws->s3api('list-objects', {prefix => $source_name, bucket => $TMP_BUCKET});
+            if($res1) {
+                $tmp_size = $res1->{Contents}[0]->{Size};
+            } else {
+                critf("$AWS::CLIWrapper::Error->{Code}, $AWS::CLIWrapper::Error->{Message}");
+            }
+            # list object
+            my $res2 = $aws->s3api('list-objects', {prefix => $param->{key}, bucket => $BUCKET});
+            if($res2) {
+                $size = $res2->{Contents}[0]->{Size};
+            } else {
+                critf("$AWS::CLIWrapper::Error->{Code}, $AWS::CLIWrapper::Error->{Message}");
+            }
+            if($size != $tmp_size) {
+                critf("size not match!");
+                return;
+            }
+        }
+    }
+    infof("remove queue, id:$image_id, name:$image_name");
+    $teng->txn_begin;
+    my $ret = $image_queue->delete_queue_by_id($teng, $image_id);
+    if ($ret) {
+        $teng->txn_commit;
     } else {
-        warnf( $AWS::CLIWrapper::Error->{Code});
-        warnf( $AWS::CLIWrapper::Error->{Message});
+        $teng->rollback;
     }
     return;
 }
+
+
