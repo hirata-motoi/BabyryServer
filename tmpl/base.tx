@@ -78,18 +78,32 @@
 
     <div style="display:none" class="relatives-data" data-json="<: encode_json_kolon($wall.relatives) :>" ></div>
 
-    <script src="<: uri_for('/static/jquery/js/jquery.min.js') :>"></script>
-    <script src="<: uri_for('/static/bootstrap/js/bootstrap.min.js') :>"></script>
-    <script src="<: uri_for('/static/underscore/js/underscore-min.js') :>"></script>
-    <!--script(src!='<: uri_for('/static/js/es5-shim.min.js') :>')-->
-    <!--script(src!='<: uri_for('/static/js/micro_template.js') :>')-->
-    <!--script(src!='<: uri_for('/static/js/strftime.js') :>')-->
-    <!--script(src!='<: uri_for('/static/js/sprintf-0.7-beta1.js') :>')-->
-    <!--script(src!='<: uri_for('/static/js/micro-location.js') :>')-->
-    <!--script(src!='<: uri_for('/static/js/micro_dispatcher.js') :>')-->
-    <!--script(src!='<: uri_for('/static/js/xsrf-token.js') :>')-->
+    <script src="<: static_file('/static/jquery/js/jquery.min.js') :>"></script>
+    <script src="<: static_file('/static/bootstrap/js/bootstrap.min.js') :>"></script>
+    <script src="<: static_file('/static/underscore/js/underscore-min.js') :>"></script>
+    <!--script(src!='<: static_file('/static/js/es5-shim.min.js') :>')-->
+    <!--script(src!='<: static_file('/static/js/micro_template.js') :>')-->
+    <!--script(src!='<: static_file('/static/js/strftime.js') :>')-->
+    <!--script(src!='<: static_file('/static/js/sprintf-0.7-beta1.js') :>')-->
+    <!--script(src!='<: static_file('/static/js/micro-location.js') :>')-->
+    <!--script(src!='<: static_file('/static/js/micro_dispatcher.js') :>')-->
+    <!--script(src!='<: static_file('/static/js/xsrf-token.js') :>')-->
     <script src="<: static_file('/static/js/main.js') :>"></script>
     <!-- if lt IE 9script(src="http://html5shiv.googlecode.com/svn/trunk/html5.js') -->
     : block javascript -> {}
+
+    : if c().req().param("livereload") == "true" {
+    <script type="text/javascript">
+      (function(){
+        // enable livereload for debugging
+        var script = document.createElement('script');
+        script.onerror = function(){
+          console.log('livereload server not running.');
+        };
+        script.src = '//' + location.hostname + ':35729/livereload.js'
+        document.getElementsByTagName('head')[0].appendChild(script)
+      })();
+    </script>
+    : }
   </body>
 </html>
