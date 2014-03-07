@@ -30,48 +30,57 @@
     width: 50%;
   }
   [data-columns]::before {
-    display: none;
+    visibility: hidden;
+    //display: none;
   }
 </style>
 : }
 
 : around javascript -> {
-<script type="text/javascript" src="<: uri_for('/static/backbone/js/backbone-min.js') :>"></script>
+<script type="text/javascript" src="<: static_file('/static/backbone/js/backbone-min.js') :>"></script>
 <!-- grid layout
   http://salvattore.com/
   http://suprb.com/apps/nested/
 -->
-<script type="text/javascript" src="<: uri_for('/static/salvattore/js/salvattore.min.js') :>"></script>
-<script type="text/javascript" src="<: uri_for('/static/js/home.js') :>"></script>
-<script type="text/template" id="template-item">
+<script type="text/javascript" src="<: static_file('/static/salvattore/js/salvattore.js') :>"></script>
+<script type="text/template" id="entry-view">
   <div class="item" onclick="location.href='/detail/123'">
-    <div class="image"><img src="http://lorempixel.com/320/<%= y %>/people/" class="img-thumbnail"/></div>
+    <div class="image"><img src="http://lorempixel.com/320/480/people/" class="img-thumbnail"/></div>
     <div class="comment panel panel-default">
       <div class="panel-heading">comment</div>
       <ul class="list-group">
-        <% while (i++ < n) { %>
-          <li class="list-group-item">comment<%= i %></li>
-        <% } %>
+          <li class="list-group-item">comment</li>
+        <!--% while (i++ < n) { %-->
+          <!--li class="list-group-item">comment< %= i % ></li-->
+        <!--% } %-->
       </ul>
     </div>
   </div>
 </script>
+<script type="text/javascript" src="<: static_file('/static/js/config.js') :>"></script>
+<script type="text/javascript" src="<: static_file('/static/js/model.js') :>"></script>
+<script type="text/javascript" src="<: static_file('/static/js/collection.js') :>"></script>
+<script type="text/javascript" src="<: static_file('/static/js/view.js') :>"></script>
+<script type="text/javascript" src="<: static_file('/static/js/app.js') :>"></script>
 <script type="text/javascript">
   $(function(){
-    var tmpl = _.template($('#template-item').html());
-    var grid = $('.timeline').get(0);
-    var load_contents = function () {
-      var item = [];
-      for (var i in _.range(10)) {
-        item.push(document.createElement('article'));
-      }
-      salvattore.append_elements(grid, item);
-      for (var i = 0; i < item.length; i++) {
-        item[i].outerHTML = tmpl({ i: 0, n: Math.floor(Math.random()*5)+1, y: Math.floor(Math.random()*100 + 240) });
-      }
-    };
-    load_contents();
-    $('#load-more').on('click', load_contents);
+
+    //var tmpl = _.template($('#entry-view').html());
+    //var grid = $('.timeline').get(0);
+    //var load_contents = function () {
+    //  var item = [];
+    //  for (var i in _.range(10)) {
+    //    item.push(document.createElement('article'));
+    //  }
+    //  salvattore.append_elements(grid, item);
+    //  for (var i = 0; i < item.length; i++) {
+    //    item[i].outerHTML = tmpl({ i: 0, n: Math.floor(Math.random()*5)+1, y: Math.floor(Math.random()*100 + 240) });
+    //  }
+    //};
+    //load_contents();
+    //$('#load-more').on('click', load_contents);
+
+    Babyry.$app = new Babyry.App();
   });
 </script>
 : }
@@ -79,7 +88,7 @@
 : around content -> {
 <button class="btn btn-default btn-lg btn-block">投稿</button>
 
-<div class="timeline row" data-columns></div>
+<div class="timeline row" data-columns id="app"></div>
 
 <button class="btn btn-default btn-lg btn-block" id="load-more">読み込み</button>
 : }

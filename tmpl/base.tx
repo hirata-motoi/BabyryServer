@@ -88,8 +88,11 @@
     <!--script(src!='<: static_file('/static/js/micro-location.js') :>')-->
     <!--script(src!='<: static_file('/static/js/micro_dispatcher.js') :>')-->
     <!--script(src!='<: static_file('/static/js/xsrf-token.js') :>')-->
-    <script src="<: static_file('/static/js/main.js') :>"></script>
     <!-- if lt IE 9script(src="http://html5shiv.googlecode.com/svn/trunk/html5.js') -->
+
+    <script src="<: static_file('/static/js/babyry.js') :>"></script>
+    <!-- TODO: main.jsはbabyry.jsに持ってく -->
+    <script src="<: static_file('/static/js/main.js') :>"></script>
     : block javascript -> {}
 
     : if c().req().param("livereload") == "true" {
