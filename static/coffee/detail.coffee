@@ -16,15 +16,17 @@ loadingFlg = false
 $( () ->
   $(".img-thumbnail").on("click", () ->
     imageId   = $(this).parents(".item").attr("image_id")
-    data = getData()
+    data = getData preserveResponseData, showErrorMessage, true
+    window.console.log data.list
     owlContainer = $(".owl-carousel").clone(true)
     owlContainer.addClass("displayed")
 
     # create new contents
-    for i in [0 .. data.row_count - 1]
+    for i in [0 .. data.found_row_count - 1]
 
       if data.list[i]
-        image_url = data.list[i].image_url
+        window.console.log data.list[i]
+        image_url = data.list[i].fullsize_image_url
         entryIdsInArray.push data.list[i].image_id
       else 
         image_url = ""
@@ -65,8 +67,9 @@ $( () ->
           loadingFlg = true
 
           # ajax
+          ###
           $.ajax("/entry/search.json", {
-            processData: false,
+            processData: true,
             contentType: false,
             data: {
               "page": currentPageNo + 1,
@@ -76,6 +79,8 @@ $( () ->
             success: showEntries,
             error: showErrorMessage
           })
+          ###
+          getData showEntries, showErrorMessage, false
         else
           window.console.log "shouldPreLoad is false"
 
@@ -88,9 +93,36 @@ $( () ->
     # TODO improve
     return if entryIdsInArray.length < owl.currentPosition() + num then true else false
 
-  getData = () ->
-    list = $.parseJSON( $("#data-json").attr("data-json") )
-    return { list: list, row_count: 100 }
+  preserveResponseData = (response) ->
+    window.entryData or= {}
+    window.entryData.entries or= []
+    window.entryData.entries.push entry for entry in response.data.entries
+    window.entryData.metadata = response.metadata
+
+  getData = (successCallback, errorCallback, tempNotAsyncFlg) ->
+    window.entryData or= {}
+    window.entryData.metadata or= {}
+
+    nextPage = if window.entryData.metadata.page then parseInt(window.entryData.metadata.page, 10) + 1 else 1
+    countPerPage = window.entryData.metadata.count || 10
+    # ajax
+    $.ajax("/entry/search.json", {
+      async: !tempNotAsyncFlg, # temporary
+      processData: true,
+      contentType: false,
+      data: {
+        "page": nextPage,
+        "count": countPerPage
+      },
+      dataType: 'json',
+      success: successCallback
+      error: errorCallback
+    })
+    return {
+      list: window.entryData.entries,
+      found_row_count: window.entryData.metadata.found_row_count
+    }
+
 
   createImageBox = (image_url) ->
     tmpl = $("#item-tmpl").clone(true)
@@ -109,16 +141,21 @@ $( () ->
 
   showEntries = (response) ->
     window.console.log response
-    return if response.data.length < 1
+    return if response.data.entries.length < 1
+
+    preserveResponseData response
 
     owl = $(".owl-carousel").data('owlCarousel')
     unloadedElems = $(".unloaded");
     for elem, i in unloadedElems
-        if response.data[i]
-          image_url = response.data[i].fullsize_image_url
-          elem.find(".img-box img").attr("src", image_url)
-          elem.find(".loading").removeClass("loading")
-          entryIdsInArray.push response.data[i].image_id
+        if response.data.entries[i]
+          window.console.log response.data.entries[i]
+          window.console.log elem
+          image_url = response.data.entries[i].fullsize_image_url
+          $(elem).find(".img-box img").attr("src", image_url)
+          $(elem).find(".loading").removeClass("loading")
+          $(elem).removeClass("unloaded")
+          entryIdsInArray.push response.data.entries[i].image_id
         else
           loadingFlg = false
           break

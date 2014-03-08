@@ -41,9 +41,9 @@ QUERY
         $sql,
         [$uploaded_by, 0, $from, $limit]
     );
-    my $row = $teng->dbh->selectrow_array(q{ SELECT FOUND_ROWS() });
+    my $found_row_count = $teng->dbh->selectrow_array(q{ SELECT FOUND_ROWS() });
 
-    return (\@records, $row);
+    return (\@records, $found_row_count);
 }
 
 sub get_image_ids_by_rows{
