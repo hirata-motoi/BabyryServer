@@ -1,0 +1,221 @@
+: cascade base
+
+: around head -> {
+<style>
+  .image {
+    margin: 0 auto;
+    max-width: 320px;
+    padding: 10px;
+  }
+  .image img {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .item {
+    border: 1px solid #eee;
+    border-radius: 2px;
+    padding: 4px;
+    margin: 4px;
+  }
+
+  /* salvattore */
+  .timeline[data-columns]::before {
+    content: '2 .column.size-1of2';
+  }
+  .column {
+    float: left;
+  }
+  .size-1of2 {
+    width: 50%;
+  }
+  [data-columns]::before {
+    display: none;
+  }
+</style>
+: }
+
+: around javascript -> {
+<script type="text/javascript" src="<: uri_for('/static/backbone/js/backbone-min.js') :>"></script>
+<!-- grid layout
+  http://salvattore.com/
+  http://suprb.com/apps/nested/
+-->
+<script type="text/javascript" src="<: uri_for('/static/salvattore/js/salvattore.min.js') :>"></script>
+<script type="text/template" id="template-item">
+  <span id='child_row_fix_<%= child_id %>'>
+    <span id='child_row_<%= child_id %>'><span id='child_row_text_<%= child_id %>'><%= child_name %></span>
+      <input type='submit' value='edit' id='edit_child_name_<%= child_id %>'>
+      <input type='submit' value='delete' id='delete_child_submit_<%= child_id %>'><br>
+    </span>
+  </span>
+  <span id='child_row_edit_<%= child_id %>' style="display:none;">
+    <input type='text' name='child_name' id='new_child_name_<%= child_id %>' value='new_child_name'>
+    <input type='text' name='stamp_id' id='new_stamp_id_<%= child_id %>' value='new_stamp_id'>
+    <input type='submit' value='edit name' id='edit_child_name_submit_<%= child_id %>'><br>
+  </span>
+</script>
+<script type="text/javascript">
+  var tmpl = _.template($('#template-item').html());
+  var user_name;
+  var child_row_id = [];
+  var child_name = [];
+  var stamp_id = [];
+  $.ajax({
+    url : '/profile/get.json',
+    success : function(data){
+      $('#user_name').text(data.user_name);
+      user_name = data.user_name;
+      $('#user_icon').text(data.has_icon);
+      for (var i = 0; i < data.child.length; i++) {
+        var child_id = data.child[i].child_id;
+        add_listener(i, child_id, data.child[i].child_name, data.child[i].stamp_id);
+      }
+    },
+    error : function(data){
+      console.log("error");
+    }
+  });
+  add_listener = function(i, child_id, _child_name, _stamp_id) {
+    child_row_id[child_id] = i;
+    child_name[i] = _child_name;
+    stamp_id[i] = _stamp_id;
+    var HTML = tmpl({ child_id: child_id, child_name: _child_name});
+    $('#child').append(HTML);
+    $('#delete_child_submit_' + child_id).on('click', function(){
+      delete_child($(this).attr('id').replace('delete_child_submit_',''));
+    });
+    $('#edit_child_name_' + child_id).on('click', function(){
+      var child_id = $(this).attr('id').replace('edit_child_name_','');
+      $('#child_row_fix_' + child_id).hide();
+      $('#new_child_name_' + child_id).val(child_name[child_row_id[child_id]]);
+      $('#new_stamp_id_' + child_id).val(stamp_id[child_row_id[child_id]]);
+      $('#child_row_edit_' + child_id).show();
+    });
+    $('#edit_child_name_submit_' + child_id).on('click', function(){
+      var child_id = $(this).attr('id').replace('edit_child_name_submit_','');
+      token = getXSRFToken();
+      $.ajax("/profile/edit_child.json", {
+        type: "post",
+        data: {
+          "child_id": child_id,
+          "child_name": $('#new_child_name_' + child_id).val(),
+          "stamp_id": $('#new_stamp_id_' + child_id).val(),
+          "XSRF-TOKEN": token
+        },
+        dataType: 'json',
+        success: function(data){
+          child_name[child_row_id[child_id]] = data.updated.child_name;
+          stamp_id[child_row_id[child_id]] = data.updated.stamp_id;
+          $('#child_row_edit_' + child_id).hide();
+          $('#child_row_text_' + child_id).text(data.updated.child_name);
+          $('#child_row_fix_' + child_id).show();
+        },
+        error: function(){console.log("error")}
+      });
+    });
+  }
+  $('#edit_name').on("click", function(){
+    $("#name_fix").hide();
+    $('#new_name').val(user_name);
+    $("#name_edit").show();
+  });
+  $('#name_edit_submit').on("click", function(){
+    token = getXSRFToken();
+    $.ajax("/profile/edit_name.json", {
+      type: "post",
+      data: {
+        "user_name": $('#new_name').val(),
+        "XSRF-TOKEN": token
+      },
+      dataType: 'json',
+      success: function(){
+        reflect_name($('#new_name').val());
+        user_name = $('#new_name').val();
+      },
+      error: function(){console.log("error")}
+    });
+  });
+  reflect_name = function(name) {
+    $("#name_edit").hide();
+    $("#user_name").text(name);
+    $("#name_fix").show();
+  }
+  delete_child = function(id) {
+    token = getXSRFToken();
+    $.ajax("/profile/delete_child.json", {
+      type: "post",
+      data: {
+        "child_id": id,
+        "XSRF-TOKEN": token
+      },
+      dataType: 'json',
+      success: function(){
+        $('#child_row_' + id).remove();
+      },
+      error: function(){console.log("error")}
+    });
+  }
+  $('#add_child_submit').on('click', function() {
+    token = getXSRFToken();
+    var add_stamp_id = $('#add_stamp_id').val();
+    var add_child_name = $('#add_child_name').val();
+    $.ajax("/profile/add_child.json", {
+      type: "post",
+      data: {
+        "stamp_id": add_stamp_id,
+        "child_name": add_child_name,
+        "XSRF-TOKEN": token
+      },
+      dataType: 'json',
+      success: function(data){
+        $('#add_stamp_id').val('');
+        $('#add_child_name').val('');
+        var HTML = tmpl({ child_id: data.id, child_name: add_child_name});
+        var max = child_name.length;
+        child_row_id[data.id] = max;
+        child_name[max] = add_child_name;
+        stamp_id[max] = add_stamp_id;
+        //$('#child').append(HTML);
+        add_listener(max, data.id, add_child_name, add_stamp_id);
+      },
+      error: function(){console.log("error")}
+    });
+  });
+
+  getXSRFToken = function() {
+    var c, cookies, matched, token, _i, _len;
+    cookies = document.cookie.split(/\s*;\s*/);
+    for (_i = 0, _len = cookies.length; _i < _len; _i++) {
+      c = cookies[_i];
+      matched = c.match(/^XSRF-TOKEN=(.*)$/);
+      if (matched != null) {
+        token = matched[1];
+      }
+    }
+    return token;
+  };
+</script>
+: }
+
+: around content -> {
+名前:
+<div id="name_fix">
+  <span id="user_name"></span>
+  <input type="button" id="edit_name" value="edit">
+</div>
+<div id="name_edit" style="display:none;">
+  <input type='text' name='user_name' id='new_name' value='new_name'>
+  <input type='submit' value='edit name' id='name_edit_submit'>
+</div>
+<hr>
+アイコン:<span id="user_icon"></span><br>
+<hr>
+子供たち:<br><span id="child"></span><br>
+<span id='add_child'>
+  <input type='text' name='child_name' id='add_child_name'>
+  <input type='text' name='stamp_id' id='add_stamp_id'>
+  <input type='submit' value='edit name' id='add_child_submit'><br>
+</span>
+: }
+

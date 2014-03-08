@@ -1,4 +1,7 @@
 +{
+    '/profile' => +{
+        controller => 'Profile', action => 'index',
+    },
     '/profile/get.json' => +{
         controller => 'Profile', action => 'get',
     },
