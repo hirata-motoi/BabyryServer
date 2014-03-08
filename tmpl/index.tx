@@ -51,7 +51,7 @@
 
 <script id="template-item">
   <div class="item">
-    <div class="image"><img src="http://localhost:5004/static/img/160x160.png" class="img-thumbnail"/></div>
+    <div class="image"><img src="/static/img/160x160.png" class="img-thumbnail"/></div>
     <div class="comment panel panel-default">
       <div class="panel-heading">comment</div>
       <ul class="list-group">
