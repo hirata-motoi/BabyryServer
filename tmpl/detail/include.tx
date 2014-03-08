@@ -1,9 +1,4 @@
 <style type="text/css">
-  body {
-    background: #000;
-    margin: 0;
-    padding-bottom: 50px;
-  }
   .img-box {
     min-height: 100%;
     width: 100%;
