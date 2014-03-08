@@ -6,6 +6,11 @@ use parent qw/Babyry::Web::C/;
 use Log::Minimal;
 use Babyry::Logic::Profile;
 
+sub index {
+    my ($class, $c) = @_;
+    $c->render('/profile/index.tx');
+}
+
 sub profile_edit_name_sample_form {
     my ($class, $c) = @_;
 
