@@ -9,7 +9,7 @@ use Babyry::Model::Image;
 use Babyry::Model::ImageStampMap;
 use Babyry::Model::Comment;
 use Data::Dump;
-
+use Babyry::Common;
 
 #params
 # stamp_id:    int(default: 0)
@@ -83,7 +83,7 @@ sub get_url_by_image_id {
     my ($self, $id) = @_;
 
     my $home_dir = Babyry->base_dir;
-    my $bucket = 'bebyry-image-upload';
+    my $bucket = Babyry::Common->config->{bucket};
     my $ruby = "/home/babyry/.rbenv/shims/ruby $home_dir/lib/Babyry/Model/get_onetime_url.rb";
     my $url = `$ruby $bucket ${id}.jpg`;
     chomp($url);

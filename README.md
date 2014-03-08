@@ -44,7 +44,7 @@
 ### ライブラリのインストール
 
     $ cd [project_directry] (--path [library_path])
-    $ bundle install
+    $ bundle install --path vendor/bundle
 
 ### rubyスクリプトの実行
 
