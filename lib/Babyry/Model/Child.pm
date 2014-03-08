@@ -51,6 +51,8 @@ sub edit_child {
 sub delete_child {
     my ($self, $teng, $params) = @_;
 
+    #TODO
+    # just set disable = 1
     my $row = $teng->single('child', { child_id => $params->{'child_id'} }) or return;
     $row->delete;
 
