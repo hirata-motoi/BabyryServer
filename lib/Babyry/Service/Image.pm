@@ -14,6 +14,7 @@ use Babyry::Model::Sequence;
 use Babyry::Model::Image;
 use Babyry::Model::ImageUserMap;
 use Babyry::Model::Comment;
+use Babyry::Model::ImageQueue;
 
 sub is_valid_image_id {
    my ($self, $image_id) = @_;
@@ -66,8 +67,6 @@ sub web_submit {
         return {error => 'NOT RELATIVES'} if ($share_id !~ /^($relatives_list)$/ or !$user->is_verified($teng_r, $params));
     }
 
-    # post auth ok? (??TODO??)
-
     # tmp image exist?
     my $tmpdir  = Babyry::Common->config->{tmp_uploaded_image_dir};
     # TODO define config or %ENV
@@ -75,28 +74,32 @@ sub web_submit {
         $tmpdir = File::Spec->catdir( Babyry->base_dir, $tmpdir );
     }
 
+    my %format;
     my @images;
     for my $img (@{$params->{image}}) {
         return {error => 'INVALID FORMAT'} unless ($img =~ /^(.+)_thumb.(jpg|jpeg|png)$/);
         my ($img_name, $format) = ($1, $2);
         push @images, $img_name;
-        return {error => 'NO TMP IMAGE'} unless (-f "$tmpdir/$img" and -f "$tmpdir/$img_name.$format");
+        $format{$img_name} = $format;
     }
 
     # get image_id insert database, then mv to upload dir
     my $image_seq = Babyry::Model::Sequence->new();
     my $image = Babyry::Model::Image->new();
     my $image_user_map = Babyry::Model::ImageUserMap->new();
+    my $image_queue = Babyry::Model::ImageQueue->new();
     my $unixtime = time();
     $teng->txn_begin;
     for my $img (@images) {
         my $id = $image_seq->get_id($teng, 'seq_image');
+        my $_format = $format{$img};
         $image->set_new_image( $teng,
             {
                 image_id     => $id,
                 uploaded_by  => $params->{'user_id'},
                 created_at   => $unixtime,
-                updated_at   => $unixtime, 
+                updated_at   => $unixtime,
+                format       => $_format,
             }
         );
         for my $relative_id (@relatives_array_list, $params->{'user_id'}) {
@@ -108,7 +111,13 @@ sub web_submit {
                 updated_at => $unixtime,
             });
         }
-        system("touch /data/image/uploaded/${id}_${img}");
+        $image_queue->enqueue($teng,
+            {
+                image_name => $img,
+                image_id   => $id,
+                created_at => $unixtime,
+            }
+        );
     }
     $teng->txn_commit;
 

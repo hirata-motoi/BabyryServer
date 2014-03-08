@@ -67,6 +67,7 @@ sub set_new_image {
             uploaded_by  => $params->{uploaded_by},
             created_at   => $params->{created_at},
             updated_at   => $params->{updated_at},
+            format       => $params->{format},
         }
     );
 }

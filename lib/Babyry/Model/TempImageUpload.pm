@@ -9,8 +9,7 @@ use File::Spec;
 use Imager::ExifOrientation;
 use Image::Info qw/image_type/;
 use Babyry::Common;
-
-
+use Babyry::Model::UploadS3;
 
 sub make_thumbnail {
     my ($self, $params) = @_;
@@ -31,12 +30,10 @@ sub make_thumbnail {
         $tmpdir = File::Spec->catdir( Babyry->base_dir, $tmpdir );
     }
 
-
     # synthesize fullsize image
+    my $image_name = sprintf('%d_%d.%s', $user_id, $time, $format);
     $img->write(
-        file => File::Spec->catfile(
-            $tmpdir, sprintf('%d_%d.%s', $user_id, $time, $format)
-        ),
+        file => File::Spec->catfile( $tmpdir, $image_name ),
         jpegquality => 60
     ) or return { error2 => $img->errstr };
 
@@ -50,12 +47,12 @@ sub make_thumbnail {
     );
     $thumb->write( file => $thumb_path ) or return { error3 => $thumb->errstr };
 
+    my $s3 = Babyry::Model::UploadS3->new()->tmp_upload($tmpdir, [$image_name, $thumb_name]);
+    my $tmp_url = 'https://babyry-image-tmp-upload-dev.s3.amazonaws.com/'.$thumb_name;
+
     return {
         image_tmp_name => $thumb_name,
-        image_tmp_url  => File::Spec->catfile(
-            Babyry::Common->config->{tmp_uploaded_image_relative_path},
-            $thumb_name
-        ),
+        image_tmp_url  => $tmp_url,
         size => {
             x => $thumb->getwidth(),
             y => $thumb->getheight(),
