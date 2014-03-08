@@ -33,6 +33,9 @@
     display: none;
   }
 </style>
+
+<link href="<: uri_for('/static/jquery/plugin/owl/owl-carousel/owl.carousel.css') :>" rel="stylesheet">
+<link href="<: uri_for('/static/jquery/plugin/owl/owl-carousel/owl.theme.css') :>" rel="stylesheet">
 : }
 
 : around javascript -> {
@@ -42,10 +45,13 @@
   http://suprb.com/apps/nested/
 -->
 <script type="text/javascript" src="<: uri_for('/static/salvattore/js/salvattore.min.js') :>"></script>
-<script type="text/javascript" src="<: uri_for('/static/js/home.js') :>"></script>
-<script type="text/template" id="template-item">
-  <div class="item" onclick="location.href='/detail/123'">
-    <div class="image"><img src="http://lorempixel.com/320/<%= y %>/people/" class="img-thumbnail"/></div>
+
+<!-- for owl -->
+<script src="<: uri_for('/static/jquery/plugin/owl/owl-carousel/owl.carousel.js') :>"></script>
+
+<script id="template-item">
+  <div class="item">
+    <div class="image"><img src="http://localhost:5004/static/img/160x160.png" class="img-thumbnail"/></div>
     <div class="comment panel panel-default">
       <div class="panel-heading">comment</div>
       <ul class="list-group">
@@ -74,12 +80,19 @@
     $('#load-more').on('click', load_contents);
   });
 </script>
+<script type="text/javascript" src="<: uri_for('/static/js/detail.js') :>"></script>
 : }
 
 : around content -> {
-<button class="btn btn-default btn-lg btn-block">投稿</button>
+<div class="dynamic-container">
+  <button class="btn btn-default btn-lg btn-block">投稿</button>
 
-<div class="timeline row" data-columns></div>
+  <div class="timeline row" data-columns></div>
 
-<button class="btn btn-default btn-lg btn-block" id="load-more">読み込み</button>
+  <button class="btn btn-default btn-lg btn-block" id="load-more">読み込み</button>
+</div>
+
+: include detail::include
+
+<div id="data-json" data-json='[{"image_url":"/static/img/160x160.png"},{"image_url":"/static/img/160x160.png"},{"image_url":"/static/img/160x160.png"},{"image_url":"/static/img/160x160.png"},{"image_url":"/static/img/160x160.png"}]' style="display:none"></div>
 : }
