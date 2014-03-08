@@ -1,0 +1,92 @@
+<style type="text/css">
+  body {
+    background: #000;
+    margin: 0;
+    padding-bottom: 50px;
+  }
+  .img-box {
+    min-height: 100%;
+    width: 100%;
+  }
+  .img-detail {
+    width: 100%;
+  }
+  .footer {
+    display: -webkit-box;
+    display: box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #eee;
+    padding: 8px 2px 8px;
+  }
+  .owl-item {
+    width: 320px;
+  }
+</style>
+
+<div class="detail-container" style="display:none">
+<!--
+  <ul class="pager" style="margin: 0; padding: 5px; background: #eee;">
+    <li class="previous"><a href="/"><span class="glyphicon glyphicon-chevron-left"></span>戻る</a></li>
+  </ul>
+-->
+<div class="owl-carousel owl-theme"></div>
+<!--
+  <div class="footer">
+    <form class="form-inline" role="form" style="width: 100%;">
+      <div style="display: -webkit-box; width: 100%;">
+        <div style=" -webkit-box-flex: 1;">
+          <label class="sr-only" for="exampleInputEmail2">コメント</label>
+          <input type="email" class="form-control" placeholder="コメント">
+        </div>
+        <div style=" width: 60px;">
+          <button type="submit" class="btn btn-default">送信</button>
+        </div>
+      </div>
+    </form>
+  </div>
+-->
+</div>
+
+
+<div id="item-tmpl" style="display:none">
+  <div class="img-box" style="position: relative;">
+    <img src="" class="img-detail" />
+    <div style="position: absolute; top: 10px; right: 10px; font-size: 30px; line-height: 50px;">
+      <a class="glyphicon glyphicon-plus-sign" style=" text-shadow: 0 0 2px #000; color: #eee;text-decoration:none;"></a>
+    </div>
+  </div>
+  <div class="comment-container" style="background: #fff; padding-top: 10px; padding-bottom: 10px;">
+    <div class="media">
+      <a class="pull-left" href="#">
+        <img class="media-object" alt="64x64" src="/static/img/160x160.png" style="width: 64px; height: 64px;">
+      </a>
+      <div class="media-body">
+        <h4 class="media-heading">Media heading</h4>
+        Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+        <a href="http://dena.com">DeNA</a>
+      </div>
+    </div>
+    <div class="media">
+      <a class="pull-left" href="#">
+        <img class="media-object" alt="64x64" src="/static/img/160x160.png" style="width: 64px; height: 64px;">
+      </a>
+      <div class="media-body">
+        <h4 class="media-heading">Media heading</h4>
+        Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+        <div class="media">
+          <a class="pull-left" href="#">
+            <img class="media-object" data-src="holder.js/64x64" alt="64x64" src="/static/img/160x160.png" style="width: 64px; height: 64px;">
+          </a>
+          <div class="media-body">
+            <h4 class="media-heading">Nested media heading</h4>
+            Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

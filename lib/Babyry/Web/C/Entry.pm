@@ -25,11 +25,14 @@ sub search {
 
     my $ret = {};
 
-    $ret->{data} = $logic->search($params);
+    my $data = $logic->search($params);
+    my $found_row_count = delete $data->{found_row_count};
+    $ret->{data} = $data;
 
     $ret->{metadata} = {
-        count => $count,
-        page  => $page,
+        count           => $count,
+        page            => $page,
+        found_row_count => $found_row_count,
         condition => {
             stamp_id    => $stamp_id,
             uploaded_by => $uploaded_by
