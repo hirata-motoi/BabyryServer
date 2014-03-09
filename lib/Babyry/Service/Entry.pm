@@ -6,6 +6,7 @@ use utf8;
 use parent qw/Babyry::Service::Base/;
 use Log::Minimal;
 use Babyry::Model::Image;
+use Babyry::Model::ImageUserMap;
 use Babyry::Model::ImageStampMap;
 use Babyry::Model::Comment;
 use Data::Dump;
@@ -24,7 +25,7 @@ sub search {
     my $teng = $self->teng('BABYRY_MAIN_R');
     my $from = ($page - 1) * $count || 0;
 
-    my ($images, $found_row_count)  = Babyry::Model::Image::get_by_uploaded_by($teng, $uploaded_by, $from, $count);
+    my ($images, $found_row_count)  = Babyry::Model::ImageUserMap::get_by_user_id($teng, $uploaded_by, $from, $count);
 
     # imagesを他の経路から取ってきたときも、get_entries_by_imagesを使い回せる用にしておく。
     my $entries = $self->get_entries_by_images($images);
@@ -82,10 +83,13 @@ sub get_entries_by_images{
 sub get_url_by_image_id {
     my ($self, $id) = @_;
 
+    my $teng_r = $self->teng('BABYRY_MAIN_R');
     my $home_dir = Babyry->base_dir;
     my $bucket   = Babyry::Common->config->{bucket};
     my $ruby     = Babyry::Common->config->{ruby};
-    my $command  = "$ruby $home_dir/lib/Babyry/Model/get_onetime_url.rb $bucket ${id}.jpeg";
+    my $image = Babyry::Model::Image->new()->get_by_image_id($teng_r, $id);
+    my $format = $image->format;
+    my $command  = "$ruby $home_dir/lib/Babyry/Model/get_onetime_url.rb $bucket ${id}.${format}";
     my $url = `$command`;
     chomp($url);
 
