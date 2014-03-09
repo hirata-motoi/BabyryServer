@@ -83,17 +83,10 @@ sub get_entries_by_images{
 sub get_url_by_image_id {
     my ($self, $id) = @_;
 
-    my $teng_r = $self->teng('BABYRY_MAIN_R');
-    my $home_dir = Babyry->base_dir;
-    my $bucket   = Babyry::Common->config->{bucket};
-    my $ruby     = Babyry::Common->config->{ruby};
-    my $image = Babyry::Model::Image->new()->get_by_image_id($teng_r, $id);
-    my $format = $image->format;
-    my $command  = "$ruby $home_dir/lib/Babyry/Model/get_onetime_url.rb $bucket ${id}.${format}";
-    my $url = `$command`;
-    chomp($url);
+    my $teng = $self->teng('BABYRY_MAIN_R');
+    my $url = Babyry::Model::Image->new()->get_by_image_id($teng, $id);
 
-    return $url;
+    return $url->url;
 }
 
 1;
