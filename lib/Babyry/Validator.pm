@@ -12,7 +12,7 @@ sub validate {
 
     my $req = $c->req;
     my $validator = Babyry::FormValidator->new($req);
-    $validator->load_constraints(qw/DATE Email URL File Number/);
+    $validator->load_constraints(qw/Date Email URL File Number/);
 
     $self->do_form_validate($validator);
     $self->do_logic_validate($c, $validator);
