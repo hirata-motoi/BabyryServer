@@ -55,7 +55,7 @@ sub _get_image_count_by_stamp {
 
     my %image_count_by_stamp = ();
     for my $image_id ( keys %{$image_stamp_map} ) {
-        map { $image_count_by_stamp{$_}++ } @{ $image_stamp_map->{$image_id} };
+        map { $image_count_by_stamp{ $_->stamp_id }++ } @{ $image_stamp_map->{$image_id} };
     }
     return \%image_count_by_stamp;
 }
