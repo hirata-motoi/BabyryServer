@@ -13,7 +13,7 @@ this part will be replaced by methods in entries.coffee
 
 entryIdsInArray = []
 loadingFlg = false
-$( () ->
+showImageDetail = () ->
   $(".img-thumbnail").on("click", () ->
     imageId   = $(this).parents(".item").attr("image_id")
     data = getData preserveResponseData, showErrorMessage, true
@@ -170,5 +170,5 @@ $( () ->
   getCurrentEntryId = () ->
     # 今表示されている投稿のentry_id
 
- )
-
+window.util = []
+window.util.showImageDetail = showImageDetail
