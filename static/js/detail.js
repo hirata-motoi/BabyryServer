@@ -204,6 +204,7 @@
       }
       owlElem.find(".img-box").on("click", function() {
         var comment, comments, currentPosition, h4, icon, img, media, mediaBody, owl, _i, _len;
+        $(".comment-container").empty();
         owl = $(".owl-carousel").data('owlCarousel');
         currentPosition = owl.currentPosition();
         comments = window.entryData.entries[currentPosition].comments;

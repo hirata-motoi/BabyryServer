@@ -202,6 +202,8 @@ showImageDetail = () ->
     owlElem.attr("id", "")
     owlElem.addClass("unloaded") if !image_url
     owlElem.find(".img-box").on("click", () ->
+      $(".comment-container").empty()
+
       owl = $(".owl-carousel").data('owlCarousel')
       currentPosition = owl.currentPosition()
       comments = window.entryData.entries[currentPosition].comments
