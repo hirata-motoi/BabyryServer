@@ -53,6 +53,14 @@ sub get_entries_by_images{
         # stamp_idsのリストを$stampsから抜き出して、まとめて取るようにする。
         my $stamps = Babyry::Model::ImageStampMap::get_stamp_ids_by_rows($stamps->{$image->image_id});
 
+        # TODO 上でstamp_idのリストしか持ってないので、ここで暫定でicon_urlを作る
+        my @stamp_info = map {
+            {
+                stamp_id => $_,
+                icon_url => sprintf Babyry::Common->config->{icon_url_base}, $_
+            }
+        } @$stamps;
+
         # temporary url
         my $url = $self->get_url_by_image_id($image->image_id);
 
@@ -71,7 +79,7 @@ sub get_entries_by_images{
 
         push(@entries,{
             %$columns,
-            stamps => $stamps,
+            stamps => \@stamp_info,
             comments => $cmt_array,
             fullsize_image_url => $url,
         });

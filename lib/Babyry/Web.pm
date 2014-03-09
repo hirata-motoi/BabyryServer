@@ -46,7 +46,9 @@ sub render_json_validation_error {
     my ($c, $validator) = @_;
 
     my $messages = $validator->get_messages();
-    $c->render_json( +{ error_messages => $messages } );
+    my $res = $c->render_json( +{ error_messages => $messages } );
+    $res->status(400);
+    return $res;
 }
 
 

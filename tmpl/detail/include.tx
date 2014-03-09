@@ -20,38 +20,34 @@
   .owl-item {
     width: 320px;
   }
+  .stamp {
+    text-shadow: 0 0 2px #000;
+    color: #eee;
+    text-decoration:none;
+  }
+  .stamp-icon {
+    width: 36px;
+    height: 36px;
+    display: block;
+    margin: 5px;
+  }
+  .listed-stamp {
+    width: 36px;
+    height: 36px;
+    margin: 5px;
+  }
 </style>
 
 <div class="detail-container" style="display:none">
-<!--
-  <ul class="pager" style="margin: 0; padding: 5px; background: #eee;">
-    <li class="previous"><a href="/"><span class="glyphicon glyphicon-chevron-left"></span>戻る</a></li>
-  </ul>
--->
 <div class="owl-carousel owl-theme"></div>
-<!--
-  <div class="footer">
-    <form class="form-inline" role="form" style="width: 100%;">
-      <div style="display: -webkit-box; width: 100%;">
-        <div style=" -webkit-box-flex: 1;">
-          <label class="sr-only" for="exampleInputEmail2">コメント</label>
-          <input type="email" class="form-control" placeholder="コメント">
-        </div>
-        <div style=" width: 60px;">
-          <button type="submit" class="btn btn-default">送信</button>
-        </div>
-      </div>
-    </form>
-  </div>
--->
 </div>
 
 
 <div id="item-tmpl" style="display:none">
   <div class="img-box" style="position: relative;">
     <img src="" class="img-detail" />
-    <div style="position: absolute; top: 10px; right: 10px; font-size: 30px; line-height: 50px;">
-      <a class="glyphicon glyphicon-plus-sign" style=" text-shadow: 0 0 2px #000; color: #eee;text-decoration:none;"></a>
+    <div class="stamp-container" style="position: absolute; top: 10px; right: 10px; font-size: 30px; text-align: center;">
+      <a href="#stampAttachModal" data-toggle="modal" data-backdrop="true" class="glyphicon glyphicon-plus-sign stamp-add-icon" style="text-shadow: 0 0 2px #000; color: #eee;text-decoration:none;"></a>
     </div>
   </div>
   <div class="comment-container" style="background: #fff; padding-top: 10px; padding-bottom: 10px;">
@@ -85,3 +81,17 @@
     </div>
   </div>
 </div>
+
+<div id="stampAttachModal" class="modal fade" style="top: auto; margin: 0 auto 20px; max-width: 100%;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>pick stamps</h3>
+      </div>
+      <div class="modal-body">
+      </div>
+    </div>
+  </div>
+</div>
+
