@@ -95,8 +95,8 @@
         if(window.entryData.entries == undefined) {
           window.entryData.entries = [];
         }
-        window.entryData.entries.push(data.data.entries);
-        window.entryData.metadata = data.data.metadata;
+        window.entryData.entries = window.entryData.entries.concat(data.data.entries);
+        window.entryData.metadata = data.metadata;
         window.util.showImageDetail();
       },
       error : function(data){

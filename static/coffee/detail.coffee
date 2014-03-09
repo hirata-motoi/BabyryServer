@@ -15,12 +15,12 @@ window.entryData.metadata or= {}
 window.stampData or= {}
 window.stampsByImagePosition or= {}
 
-entryIdsInArray = []
-loadingFlg = false
+window.entryIdsInArray = []
+window.loadingFlg = false
 showImageDetail = () ->
   $(".img-thumbnail").on("click", () ->
     imageId   = $(this).parents(".item").attr("image_id")
-    data = getData preserveResponseData, showErrorMessage, true
+    data = pickData()
   
     # setup stampsByImagePosition
     upsertStampsByImagePosition data.list
@@ -33,7 +33,7 @@ showImageDetail = () ->
 
       if data.list[i]
         image_url = data.list[i].fullsize_image_url
-        entryIdsInArray.push data.list[i].image_id
+        window.entryIdsInArray.push data.list[i].image_id
         stamps = data.list[i].stamps
         image_id = data.list[i].image_id
       else 
@@ -44,7 +44,8 @@ showImageDetail = () ->
       owlContainer.append $elem
       initialIndex = i if data.list[i] and data.list[i].image_id == imageId
       
-      if stamps and stamps.length > 0
+      #if stamps and stamps.length > 0
+      if stamps
         stampList = []
         for stampInfo, n in stamps
           stampElem = $("<a>")
@@ -70,7 +71,7 @@ showImageDetail = () ->
       beforeMove: () ->
       afterMove: () ->
         if shouldPreLoad(5)
-          return if loadingFlg
+          return if window.loadingFlg
 
           # 前回取得したページno
           currentPageNo = 1
@@ -99,7 +100,7 @@ showImageDetail = () ->
             "error": showErrorMessage
           })
           ###
-          getData showEntries, showErrorMessage, false
+          getData showEntries, showErrorMessage
     });
     $(".stamp-attach-icon").on "click", attachStamp
   )
@@ -107,20 +108,24 @@ showImageDetail = () ->
   shouldPreLoad = (num) ->
     owl = $(".owl-carousel").data('owlCarousel')
     # TODO improve
-    return if entryIdsInArray.length < owl.currentPosition() + num then true else false
+    return if window.entryIdsInArray.length < owl.currentPosition() + num then true else false
 
   preserveResponseData = (response) ->
     window.entryData.entries.push entry for entry in response.data.entries
     window.entryData.metadata = response.metadata
 
-  getData = (successCallback, errorCallback, tempNotAsyncFlg) ->
+  pickData = () ->
+    return {
+      list: window.entryData.entries,
+      found_row_count: window.entryData.metadata.found_row_count
+    }
 
+  getData = (successCallback, errorCallback) ->
     nextPage = if window.entryData.metadata.page then parseInt(window.entryData.metadata.page, 10) + 1 else 1
     countPerPage = window.entryData.metadata.count || 10
     # ajax
     $.ajax({
       "url" : "/entry/search.json",
-      "async": !tempNotAsyncFlg, # temporary
       "processData": true,
       "contentType": false,
       "data": {
@@ -131,10 +136,6 @@ showImageDetail = () ->
       "success": successCallback
       "error": errorCallback
     })
-    return {
-      list: window.entryData.entries,
-      found_row_count: window.entryData.metadata.found_row_count
-    }
 
 
   createImageBox = (image_url, image_id) ->
@@ -166,11 +167,11 @@ showImageDetail = () ->
           $(elem).find(".img-box img").attr("src", image_url)
           $(elem).find(".loading").removeClass("loading")
           $(elem).removeClass("unloaded")
-          entryIdsInArray.push response.data.entries[i].image_id
+          window.entryIdsInArray.push response.data.entries[i].image_id
         else
-          loadingFlg = false
+          window.loadingFlg = false
           break
-    loadingFlg = false
+    window.loadingFlg = false
 
 
   getNextIds = () ->
@@ -211,7 +212,7 @@ showImageDetail = () ->
     stampHash = getStampHash()
     stampIconUrl = stampHash[stampId].icon_url
     targetImgBox = $(".img-box")[currentPosition]
-    imageId = $(".img-box").attr("image-id")
+    imageId = $(targetImgBox).attr("image-id")
 
     # stampのaを作ってappend
     stampElem = $("<a>")
@@ -305,5 +306,6 @@ showImageDetail = () ->
   else
     window.stampData = response.data
     setStampAttachList()
+
 window.util = []
 window.util.showImageDetail = showImageDetail

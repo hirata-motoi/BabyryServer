@@ -1,5 +1,5 @@
 (function() {
-  var console, entryIdsInArray, loadingFlg, showImageDetail, _base, _base1;
+  var console, showImageDetail, _base, _base1;
 
   if (typeof window.console === "undefined") {
     console = {};
@@ -24,23 +24,23 @@
 
   window.stampsByImagePosition || (window.stampsByImagePosition = {});
 
-  entryIdsInArray = [];
+  window.entryIdsInArray = [];
 
-  loadingFlg = false;
+  window.loadingFlg = false;
 
   showImageDetail = function() {
-    var alreadyAttachedStamp, attachStamp, createImageBox, createStampAttachIcon, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, preserveResponseData, setStampAttachList, setStampsByImagePosition, shouldPreLoad, showEntries, showErrorMessage, showLoadingImage, upsertStampsByImagePosition;
+    var alreadyAttachedStamp, attachStamp, createImageBox, createStampAttachIcon, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, setStampAttachList, setStampsByImagePosition, shouldPreLoad, showEntries, showErrorMessage, showLoadingImage, upsertStampsByImagePosition;
     $(".img-thumbnail").on("click", function() {
       var $elem, data, i, imageId, image_id, image_url, initialIndex, n, owlContainer, stampElem, stampImage, stampInfo, stampList, stamps, _i, _j, _len, _ref;
       imageId = $(this).parents(".item").attr("image_id");
-      data = getData(preserveResponseData, showErrorMessage, true);
+      data = pickData();
       upsertStampsByImagePosition(data.list);
       owlContainer = $(".owl-carousel").clone(true);
       owlContainer.addClass("displayed");
       for (i = _i = 0, _ref = data.found_row_count - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
         if (data.list[i]) {
           image_url = data.list[i].fullsize_image_url;
-          entryIdsInArray.push(data.list[i].image_id);
+          window.entryIdsInArray.push(data.list[i].image_id);
           stamps = data.list[i].stamps;
           image_id = data.list[i].image_id;
         } else {
@@ -52,7 +52,7 @@
         if (data.list[i] && data.list[i].image_id === imageId) {
           initialIndex = i;
         }
-        if (stamps && stamps.length > 0) {
+        if (stamps) {
           stampList = [];
           for (n = _j = 0, _len = stamps.length; _j < _len; n = ++_j) {
             stampInfo = stamps[n];
@@ -73,9 +73,9 @@
         beforeInit: function() {},
         beforeMove: function() {},
         afterMove: function() {
-          var count, currentPageNo;
+          var count, currentPageNo, loadingFlg;
           if (shouldPreLoad(5)) {
-            if (loadingFlg) {
+            if (window.loadingFlg) {
               return;
             }
             currentPageNo = 1;
@@ -97,7 +97,7 @@
             })
             */
 
-            return getData(showEntries, showErrorMessage, false);
+            return getData(showEntries, showErrorMessage);
           }
         }
       });
@@ -106,7 +106,7 @@
     shouldPreLoad = function(num) {
       var owl;
       owl = $(".owl-carousel").data('owlCarousel');
-      if (entryIdsInArray.length < owl.currentPosition() + num) {
+      if (window.entryIdsInArray.length < owl.currentPosition() + num) {
         return true;
       } else {
         return false;
@@ -121,13 +121,18 @@
       }
       return window.entryData.metadata = response.metadata;
     };
-    getData = function(successCallback, errorCallback, tempNotAsyncFlg) {
+    pickData = function() {
+      return {
+        list: window.entryData.entries,
+        found_row_count: window.entryData.metadata.found_row_count
+      };
+    };
+    getData = function(successCallback, errorCallback) {
       var countPerPage, nextPage;
       nextPage = window.entryData.metadata.page ? parseInt(window.entryData.metadata.page, 10) + 1 : 1;
       countPerPage = window.entryData.metadata.count || 10;
-      $.ajax({
+      return $.ajax({
         "url": "/entry/search.json",
-        "async": !tempNotAsyncFlg,
         "processData": true,
         "contentType": false,
         "data": {
@@ -138,10 +143,6 @@
         "success": successCallback,
         "error": errorCallback
       });
-      return {
-        list: window.entryData.entries,
-        found_row_count: window.entryData.metadata.found_row_count
-      };
     };
     createImageBox = function(image_url, image_id) {
       var owlElem, tmpl;
@@ -175,13 +176,13 @@
           $(elem).find(".img-box img").attr("src", image_url);
           $(elem).find(".loading").removeClass("loading");
           $(elem).removeClass("unloaded");
-          entryIdsInArray.push(response.data.entries[i].image_id);
+          window.entryIdsInArray.push(response.data.entries[i].image_id);
         } else {
-          loadingFlg = false;
+          window.loadingFlg = false;
           break;
         }
       }
-      return loadingFlg = false;
+      return window.loadingFlg = false;
     };
     getNextIds = function() {
       var currentEntryId;
@@ -232,7 +233,7 @@
       stampHash = getStampHash();
       stampIconUrl = stampHash[stampId].icon_url;
       targetImgBox = $(".img-box")[currentPosition];
-      imageId = $(".img-box").attr("image-id");
+      imageId = $(targetImgBox).attr("image-id");
       stampElem = $("<a>");
       stampElem.addClass("stamp");
       stampImage = $("<img>");
