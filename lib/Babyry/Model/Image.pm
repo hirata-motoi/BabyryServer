@@ -73,4 +73,32 @@ sub set_new_image {
     );
 }
 
+sub get_image_by_updated_at{
+    my ($self, $teng, $old_update, $limit) = @_;
+    $limit ||= 10;
+    my $sql = <<QUERY;
+    SELECT image_id, format FROM image WHERE updated_at < ? LIMIT ?
+QUERY
+    my @records =$teng->search_by_sql(
+        $sql,
+        [$old_update, $limit]
+    );
+
+    return (\@records);
+}
+
+sub update_url {
+    my ($self, $teng, $id, $url, $time) = @_;
+    $teng->update(
+        'image' => {
+            'url' => $url,
+            'updated_at' => $time,
+        }, {
+            'image_id' => $id,
+        }
+    );
+    return;
+}
+
+
 1;

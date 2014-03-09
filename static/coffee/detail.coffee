@@ -17,8 +17,7 @@ window.stampsByImagePosition or= {}
 
 entryIdsInArray = []
 loadingFlg = false
-$( () ->
-
+showImageDetail = () ->
   $(".img-thumbnail").on("click", () ->
     imageId   = $(this).parents(".item").attr("image_id")
     data = getData preserveResponseData, showErrorMessage, true
@@ -306,6 +305,5 @@ $( () ->
   else
     window.stampData = response.data
     setStampAttachList()
-
-    
-)
+window.util = []
+window.util.showImageDetail = showImageDetail

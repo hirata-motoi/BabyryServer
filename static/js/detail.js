@@ -1,5 +1,5 @@
 (function() {
-  var console, entryIdsInArray, loadingFlg, _base, _base1;
+  var console, entryIdsInArray, loadingFlg, showImageDetail, _base, _base1;
 
   if (typeof window.console === "undefined") {
     console = {};
@@ -28,7 +28,7 @@
 
   loadingFlg = false;
 
-  $(function() {
+  showImageDetail = function() {
     var alreadyAttachedStamp, attachStamp, createImageBox, createStampAttachIcon, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, preserveResponseData, setStampAttachList, setStampsByImagePosition, shouldPreLoad, showEntries, showErrorMessage, showLoadingImage, upsertStampsByImagePosition;
     $(".img-thumbnail").on("click", function() {
       var $elem, data, i, imageId, image_id, image_url, initialIndex, n, owlContainer, stampElem, stampImage, stampInfo, stampList, stamps, _i, _j, _len, _ref;
@@ -333,7 +333,11 @@
       window.stampData = response.data;
       return setStampAttachList();
     }
-  });
+  };
+
+  window.util = [];
+
+  window.util.showImageDetail = showImageDetail;
 
 }).call(this);
 
