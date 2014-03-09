@@ -36,7 +36,7 @@ sub list {
         $logic->list( $c->stash->{user_id} );
     } || {};
 
-    return $self->output_response_json($c, $ret, $@);
+    return $self->output_response_json($c, {data => $ret}, $@);
 }
 
 1;
