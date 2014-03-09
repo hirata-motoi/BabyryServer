@@ -69,7 +69,7 @@
     <div class="modal-content" style="background-color: black">
       <div class="modal-body">
 
-        <div class="comment-container" style="background-color: black; padding-top: 10px; padding-bottom: 10px; overflow: scroll; height: 340px;">
+        <div class="comment-container" style="background-color: black; padding-top: 10px; padding-bottom: 10px; overflow: scroll; height: 300px;">
           <div class="media">
           </div>
         </div> <!-- comment-container -->
