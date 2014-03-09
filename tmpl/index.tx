@@ -51,34 +51,61 @@
 
 <script id="template-item">
   <div class="item">
-    <div class="image"><img src="/static/img/160x160.png" class="img-thumbnail"/></div>
+    <div class="image"><img src="<%= fullsize_image_url %>" class="img-thumbnail"/></div>
     <div class="comment panel panel-default">
       <div class="panel-heading">comment</div>
       <ul class="list-group">
-        <% while (i++ < n) { %>
-          <li class="list-group-item">comment<%= i %></li>
+        <% for (i=0; i<comments.length; i++) { %>
+          <li class="list-group-item"><%= comments[i].comment %></li>
         <% } %>
       </ul>
     </div>
   </div>
 </script>
 <script type="text/javascript">
-  $(function(){
-    var tmpl = _.template($('#template-item').html());
-    var grid = $('.timeline').get(0);
-    var load_contents = function () {
-      var item = [];
-      for (var i in _.range(10)) {
-        item.push(document.createElement('article'));
+  if (window.entryData == undefined) {
+    window.entryData = {};
+  }
+  var page = 1;
+  var count = 10;
+  var tmpl = _.template($('#template-item').html());
+  var grid = $('.timeline').get(0);
+  var load_contents = function() {
+    $.ajax({
+      url : '/entry/search.json',
+      dataType: "json",
+      data: {
+        count: count,
+        page: page
+      },
+      success : function(data){
+        var item = [];
+        for (var i = 0; i < data.data.entries.length; i++) {
+          item.push(document.createElement('article'));
+        }
+        salvattore.append_elements(grid, item);
+        for (var i = 0; i < data.data.entries.length; i++) {
+          item[i].outerHTML = tmpl({ i: 0, comments: data.data.entries[i].comments, fullsize_image_url: data.data.entries[i].fullsize_image_url });
+        }
+        if (count > (data.data.entries.length + 1)) {
+          $('#load-more').hide();
+        }
+        page++;
+
+        if(window.entryData.entries == undefined) {
+          window.entryData.entries = [];
+        }
+        window.entryData.entries.push(data.data.entries);
+        window.entryData.metadata = data.data.metadata;
+        window.util.showImageDetail();
+      },
+      error : function(data){
+        console.log("error");
       }
-      salvattore.append_elements(grid, item);
-      for (var i = 0; i < item.length; i++) {
-        item[i].outerHTML = tmpl({ i: 0, n: Math.floor(Math.random()*5)+1, y: Math.floor(Math.random()*100 + 240) });
-      }
-    };
-    load_contents();
-    $('#load-more').on('click', load_contents);
-  });
+    });
+  }
+  load_contents();
+  $('#load-more').on('click', load_contents);
 </script>
 <script type="text/javascript" src="<: uri_for('/static/js/detail.js') :>"></script>
 : }
