@@ -103,6 +103,54 @@
       });
       return $(".stamp-attach-icon").on("click", attachStamp);
     });
+    $("#comment-submit").on("click", function() {
+      var comment, currentPosition, imageElem, imageId, owl, token;
+      token = getXSRFToken();
+      comment = $("#comment-textarea").val();
+      owl = $(".owl-carousel").data('owlCarousel');
+      currentPosition = owl.currentPosition();
+      imageElem = $(".img-box")[currentPosition];
+      imageId = $(imageElem).attr("image-id");
+      return $.ajax({
+        "type": "post",
+        "url": "/image/comment.json",
+        "data": {
+          "image_id": imageId,
+          "comment": comment,
+          "XSRF-TOKEN": token
+        },
+        "dataType": "json",
+        "success": function(data) {
+          var h4, icon, img, media, mediaBody;
+          media = $("<div>");
+          media.addClass("media");
+          icon = $("<a>");
+          icon.addClass("pull-left");
+          icon.attr("href", "#");
+          img = $("<img>");
+          img.addClass("media-object");
+          img.attr("alt", "64x64");
+          img.attr("src", "/static/img/160x160.png");
+          img.css("width", "64px");
+          img.css("height", "64px");
+          icon.append(img);
+          media.append(icon);
+          mediaBody = $("<div>");
+          mediaBody.addClass("media-body");
+          h4 = $("<h4>");
+          h4.addClass("media-heading");
+          h4.val("Media heading");
+          mediaBody.append(h4);
+          mediaBody.text(comment);
+          media.append(mediaBody);
+          $(".comment-container").prepend(media);
+          window.entryData.entries[currentPosition].comments.push({
+            "comment": comment
+          });
+          return $("#comment-textarea").val("");
+        }
+      });
+    });
     shouldPreLoad = function(num) {
       var owl;
       owl = $(".owl-carousel").data('owlCarousel');
@@ -155,6 +203,37 @@
         owlElem.addClass("unloaded");
       }
       owlElem.find(".img-box").on("click", function() {
+        var comment, comments, currentPosition, h4, icon, img, media, mediaBody, owl, _i, _len;
+        owl = $(".owl-carousel").data('owlCarousel');
+        currentPosition = owl.currentPosition();
+        comments = window.entryData.entries[currentPosition].comments;
+        if (comments) {
+          for (_i = 0, _len = comments.length; _i < _len; _i++) {
+            comment = comments[_i];
+            media = $("<div>");
+            media.addClass("media");
+            icon = $("<a>");
+            icon.addClass("pull-left");
+            icon.attr("href", "#");
+            img = $("<img>");
+            img.addClass("media-object");
+            img.attr("alt", "64x64");
+            img.attr("src", "/static/img/160x160.png");
+            img.css("width", "64px");
+            img.css("height", "64px");
+            icon.append(img);
+            media.append(icon);
+            mediaBody = $("<div>");
+            mediaBody.addClass("media-body");
+            h4 = $("<h4>");
+            h4.addClass("media-heading");
+            h4.val("Media heading");
+            mediaBody.append(h4);
+            mediaBody.text(comment.comment);
+            media.append(mediaBody);
+            $(".comment-container").prepend(media);
+          }
+        }
         return $("#commentModal").modal("show");
       });
       owlElem.show();

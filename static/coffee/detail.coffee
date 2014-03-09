@@ -105,6 +105,62 @@ showImageDetail = () ->
     $(".stamp-attach-icon").on "click", attachStamp
   )
 
+  $("#comment-submit").on("click", () ->
+    token = getXSRFToken()
+    comment = $("#comment-textarea").val()
+    owl = $(".owl-carousel").data('owlCarousel')
+    currentPosition = owl.currentPosition()
+    imageElem = $(".img-box")[currentPosition]
+    imageId = $(imageElem).attr("image-id")
+
+    $.ajax({
+      "type": "post",
+      "url" : "/image/comment.json",
+      "data": {
+        "image_id": imageId,
+        "comment" : comment
+        "XSRF-TOKEN": token
+      },
+      "dataType": "json",
+      "success" : (data) ->
+        media = $("<div>")
+        media.addClass("media")
+        
+        icon = $("<a>")
+        icon.addClass("pull-left")
+        icon.attr("href", "#")
+
+        img = $("<img>")
+        img.addClass("media-object")
+        img.attr("alt", "64x64")
+        img.attr("src", "/static/img/160x160.png")
+        img.css("width", "64px")
+        img.css("height", "64px")
+
+        icon.append img
+        media.append icon
+
+        mediaBody = $("<div>")
+        mediaBody.addClass("media-body")
+
+        h4 = $("<h4>")
+        h4.addClass("media-heading")
+        h4.val("Media heading")
+
+        mediaBody.append h4
+        mediaBody.text(comment)
+
+        media.append mediaBody
+
+        $(".comment-container").prepend media
+        window.entryData.entries[currentPosition].comments.push {"comment": comment}
+
+        # textareaを空にする
+        $("#comment-textarea").val("")
+    })
+    
+  )
+
   shouldPreLoad = (num) ->
     owl = $(".owl-carousel").data('owlCarousel')
     # TODO improve
@@ -146,6 +202,34 @@ showImageDetail = () ->
     owlElem.attr("id", "")
     owlElem.addClass("unloaded") if !image_url
     owlElem.find(".img-box").on("click", () ->
+      owl = $(".owl-carousel").data('owlCarousel')
+      currentPosition = owl.currentPosition()
+      comments = window.entryData.entries[currentPosition].comments
+
+      if comments
+        for comment in comments
+          media = $("<div>")
+          media.addClass("media")
+          icon = $("<a>")
+          icon.addClass("pull-left")
+          icon.attr("href", "#")
+          img = $("<img>")
+          img.addClass("media-object")
+          img.attr("alt", "64x64")
+          img.attr("src", "/static/img/160x160.png")
+          img.css("width", "64px")
+          img.css("height", "64px")
+          icon.append img
+          media.append icon
+          mediaBody = $("<div>")
+          mediaBody.addClass("media-body")
+          h4 = $("<h4>")
+          h4.addClass("media-heading")
+          h4.val("Media heading")
+          mediaBody.append h4
+          mediaBody.text(comment.comment)
+          media.append mediaBody
+          $(".comment-container").prepend media
       $("#commentModal").modal("show")
     )
     owlElem.show()

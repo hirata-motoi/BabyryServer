@@ -69,65 +69,13 @@
     <div class="modal-content" style="background-color: black">
       <div class="modal-body">
 
-        <div class="comment-container" style="background-color: black; padding-top: 10px; padding-bottom: 10px; overflow: scroll; height: 400px;">
+        <div class="comment-container" style="background-color: black; padding-top: 10px; padding-bottom: 10px; overflow: scroll; height: 340px;">
           <div class="media">
-            <a class="pull-left" href="#">
-              <img class="media-object" alt="64x64" src="/static/img/160x160.png" style="width: 64px; height: 64px;">
-            </a>
-            <div class="media-body">
-              <h4 class="media-heading">Media heading</h4>
-              Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-              <a href="http://dena.com">DeNA</a>
-            </div>
           </div>
-          <div class="media">
-            <a class="pull-left" href="#">
-              <img class="media-object" alt="64x64" src="/static/img/160x160.png" style="width: 64px; height: 64px;">
-            </a>
-            <div class="media-body">
-              <h4 class="media-heading">Media heading</h4>
-              Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-              <a href="http://dena.com">DeNA</a>
-            </div>
-          </div>
-          <div class="media">
-            <a class="pull-left" href="#">
-              <img class="media-object" alt="64x64" src="/static/img/160x160.png" style="width: 64px; height: 64px;">
-            </a>
-            <div class="media-body">
-              <h4 class="media-heading">Media heading</h4>
-              Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-              <a href="http://dena.com">DeNA</a>
-            </div>
-          </div>
-          <div class="media">
-            <a class="pull-left" href="#">
-              <img class="media-object" alt="64x64" src="/static/img/160x160.png" style="width: 64px; height: 64px;">
-            </a>
-            <div class="media-body">
-              <h4 class="media-heading">Media heading</h4>
-              Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-              <a href="http://dena.com">DeNA</a>
-            </div>
-          </div>
-          <div class="media">
-            <a class="pull-left" href="#">
-              <img class="media-object" alt="64x64" src="/static/img/160x160.png" style="width: 64px; height: 64px;">
-            </a>
-            <div class="media-body">
-              <h4 class="media-heading">Media heading</h4>
-              Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-              <div class="media">
-                <a class="pull-left" href="#">
-                  <img class="media-object" data-src="holder.js/64x64" alt="64x64" src="/static/img/160x160.png" style="width: 64px; height: 64px;">
-                </a>
-                <div class="media-body">
-                  <h4 class="media-heading">Nested media heading</h4>
-                  Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-                </div>
-              </div>
-            </div>
-          </div>
+        </div> <!-- comment-container -->
+        <div>
+          <textarea rows=2 style="width: 90%;" id="comment-textarea"></textarea>
+          <button type="submit" id="comment-submit">投稿</button>
         </div>
       </div> <!-- modal-body -->
     </div> <!-- modal-content -->
