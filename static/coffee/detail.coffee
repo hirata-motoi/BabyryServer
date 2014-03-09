@@ -145,6 +145,9 @@ showImageDetail = () ->
     owlElem.find(".img-box img").attr("src", image_url)
     owlElem.attr("id", "")
     owlElem.addClass("unloaded") if !image_url
+    owlElem.find(".img-box").on("click", () ->
+      $("#commentModal").modal("show")
+    )
     owlElem.show()
     return owlElem
 

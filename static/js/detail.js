@@ -154,6 +154,9 @@
       if (!image_url) {
         owlElem.addClass("unloaded");
       }
+      owlElem.find(".img-box").on("click", function() {
+        return $("#commentModal").modal("show");
+      });
       owlElem.show();
       return owlElem;
     };
