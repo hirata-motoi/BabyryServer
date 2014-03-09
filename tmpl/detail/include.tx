@@ -74,9 +74,12 @@
 <div id="commentModal" class="modal fade" style="top: auto; margin: 0 auto 20px; max-width: 100%;">
   <div class="modal-dialog">
     <div class="modal-content" style="background-color: black">
+      <div class="modal-header" style="height: 20px;">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin-top: -15px;">×</button>
+      </div>
       <div class="modal-body">
 
-        <div class="comment-container" style="background-color: black; padding-top: 10px; padding-bottom: 10px; overflow: scroll; height: 300px;">
+        <div class="comment-container" style="background-color: black; padding-top: 10px; padding-bottom: 10px; overflow: scroll; height: 250px;">
           <div class="media">
           </div>
         </div> <!-- comment-container -->
