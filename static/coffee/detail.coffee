@@ -207,6 +207,15 @@ showImageDetail = () ->
       owl = $(".owl-carousel").data('owlCarousel')
       currentPosition = owl.currentPosition()
       comments = window.entryData.entries[currentPosition].comments
+      comments.sort( (a, b) ->
+        aCreatedAt = a.created_at
+        bCreatedAt = b.created_at
+        if aCreatedAt < bCreatedAt
+          return -1
+        if aCreatedAt > bCreatedAt
+          return 1
+        return 0
+      )
 
       if comments
         for comment in comments

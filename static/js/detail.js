@@ -208,6 +208,18 @@
         owl = $(".owl-carousel").data('owlCarousel');
         currentPosition = owl.currentPosition();
         comments = window.entryData.entries[currentPosition].comments;
+        comments.sort(function(a, b) {
+          var aCreatedAt, bCreatedAt;
+          aCreatedAt = a.created_at;
+          bCreatedAt = b.created_at;
+          if (aCreatedAt < bCreatedAt) {
+            return -1;
+          }
+          if (aCreatedAt > bCreatedAt) {
+            return 1;
+          }
+          return 0;
+        });
         if (comments) {
           for (_i = 0, _len = comments.length; _i < _len; _i++) {
             comment = comments[_i];
