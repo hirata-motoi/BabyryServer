@@ -106,13 +106,16 @@
   }
   load_contents();
   $('#load-more').on('click', load_contents);
+  $('#image_upload').on('click', function(){
+    location.href = '/image/web/upload';
+  });
 </script>
 <script type="text/javascript" src="<: uri_for('/static/js/detail.js') :>"></script>
 : }
 
 : around content -> {
 <div class="dynamic-container">
-  <button class="btn btn-default btn-lg btn-block">投稿</button>
+  <button class="btn btn-default btn-lg btn-block" id="image_upload">投稿</button>
 
   <div class="timeline row" data-columns></div>
 
