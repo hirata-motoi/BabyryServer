@@ -74,7 +74,7 @@
   <input type="submit" value="hoge">
 </form>
 
-<div id="relativesModal" class="modal fade" style="position: relative; top: auto; left: auto; right: auto; margin: 0 auto 20px; max-width: 100%;">
+<div id="relativesModal" class="modal fade" style="top: auto; margin: 0 auto 20px; max-width: 100%; height: 500px;">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
