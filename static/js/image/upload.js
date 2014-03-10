@@ -1,5 +1,5 @@
 (function() {
-  var $form, console, getXSRFToken, pickedSharedRelatives, redirectToWall, showErrorMessage, showTmpImage, submit;
+  var $form, console, getXSRFToken, pickedSharedRelatives, redirectToWall, showErrorMessage, showLoadingImage, submit;
 
   if (typeof window.console === "undefined") {
     console = {};
@@ -16,8 +16,9 @@
   $form = $("#image-post-form");
 
   $form.find("[type=file]").on("change", function() {
-    var fd;
+    var box, fd;
     window.console.log("file changed");
+    box = showLoadingImage();
     fd = new FormData($form[0]);
     $.ajax($form.attr("action"), {
       type: 'post',
@@ -25,23 +26,46 @@
       contentType: false,
       data: fd,
       dataType: 'json',
-      success: showTmpImage,
+      success: function(data) {
+        box.find("img").attr("src", "");
+        box.attr("filename", data.image_tmp_name);
+        box.find("img").attr("src", data.image_tmp_url);
+        box.find("img").css("width", "80");
+        return box.find("img").css("height", "80");
+      },
       error: showErrorMessage
     });
     return false;
   });
 
-  showTmpImage = function(data) {
-    var box, image;
-    window.console.log(data);
-    box = $("<span>").addClass("js-uploaded-image-box");
-    box.attr("filename", data.image_tmp_name);
+  showLoadingImage = function() {
+    var box, image, innerBox;
+    box = $("<div>").addClass("js-uploaded-image-box");
+    box.css("display", "table-cell");
+    box.css("width", "100");
+    box.css("height", "100");
+    box.css("text-align", "center");
+    box.css("vertical-align", "middle");
+    box.css("padding-left", "6px");
+    box.css("padding-right", "6px");
+    innerBox = $("<div>");
+    innerBox.css("display", "table-cell");
+    innerBox.css("width", "88");
+    innerBox.css("height", "88");
+    innerBox.css("text-align", "center");
+    innerBox.css("vertical-align", "middle");
+    innerBox.css("border", "solid 1px gray");
+    innerBox.css("padding", "1px");
+    innerBox.css("margin", "2px");
+    innerBox.addClass("inner-box");
     image = $("<img>");
-    image.attr("src", data.image_tmp_url);
-    image.css("width", "80");
-    image.css("height", "80");
-    box.append(image);
-    return $(".js-image-container").append(box);
+    image.attr("src", "/static/img/ajax-loader.gif");
+    image.css("width", "30");
+    image.css("height", "30");
+    innerBox.append(image);
+    box.append(innerBox);
+    $(".js-image-container").append(box);
+    return box;
   };
 
   submit = function() {

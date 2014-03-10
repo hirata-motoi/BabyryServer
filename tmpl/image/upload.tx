@@ -35,12 +35,21 @@
   #add-image-icon {
     width: 80px;
     height: 80px;
+    margin-top: 10px;
   }
   .disabled-iframe {
     display: none;
   }
   #image-post-form {
     display: none;
+  }
+  .js-image-container {
+    float: left;
+  }
+  .inner-box {
+    box-shadow: 3px 3px 3px gray;
+    -webkit-box-shadow: 3px 3px 3px gray;
+    -moz-box-shadow: 3px 3px 3px gray;
   }
 </style>
 : }
@@ -57,7 +66,7 @@
 
 : around content -> {
 
-<div>
+<div style="height: 120px; display: table-cell;">
   <span class="js-image-container"></span>
   <span class="add-image">
     <img src="/static/img/add-image-icon.jpg" id="add-image-icon">

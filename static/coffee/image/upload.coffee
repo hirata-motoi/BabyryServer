@@ -12,6 +12,8 @@ $form = $("#image-post-form")
 $form.find("[type=file]").on("change", () ->
   window.console.log "file changed"
 
+  box = showLoadingImage()
+
   fd = new FormData( $form[0] )
   $.ajax( $form.attr("action"), {
     type: 'post',
@@ -19,27 +21,51 @@ $form.find("[type=file]").on("change", () ->
     contentType: false,
     data: fd,
     dataType: 'json',
-    success: showTmpImage,
+    success: (data) ->
+      box.find("img").attr "src", ""
+      box.attr "filename", data.image_tmp_name
+      box.find("img").attr "src", data.image_tmp_url
+      # TODO trim 
+      box.find("img").css "width", "80"
+      box.find("img").css "height", "80"
     error: showErrorMessage
   })
   return false
 )
 
-showTmpImage = (data) ->
-  window.console.log data
+showLoadingImage = () ->
+  box = $("<div>").addClass "js-uploaded-image-box"
+  box.css "display", "table-cell"
+  box.css "width", "100"
+  box.css "height", "100"
+  box.css "text-align", "center"
+  box.css "vertical-align", "middle"
+  box.css "padding-left", "6px"
+  box.css "padding-right", "6px"
 
-  box = $("<span>").addClass "js-uploaded-image-box"
-  box.attr "filename", data.image_tmp_name
+  innerBox = $("<div>")
+  innerBox.css "display", "table-cell"
+  innerBox.css "width", "88"
+  innerBox.css "height", "88"
+  innerBox.css "text-align", "center"
+  innerBox.css "vertical-align", "middle"
+
+  innerBox.css "border", "solid 1px gray"
+  innerBox.css "padding", "1px"
+  innerBox.css "margin", "2px"
+  innerBox.addClass "inner-box"
 
   image = $("<img>")
-  image.attr "src", data.image_tmp_url
+  image.attr "src", "/static/img/ajax-loader.gif"
 
   # TODO trim 
-  image.css "width", "80"
-  image.css "height", "80"
+  image.css "width", "30"
+  image.css "height", "30"
 
-  box.append image
+  innerBox.append image
+  box.append innerBox
   $(".js-image-container").append box
+  return box
 
 submit = () ->
   filenames = []
