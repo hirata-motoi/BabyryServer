@@ -69,6 +69,7 @@
       $(".dynamic-container").html(owlContainer);
       $(".owl-carousel.displayed").owlCarousel({
         items: 1,
+        pagination: false,
         scrollPerPage: true,
         beforeInit: function() {},
         beforeMove: function() {},

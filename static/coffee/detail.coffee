@@ -63,6 +63,7 @@ showImageDetail = () ->
     # set carousel
     $(".owl-carousel.displayed").owlCarousel({
       items: 1,
+      pagination: false,
       scrollPerPage: true,
       beforeInit: () ->
         # タップされた画像を初期位置へ
