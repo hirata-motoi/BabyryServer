@@ -77,7 +77,7 @@ sub get_image_by_updated_at{
     my ($self, $teng, $old_update, $limit) = @_;
     $limit ||= 10;
     my $sql = <<QUERY;
-    SELECT image_id, format FROM image WHERE updated_at < ? LIMIT ?
+    SELECT image_id, format FROM image WHERE updated_at < ? OR url = '' LIMIT ?
 QUERY
     my @records =$teng->search_by_sql(
         $sql,
