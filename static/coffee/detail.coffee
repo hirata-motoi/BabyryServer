@@ -21,6 +21,7 @@ showImageDetail = () ->
   $(".img-thumbnail").on("click", () ->
     imageId   = $(this).parents(".item").attr("image_id")
     data = pickData()
+    tappedEntryIndex = $(this).attr "entryIndex"
   
     # setup stampsByImagePosition
     upsertStampsByImagePosition data.list
@@ -87,22 +88,10 @@ showImageDetail = () ->
           loadingFlg = true
 
           # ajax
-          ###
-          $.ajax({
-            "url": "/entry/search.json",
-            "processData": true,
-            "contentType": false,
-            "data": {
-              "page": currentPageNo + 1,
-              "count": count,
-            },
-            "dataType": 'json',
-            "success": showEntries,
-            "error": showErrorMessage
-          })
-          ###
           getData showEntries, showErrorMessage
     });
+    owl = $(".owl-carousel").data('owlCarousel')
+    owl.jumpTo(tappedEntryIndex)
     $(".stamp-attach-icon").on "click", attachStamp
   )
 
