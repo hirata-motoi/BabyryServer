@@ -20,68 +20,76 @@
   .owl-item {
     width: 320px;
   }
+  .stamp {
+    text-shadow: 0 0 2px #000;
+    color: #eee;
+    text-decoration:none;
+  }
+  .stamp-icon {
+    width: 36px;
+    height: 36px;
+    display: block;
+    margin: 5px;
+  }
+  .listed-stamp {
+    width: 36px;
+    height: 36px;
+    margin: 5px;
+  }
 </style>
+<script type="text/javascript">
+  function prevent(e) {
+    console.log("prevent");
+    e.stopPropagation();
+    $("#stampAttachModal").modal({
+      "backdrop": true
+    });
+  }
+</script>
 
 <div class="detail-container" style="display:none">
-<!--
-  <ul class="pager" style="margin: 0; padding: 5px; background: #eee;">
-    <li class="previous"><a href="/"><span class="glyphicon glyphicon-chevron-left"></span>戻る</a></li>
-  </ul>
--->
-<div class="owl-carousel owl-theme"></div>
-<!--
-  <div class="footer">
-    <form class="form-inline" role="form" style="width: 100%;">
-      <div style="display: -webkit-box; width: 100%;">
-        <div style=" -webkit-box-flex: 1;">
-          <label class="sr-only" for="exampleInputEmail2">コメント</label>
-          <input type="email" class="form-control" placeholder="コメント">
-        </div>
-        <div style=" width: 60px;">
-          <button type="submit" class="btn btn-default">送信</button>
-        </div>
-      </div>
-    </form>
-  </div>
--->
+  <div class="owl-carousel owl-theme"></div>
 </div>
-
 
 <div id="item-tmpl" style="display:none">
   <div class="img-box" style="position: relative;">
     <img src="" class="img-detail" />
-    <div style="position: absolute; top: 10px; right: 10px; font-size: 30px; line-height: 50px;">
-      <a class="glyphicon glyphicon-plus-sign" style=" text-shadow: 0 0 2px #000; color: #eee;text-decoration:none;"></a>
+    <div class="stamp-container" style="position: absolute; top: 10px; right: 10px; font-size: 30px; text-align: center;">
+      <a href="#stampAttachModal" data-toggle="modal" data-backdrop="true" class="glyphicon glyphicon-plus-sign stamp-add-icon" style="text-shadow: 0 0 2px #000; color: #eee;text-decoration:none;" onClick="prevent(event)"></a>
     </div>
   </div>
-  <div class="comment-container" style="background: #fff; padding-top: 10px; padding-bottom: 10px;">
-    <div class="media">
-      <a class="pull-left" href="#">
-        <img class="media-object" alt="64x64" src="/static/img/160x160.png" style="width: 64px; height: 64px;">
-      </a>
-      <div class="media-body">
-        <h4 class="media-heading">Media heading</h4>
-        Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-        <a href="http://dena.com">DeNA</a>
+</div>
+
+<div id="stampAttachModal" class="modal fade" style="top: 0px; margin: 0 auto 20px; max-width: 100%; height: 500px;">
+  <div class="modal-dialog" style="height: 0px;">
+    <div class="modal-content" style="top: 200px;">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>pick stamps</h3>
+      </div>
+      <div class="modal-body">
       </div>
     </div>
-    <div class="media">
-      <a class="pull-left" href="#">
-        <img class="media-object" alt="64x64" src="/static/img/160x160.png" style="width: 64px; height: 64px;">
-      </a>
-      <div class="media-body">
-        <h4 class="media-heading">Media heading</h4>
-        Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-        <div class="media">
-          <a class="pull-left" href="#">
-            <img class="media-object" data-src="holder.js/64x64" alt="64x64" src="/static/img/160x160.png" style="width: 64px; height: 64px;">
-          </a>
-          <div class="media-body">
-            <h4 class="media-heading">Nested media heading</h4>
-            Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+  </div>
+</div>
+
+<div id="commentModal" class="modal fade" style="top: auto; margin: 0 auto 20px; max-width: 100%; height: 500px;">
+  <div class="modal-dialog">
+    <div class="modal-content" style="background-color: black; margin-top: 100px;">
+      <div class="modal-header" style="height: 20px;">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin-top: -15px;">×</button>
+      </div>
+      <div class="modal-body">
+
+        <div class="comment-container" style="background-color: black; padding-top: 10px; padding-bottom: 10px; overflow: scroll; height: 250px;">
+          <div class="media">
           </div>
+        </div> <!-- comment-container -->
+        <div>
+          <textarea rows=2 style="width: 80%;" id="comment-textarea"></textarea>
+          <button type="submit" id="comment-submit">投稿</button>
         </div>
-      </div>
-    </div>
-  </div>
+      </div> <!-- modal-body -->
+    </div> <!-- modal-content -->
+  </div> <!-- modal-dialog -->
 </div>
