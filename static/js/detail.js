@@ -31,9 +31,10 @@
   showImageDetail = function() {
     var alreadyAttachedStamp, attachStamp, createImageBox, createStampAttachIcon, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, setStampAttachList, setStampsByImagePosition, shouldPreLoad, showEntries, showErrorMessage, showLoadingImage, upsertStampsByImagePosition;
     $(".img-thumbnail").on("click", function() {
-      var $elem, data, i, imageId, image_id, image_url, initialIndex, n, owlContainer, stampElem, stampImage, stampInfo, stampList, stamps, _i, _j, _len, _ref;
+      var $elem, data, i, imageId, image_id, image_url, initialIndex, n, owl, owlContainer, stampElem, stampImage, stampInfo, stampList, stamps, tappedEntryIndex, _i, _j, _len, _ref;
       imageId = $(this).parents(".item").attr("image_id");
       data = pickData();
+      tappedEntryIndex = $(this).attr("entryIndex");
       upsertStampsByImagePosition(data.list);
       owlContainer = $(".owl-carousel").clone(true);
       owlContainer.addClass("displayed");
@@ -83,25 +84,12 @@
             count = 10;
             showLoadingImage();
             loadingFlg = true;
-            /*
-            $.ajax({
-              "url": "/entry/search.json",
-              "processData": true,
-              "contentType": false,
-              "data": {
-                "page": currentPageNo + 1,
-                "count": count,
-              },
-              "dataType": 'json',
-              "success": showEntries,
-              "error": showErrorMessage
-            })
-            */
-
             return getData(showEntries, showErrorMessage);
           }
         }
       });
+      owl = $(".owl-carousel").data('owlCarousel');
+      owl.jumpTo(tappedEntryIndex);
       return $(".stamp-attach-icon").on("click", attachStamp);
     });
     $("#comment-submit").on("click", function() {
