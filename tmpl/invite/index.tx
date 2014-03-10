@@ -1,7 +1,7 @@
 : cascade base
 : around content -> {
 <p>招待する人のメールアドレスを入力してください</p>
-<form action="<: uri_for('/') >" role="form">
+<form action="<: uri_for('/') :>" role="form">
   <div class="form-group">
     <label for="email">Email address</label>
     <input id="email" type="email" placeholder="Enter email" class="form-control"/>
