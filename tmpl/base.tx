@@ -57,11 +57,7 @@
             <span class="icon-bar"></span>
           </button-->
           <a href="/" class="navbar-brand">Babyry</a>
-          : if $user_id {
-          <p class="navbar-text navbar-left">Welcome <: $user_id :> <a href="<: uri_for('/logout') :>" class="navbar-link">Logout</a></p>
-          : }
-          <p class="navbar-text navbar-left"><a class="navbar-link" id="show-relatives">Relatives</a></p>
-          <a href="/profile" class="navbar-text navbar-left">Profile</a>
+          <a href="#slidemenu" class="pageslide navbar-text navbar-left">MENU</a>
           <p class="navbar-text navbar-left" style="position: absolute; top: 0; right: 20px;"><span class="glyphicon glyphicon-refresh"></a></span>
         </div>
       </div>

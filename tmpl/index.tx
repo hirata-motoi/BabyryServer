@@ -36,6 +36,7 @@
 
 <link href="<: uri_for('/static/jquery/plugin/owl/owl-carousel/owl.carousel.css') :>" rel="stylesheet">
 <link href="<: uri_for('/static/jquery/plugin/owl/owl-carousel/owl.theme.css') :>" rel="stylesheet">
+<link href="<: uri_for('/static/jquery/plugin/pageslide/jquery.pageslide.css') :>" rel="stylesheet">
 : }
 
 : around javascript -> {
@@ -111,9 +112,27 @@
   });
 </script>
 <script type="text/javascript" src="<: uri_for('/static/js/detail.js') :>"></script>
+
+<script type="text/javascript" src="<: uri_for('/static/jquery/plugin/pageslide/jquery.pageslide.min.js') :>"></script>
+<script type="text/javascript">
+$('.pageslide').pageslide({ direction: "left", speed: "normal" });
+$('#backslide').on('click', function(){
+  $.pageslide.close();
+});
+</script>
 : }
 
 : around content -> {
+<div id="slidemenu" style="display:none;">
+  : if $user_id {
+  <p>Welcome <: $user_id :><br>
+  <p><a id="backslide">HOME</a></p>
+  <a href="<: uri_for('/logout') :>">Logout</a></p>
+  : }
+  <p><a href="/profile">Profile</a></p>
+  <p><a id="show-relatives">Relatives</a></p>
+</div>
+
 <div class="dynamic-container">
   <button class="btn btn-default btn-lg btn-block" id="image_upload">投稿</button>
 
@@ -125,4 +144,5 @@
 : include detail::include
 
 <div id="data-json" data-json='[{"image_url":"/static/img/160x160.png"},{"image_url":"/static/img/160x160.png"},{"image_url":"/static/img/160x160.png"},{"image_url":"/static/img/160x160.png"},{"image_url":"/static/img/160x160.png"}]' style="display:none"></div>
+
 : }
