@@ -19,6 +19,18 @@ sub attach {
     return $ret;
 }
 
+sub detach {
+    my ($self, $image_id, $stamp_id) = @_;
+
+    my $teng  = $self->teng('BABYRY_MAIN_W');
+    $teng->txn_begin;
+
+    my $row_num = Babyry::Model::ImageStampMap::delete($teng, $image_id, $stamp_id);
+    $teng->txn_commit;
+
+    return $row_num;
+}
+
 sub list {
     my ($self, $user_id) = @_;
 

@@ -21,6 +21,18 @@ sub create {
     $row->get_columns;
 }
 
+sub delete {
+    my ($teng, $image_id, $stamp_id) = @_;
+
+    my $row = $teng->delete(
+        'image_stamp_map',
+        {
+            image_id => $image_id,
+            stamp_id => $stamp_id,
+        }
+    ) or croak( sprintf 'No delete target row image_id:%d stamp_id:%d', $image_id, $stamp_id );
+}
+
 #class method
 # {
 #       1 => [$row, $row],

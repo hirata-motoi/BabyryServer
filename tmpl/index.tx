@@ -136,7 +136,7 @@ $('#backslide').on('click', function(){
 <div class="dynamic-container">
   <button class="btn btn-default btn-lg btn-block" id="image_upload">投稿</button>
 
-  <div class="timeline row" data-columns></div>
+  <div class="timeline row" data-columns style="content: '2 .column.size-1of2';"></div>
 
   <button class="btn btn-default btn-lg btn-block" id="load-more">読み込み</button>
 </div>
