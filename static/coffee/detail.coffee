@@ -17,6 +17,7 @@ window.stampsByImagePosition or= {}
 
 window.entryIdsInArray = []
 window.loadingFlg = false
+owlObject = undefined
 showImageDetail = () ->
   $(".img-thumbnail").on("click", () ->
     imageId   = $(this).parents(".item").attr("image_id")
@@ -45,17 +46,10 @@ showImageDetail = () ->
       owlContainer.append $elem
       initialIndex = i if data.list[i] and data.list[i].image_id == imageId
       
-      #if stamps and stamps.length > 0
       if stamps
         stampList = []
         for stampInfo, n in stamps
-          stampElem = $("<a>")
-          stampElem.addClass("stamp")
-
-          stampImage = $("<img>")
-          stampImage.addClass("stamp-icon")
-          stampImage.attr("src", stampInfo.icon_url)
-          stampElem.append stampImage
+          stampElem = createStamp(stampInfo.stamp_id, stampInfo.icon_url)
           $elem.find(".stamp-container").append stampElem
 
     # replace html of container
@@ -66,10 +60,6 @@ showImageDetail = () ->
       items: 1,
       pagination: false,
       scrollPerPage: true,
-      beforeInit: () ->
-        # タップされた画像を初期位置へ
-        #owl = $(".owl-carousel").data('owlCarousel')
-        #owl.jumpTo(initialIndex)
       beforeMove: () ->
       afterMove: () ->
         if shouldPreLoad(5)
@@ -90,16 +80,21 @@ showImageDetail = () ->
           # ajax
           getData showEntries, showErrorMessage
     });
-    owl = $(".owl-carousel").data('owlCarousel')
-    owl.jumpTo(tappedEntryIndex)
+
+    # owlObjectをメモリに保持
+    owlObject = $(".owl-carousel").data("owlCarousel")
+
+    # タップされた画像を初期位置へ
+    owlObject.jumpTo(tappedEntryIndex)
+
+    # +ボタンのeventを登録
     $(".stamp-attach-icon").on "click", attachStamp
   )
 
   $("#comment-submit").on("click", () ->
     token = getXSRFToken()
     comment = $("#comment-textarea").val()
-    owl = $(".owl-carousel").data('owlCarousel')
-    currentPosition = owl.currentPosition()
+    currentPosition = owlObject.currentPosition()
     imageElem = $(".img-box")[currentPosition]
     imageId = $(imageElem).attr("image-id")
 
@@ -152,9 +147,8 @@ showImageDetail = () ->
   )
 
   shouldPreLoad = (num) ->
-    owl = $(".owl-carousel").data('owlCarousel')
     # TODO improve
-    return if window.entryIdsInArray.length < owl.currentPosition() + num then true else false
+    return if window.entryIdsInArray.length < owlObject.currentPosition() + num then true else false
 
   preserveResponseData = (response) ->
     window.entryData.entries.push entry for entry in response.data.entries
@@ -194,8 +188,7 @@ showImageDetail = () ->
     owlElem.find(".img-box").on("click", () ->
       $(".comment-container").empty()
 
-      owl = $(".owl-carousel").data('owlCarousel')
-      currentPosition = owl.currentPosition()
+      currentPosition = owlObject.currentPosition()
       comments = window.entryData.entries[currentPosition].comments
       comments.sort( (a, b) ->
         aCreatedAt = a.created_at
@@ -247,7 +240,6 @@ showImageDetail = () ->
 
     preserveResponseData response
 
-    owl = $(".owl-carousel").data('owlCarousel')
     unloadedElems = $(".unloaded");
     for elem, i in unloadedElems
         if response.data.entries[i]
@@ -291,8 +283,7 @@ showImageDetail = () ->
     stampId = $(this).attr("stamp-id")
 
     # image_idはowlのcurrentPositionから取得する
-    owl = $(".owl-carousel").data('owlCarousel')
-    currentPosition = owl.currentPosition()
+    currentPosition = owlObject.currentPosition()
 
     # 既にattach済なら何もしない
     return if alreadyAttachedStamp stampId, currentPosition
@@ -302,17 +293,8 @@ showImageDetail = () ->
     targetImgBox = $(".img-box")[currentPosition]
     imageId = $(targetImgBox).attr("image-id")
 
-    # stampのaを作ってappend
-    stampElem = $("<a>")
-    stampElem.addClass "stamp"
-    #stampElem.attr "href", "#stampAttachModal"
-    #stampElem.attr "data-toggle", "modal"
-    #stampElem.attr "data-backdrop", "true"
-
-    stampImage = $("<img>")
-    stampImage.addClass "stamp-icon"
-    stampImage.attr "src", stampIconUrl
-    stampElem.append stampImage
+    # stampのDOMを作ってappend
+    stampElem = createStamp(stampId, stampIconUrl)
     $(targetImgBox).find(".stamp-container").append stampElem
 
     # stampsByImagePositionを更新
@@ -339,6 +321,51 @@ showImageDetail = () ->
         else
           # stampsByImagePositionをfalseにする
           stampsByImagePosition[currentPosition][stampId] = false
+    })
+
+  createStamp = (stampId, stampIconUrl) ->
+    stampElem = $("<li>")
+    stampElem.addClass "stamp"
+
+    stampImage = $("<img>")
+    stampImage.addClass "stamp-icon"
+    stampImage.attr "src", stampIconUrl
+    stampImage.attr "stamp-id", stampId
+
+    # detach event
+    stampImage.on "click", detachStamp
+
+    stampElem.append stampImage
+    return stampElem
+
+  detachStamp = (e) ->
+    e.stopPropagation()
+
+    elem = $(this)
+    stampId = elem.attr("stamp-id")
+    imageId = elem.parents(".img-box").attr("image-id")
+    currentPosition = owlObject.currentPosition()
+
+    # stampを非表示にする
+    elem.hide()
+
+    token = getXSRFToken()
+    $.ajax({
+      "url" : "/stamp/detach.json",
+      "type": "post",
+      "data": {
+        "image_id": imageId,
+        "stamp_id": stampId,
+        "XSRF-TOKEN": token
+      },
+      "dataType": "json",
+      "success": (response) ->
+        # successならDOMを消す
+        elem.remove()
+        # stampsByImagePositionをfalseにする
+        stampsByImagePosition[currentPosition][stampId] = false
+      "error": (xhr, textStatus, errorThrown) ->
+        elem.show()
     })
 
   getStampHash = () ->

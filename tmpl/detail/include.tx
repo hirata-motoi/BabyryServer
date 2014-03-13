@@ -24,6 +24,7 @@
     text-shadow: 0 0 2px #000;
     color: #eee;
     text-decoration:none;
+    display: block;
   }
   .stamp-icon {
     width: 36px;
@@ -39,7 +40,6 @@
 </style>
 <script type="text/javascript">
   function prevent(e) {
-    console.log("prevent");
     e.stopPropagation();
     $("#stampAttachModal").modal({
       "backdrop": true

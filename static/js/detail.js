@@ -1,5 +1,5 @@
 (function() {
-  var console, showImageDetail, _base, _base1;
+  var console, owlObject, showImageDetail, _base, _base1;
 
   if (typeof window.console === "undefined") {
     console = {};
@@ -28,10 +28,12 @@
 
   window.loadingFlg = false;
 
+  owlObject = void 0;
+
   showImageDetail = function() {
-    var alreadyAttachedStamp, attachStamp, createImageBox, createStampAttachIcon, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, setStampAttachList, setStampsByImagePosition, shouldPreLoad, showEntries, showErrorMessage, showLoadingImage, upsertStampsByImagePosition;
+    var alreadyAttachedStamp, attachStamp, createImageBox, createStamp, createStampAttachIcon, detachStamp, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, setStampAttachList, setStampsByImagePosition, shouldPreLoad, showEntries, showErrorMessage, showLoadingImage, upsertStampsByImagePosition;
     $(".img-thumbnail").on("click", function() {
-      var $elem, data, i, imageId, image_id, image_url, initialIndex, n, owl, owlContainer, stampElem, stampImage, stampInfo, stampList, stamps, tappedEntryIndex, _i, _j, _len, _ref;
+      var $elem, data, i, imageId, image_id, image_url, initialIndex, n, owlContainer, stampElem, stampInfo, stampList, stamps, tappedEntryIndex, _i, _j, _len, _ref;
       imageId = $(this).parents(".item").attr("image_id");
       data = pickData();
       tappedEntryIndex = $(this).attr("entryIndex");
@@ -57,12 +59,7 @@
           stampList = [];
           for (n = _j = 0, _len = stamps.length; _j < _len; n = ++_j) {
             stampInfo = stamps[n];
-            stampElem = $("<a>");
-            stampElem.addClass("stamp");
-            stampImage = $("<img>");
-            stampImage.addClass("stamp-icon");
-            stampImage.attr("src", stampInfo.icon_url);
-            stampElem.append(stampImage);
+            stampElem = createStamp(stampInfo.stamp_id, stampInfo.icon_url);
             $elem.find(".stamp-container").append(stampElem);
           }
         }
@@ -72,7 +69,6 @@
         items: 1,
         pagination: false,
         scrollPerPage: true,
-        beforeInit: function() {},
         beforeMove: function() {},
         afterMove: function() {
           var count, currentPageNo, loadingFlg;
@@ -88,16 +84,15 @@
           }
         }
       });
-      owl = $(".owl-carousel").data('owlCarousel');
-      owl.jumpTo(tappedEntryIndex);
+      owlObject = $(".owl-carousel").data("owlCarousel");
+      owlObject.jumpTo(tappedEntryIndex);
       return $(".stamp-attach-icon").on("click", attachStamp);
     });
     $("#comment-submit").on("click", function() {
-      var comment, currentPosition, imageElem, imageId, owl, token;
+      var comment, currentPosition, imageElem, imageId, token;
       token = getXSRFToken();
       comment = $("#comment-textarea").val();
-      owl = $(".owl-carousel").data('owlCarousel');
-      currentPosition = owl.currentPosition();
+      currentPosition = owlObject.currentPosition();
       imageElem = $(".img-box")[currentPosition];
       imageId = $(imageElem).attr("image-id");
       return $.ajax({
@@ -141,9 +136,7 @@
       });
     });
     shouldPreLoad = function(num) {
-      var owl;
-      owl = $(".owl-carousel").data('owlCarousel');
-      if (window.entryIdsInArray.length < owl.currentPosition() + num) {
+      if (window.entryIdsInArray.length < owlObject.currentPosition() + num) {
         return true;
       } else {
         return false;
@@ -192,10 +185,9 @@
         owlElem.addClass("unloaded");
       }
       owlElem.find(".img-box").on("click", function() {
-        var comment, comments, currentPosition, h4, icon, img, media, mediaBody, owl, _i, _len;
+        var comment, comments, currentPosition, h4, icon, img, media, mediaBody, _i, _len;
         $(".comment-container").empty();
-        owl = $(".owl-carousel").data('owlCarousel');
-        currentPosition = owl.currentPosition();
+        currentPosition = owlObject.currentPosition();
         comments = window.entryData.entries[currentPosition].comments;
         comments.sort(function(a, b) {
           var aCreatedAt, bCreatedAt;
@@ -246,12 +238,11 @@
     };
     showErrorMessage = function() {};
     showEntries = function(response) {
-      var elem, i, image_url, owl, unloadedElems, _i, _len;
+      var elem, i, image_url, unloadedElems, _i, _len;
       if (response.data.entries.length < 1) {
         return;
       }
       preserveResponseData(response);
-      owl = $(".owl-carousel").data('owlCarousel');
       unloadedElems = $(".unloaded");
       for (i = _i = 0, _len = unloadedElems.length; _i < _len; i = ++_i) {
         elem = unloadedElems[i];
@@ -307,10 +298,9 @@
       return _results;
     };
     attachStamp = function() {
-      var currentPosition, imageId, owl, stampElem, stampHash, stampIconUrl, stampId, stampImage, targetImgBox, token;
+      var currentPosition, imageId, stampElem, stampHash, stampIconUrl, stampId, targetImgBox, token;
       stampId = $(this).attr("stamp-id");
-      owl = $(".owl-carousel").data('owlCarousel');
-      currentPosition = owl.currentPosition();
+      currentPosition = owlObject.currentPosition();
       if (alreadyAttachedStamp(stampId, currentPosition)) {
         return;
       }
@@ -318,12 +308,7 @@
       stampIconUrl = stampHash[stampId].icon_url;
       targetImgBox = $(".img-box")[currentPosition];
       imageId = $(targetImgBox).attr("image-id");
-      stampElem = $("<a>");
-      stampElem.addClass("stamp");
-      stampImage = $("<img>");
-      stampImage.addClass("stamp-icon");
-      stampImage.attr("src", stampIconUrl);
-      stampElem.append(stampImage);
+      stampElem = createStamp(stampId, stampIconUrl);
       $(targetImgBox).find(".stamp-container").append(stampElem);
       setStampsByImagePosition(stampId, currentPosition, true);
       token = getXSRFToken();
@@ -345,6 +330,45 @@
           } else {
             return stampsByImagePosition[currentPosition][stampId] = false;
           }
+        }
+      });
+    };
+    createStamp = function(stampId, stampIconUrl) {
+      var stampElem, stampImage;
+      stampElem = $("<li>");
+      stampElem.addClass("stamp");
+      stampImage = $("<img>");
+      stampImage.addClass("stamp-icon");
+      stampImage.attr("src", stampIconUrl);
+      stampImage.attr("stamp-id", stampId);
+      stampImage.on("click", detachStamp);
+      stampElem.append(stampImage);
+      return stampElem;
+    };
+    detachStamp = function(e) {
+      var currentPosition, elem, imageId, stampId, token;
+      e.stopPropagation();
+      elem = $(this);
+      stampId = elem.attr("stamp-id");
+      imageId = elem.parents(".img-box").attr("image-id");
+      currentPosition = owlObject.currentPosition();
+      elem.hide();
+      token = getXSRFToken();
+      return $.ajax({
+        "url": "/stamp/detach.json",
+        "type": "post",
+        "data": {
+          "image_id": imageId,
+          "stamp_id": stampId,
+          "XSRF-TOKEN": token
+        },
+        "dataType": "json",
+        "success": function(response) {
+          elem.remove();
+          return stampsByImagePosition[currentPosition][stampId] = false;
+        },
+        "error": function(xhr, textStatus, errorThrown) {
+          return elem.show();
         }
       });
     };

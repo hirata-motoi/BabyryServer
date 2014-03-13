@@ -28,6 +28,26 @@ sub attach {
     return $self->output_response_json($c, $ret, $@);
 }
 
+sub detach {
+    my ($self, $c, $p, $v) = @_;
+
+    if ($v->has_error) {
+        $v->set_error_message('stamp');
+        return $c->render_json_validation_error($v);
+    }
+
+    my $image_id = $c->req->param('image_id');
+    my $stamp_id = $c->req->param('stamp_id');
+
+    my $logic = Babyry::Logic::Stamp->new;
+
+    my $row_num = eval {
+        $logic->detach($image_id, $stamp_id);
+    } || 0;
+
+    return $self->output_response_json($c, { rows => $row_num }, $@);
+}
+
 sub list {
     my ($self, $c, $p) = @_;
 
