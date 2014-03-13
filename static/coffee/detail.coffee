@@ -54,6 +54,7 @@ showImageDetail = () ->
 
     # replace html of container
     $(".dynamic-container").html( owlContainer )
+    $(window).scrollTop(0)
 
     # set carousel
     $(".owl-carousel.displayed").owlCarousel({

@@ -65,6 +65,7 @@
         }
       }
       $(".dynamic-container").html(owlContainer);
+      $(window).scrollTop(0);
       $(".owl-carousel.displayed").owlCarousel({
         items: 1,
         pagination: false,
