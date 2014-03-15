@@ -80,9 +80,18 @@ __PACKAGE__->add_trigger(
             $c->stash->{$key} = $base_info->{$key};
         }
 
+        # update session_id
+        if ($c->stash->{session_have_to_update}) {
+            infof("update session_id.");
+            my $new_session_id = Babyry::Web::Root->new->update_session($c->stash->{user_id});
+            $c->session->set('session_id', $new_session_id);
+            $c->session->session_cookie->{expires} = time + 31*24*60*60 + 9*60*60;
+        }
+
         # clear session when session is invalid
         if ( ! $c->stash->{user_id} ) {
             $c->session->remove('session_id');
+            infof('redirect to /login');
             return $c->redirect('/login');
         }
     },
