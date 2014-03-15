@@ -25,7 +25,7 @@ sub execute {
     my $logic = Babyry::Logic::Invite->new;
 
     my $ret = eval { $logic->execute($params); } || {};
-    $self->output_response($c, 'invite/completed.tx', $ret, $@);
+    $self->output_response_json($c, $ret, $@);
 }
 
 1;

@@ -136,7 +136,7 @@ $('#backslide').on('click', function(){
   <a href="<: uri_for('/logout') :>">Logout</a></p>
   : }
   <p><a href="/profile">Profile</a></p>
-  <p><a id="show-relatives">Relatives</a></p>
+  <p><a href="/relatives">Relatives</a></p>
 </div>
 
 <div class="dynamic-container">
