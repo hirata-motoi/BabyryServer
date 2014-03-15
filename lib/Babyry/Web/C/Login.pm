@@ -36,6 +36,7 @@ critf($ret->{error});
 
     if ($ret->{user_id}) {
         $c->session->set('session_id' => $ret->{session_id});
+        $c->session->session_cookie->{expires} = time() + 9*60*60 + 31*24*60*60;
         return $c->redirect('/');
     } else {
         return $c->render('/login/index.tx', {error => 'INVALID_PASSWORD'});

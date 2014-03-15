@@ -17,7 +17,7 @@ sub set {
     my ($self, $user_id, $session_id) = @_;
 
     my $service = Babyry::Service::Session->new;
-    return $service->set($user_id, $session_id);
+    return $service->set($user_id);
 }
 
 sub get {
