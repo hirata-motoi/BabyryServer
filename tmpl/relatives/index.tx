@@ -1,0 +1,52 @@
+: cascade base
+
+: around head -> {
+<style>
+</style>
+
+: }
+
+: around javascript -> {
+<script type="text/javascript" src="<: uri_for('/static/backbone/js/backbone-min.js') :>"></script>
+<script type="text/javascript" src="<: uri_for('/static/js/invite.js') :>"></script>
+: }
+
+: around content -> {
+<div id="slidemenu" style="display:none;">
+  : if $user_id {
+  <p>Welcome <: $user_id :><br>
+  <p><a id="backslide">HOME</a></p>
+  <a href="<: uri_for('/logout') :>">Logout</a></p>
+  : }
+  <p><a href="/profile">Profile</a></p>
+  <p><a id="show-relatives">Relatives</a></p>
+</div>
+
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#home" data-toggle="tab">招待</a></li>
+  <li><a href="#profile" data-toggle="tab">友達を探す</a></li>
+  <li><a href="#messages" data-toggle="tab">友達リスト</a></li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane fade in active" id="home">
+    <ul data-role="listview" data-theme="g">
+      <li id="invite-submit" style="cursor: pointer">メールで招待</li>
+      <li>LINEで招待</li>
+    </ul>
+  </div>
+  <div class="tab-pane fade" id="profile">
+    <p></p>
+  </div>
+  <div class="tab-pane fade" id="messages">
+    <ul>
+    : for $relatives.keys() -> $key {
+      <li><: $key :> : <: $relatives[$key].email :></li>
+    : }
+  </div>
+</div>
+
+: include detail::include
+
+
+: }

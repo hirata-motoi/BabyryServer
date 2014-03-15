@@ -6,12 +6,17 @@ use utf8;
 
 use parent qw/Babyry::Web::C/;
 
-use Babyry::Logic::Stamp;
+use Babyry::Logic::Relatives;
 
 sub index {
     my ($self, $c, $p, $v) = @_;
 
-    return $self->output_response($c, '/relatives/index.tx', {});
+    my $user_id = $c->stash->{user_id};
+    my $relatives = eval {
+        Babyry::Logic::Relatives->new->get($user_id)
+    } || {};
+
+    return $self->output_response($c, '/relatives/index.tx', { %$relatives }, $@);
 }
 
 
