@@ -75,5 +75,18 @@ sub update_by_user_id {
     return {user_id =>$user_id, params => $params};
 }
 
+sub update_icon_image {
+    my ($self, $teng, $params) = @_;
+    return $teng->update(
+        'user',
+        {
+            icon_image_id => $params->{image_id},
+        },
+        {
+            user_id         => $params->{user_id},
+        }
+    );
+}
+
 1;
 

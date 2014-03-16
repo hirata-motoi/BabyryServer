@@ -29,5 +29,17 @@
     '/profile/delete_child.json' => +{
         controller => 'Profile', action => 'delete_child',
     },
+    '/profile/upload_icon_sample_form' => +{
+        controller => 'Profile', action => 'profile_upload_icon_sample_form',
+    },
+    '/profile/upload_icon.json' => +{
+        controller => 'Profile', action => 'upload_icon',
+    },
+    '/profile/upload_icon_submit_sample_form' => +{
+        controller => 'Profile', action => 'profile_upload_icon_submit_sample_form',
+    },
+    '/profile/upload_icon_submit.json' => +{
+        controller => 'Profile', action => 'upload_icon_submit',
+    },
 }
 

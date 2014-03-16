@@ -5,6 +5,7 @@ use warnings;
 use parent qw/Babyry::Web::C/;
 use Log::Minimal;
 use Babyry::Logic::Profile;
+use Babyry::Logic::Image;
 
 sub index {
     my ($class, $c) = @_;
@@ -33,6 +34,18 @@ sub profile_delete_child_sample_form {
     my ($class, $c) = @_;
 
     $c->render('/profile/delete_child_sample.tx');
+}
+
+sub profile_upload_icon_sample_form {
+    my ($class, $c) = @_;
+
+    $c->render('/profile/upload_icon_sample.tx');
+}
+
+sub profile_upload_icon_submit_sample_form {
+    my ($class, $c) = @_;
+
+    $c->render('/profile/upload_icon_submit_sample.tx');
 }
 
 sub get {
@@ -109,5 +122,38 @@ sub delete_child {
     return $c->render_json($ret);
 }
 
- 
+sub upload_icon {
+    my ($self, $c) = @_;
+
+    my $file = $c->req->uploads->get_all('file');
+    my $params = {
+        user_id => $c->stash->{'user_id'},
+        path    => $file->path,
+    };
+    my $logic = Babyry::Logic::Image->new;
+    my $ret = eval{ $logic->web_upload_execute($params) } || {};
+    infof($@) if($@);
+
+    $self->output_response_json($c, $ret, $@);
+}
+
+sub upload_icon_submit {
+    my ($self, $c) = @_;
+
+    my @image_list = $c->req->param('icon_image[]');
+
+    my $params = {
+        user_id => $c->stash->{'user_id'},
+        user    => [],
+        image   => \@image_list,
+        is_icon => '1',
+    };
+
+    my $logic = Babyry::Logic::Image->new;
+    my $ret = eval { $logic->web_submit($params) } || {};
+    infof($@) if($@);
+    $self->output_response_json($c, $ret, $@);
+}
+
+
 1;

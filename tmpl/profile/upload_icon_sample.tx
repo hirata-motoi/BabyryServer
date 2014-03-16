@@ -1,0 +1,18 @@
+: cascade base
+: around content -> {
+<style>
+  .image {
+    margin: 0 auto;
+    max-width: 320px;
+    padding: 10px;
+  }
+  .image img {
+    width: 100%;
+    max-width: 320px;
+  }
+</style>
+<form action="http://dev5001.babyry.jp/profile/upload_icon.json" method="post" enctype="multipart/form-data">icon upload:
+  <input type="file" name="file"/><br/>
+  <input type="submit" value="Upload"/>
+</form>
+: }

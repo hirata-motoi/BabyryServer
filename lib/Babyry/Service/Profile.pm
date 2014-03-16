@@ -20,7 +20,11 @@ sub get {
     my $user = $self->model('User')->get_by_user_id($teng_r, $params);
     $profile->{'user_id'} = $user->user_id;
     $profile->{'user_name'} = $user->user_name;
-    $profile->{'has_icon'} = $user->has_icon;
+    $profile->{'icon_image_id'} = $user->icon_image_id;
+
+    # get icon image
+    my $image = $self->model('Image')->get_by_image_id($teng_r, $profile->{'icon_image_id'});
+    $profile->{'icon_image_url'} = $image->url;
 
     # get child data
     my $child_map_rows = $self->model('UserChildMap')->get_child_by_user_id($teng_r, $params);
