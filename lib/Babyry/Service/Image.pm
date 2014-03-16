@@ -110,14 +110,16 @@ sub web_submit {
                 format       => $_format,
             }
         );
-        for my $relative_id (@relatives_array_list, $params->{'user_id'}) {
-            $image_user_map->add($teng, {
-                image_id   => $id,
-                user_id    => $relative_id,
-                disabled   => 0,
-                created_at => $unixtime,
-                updated_at => $unixtime,
-            });
+        unless ($params->{is_icon}) {
+            for my $relative_id (@relatives_array_list, $params->{'user_id'}) {
+                $image_user_map->add($teng, {
+                    image_id   => $id,
+                    user_id    => $relative_id,
+                    disabled   => 0,
+                    created_at => $unixtime,
+                    updated_at => $unixtime,
+                });
+            }
         }
         $image_queue->enqueue($teng,
             {
