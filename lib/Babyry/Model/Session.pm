@@ -11,7 +11,7 @@ sub set {
 
     my $session_id = $self->create($params->{user_id});
 
-    my $expire = time() + 31 * 86400;
+    my $expire = time() + 60 * 60;
     $teng->insert(
         'session',
         {
@@ -32,11 +32,10 @@ sub get {
         'session',
         {
             session_id => $session_id,
-            expired_at => { '>' => ( $now || time ) },
         }
     ) or return;
 
-    return $row->user_id;
+    return { user_id => $row->user_id, expired_at => $row->expired_at };
 }
 
 sub create {

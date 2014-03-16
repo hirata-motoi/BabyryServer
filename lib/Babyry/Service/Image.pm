@@ -68,11 +68,11 @@ sub web_submit {
     }
 
     # tmp image exist?
-    my $tmpdir  = Babyry::Common->config->{tmp_uploaded_image_dir};
+    #my $tmpdir  = Babyry::Common->config->{tmp_uploaded_image_dir};
     # TODO define config or %ENV
-    if ($tmpdir !~ m|^/|) {
-        $tmpdir = File::Spec->catdir( Babyry->base_dir, $tmpdir );
-    }
+    #if ($tmpdir !~ m|^/|) {
+    #    $tmpdir = File::Spec->catdir( Babyry->base_dir, $tmpdir );
+    #}
 
     my %format;
     my @images;
@@ -92,6 +92,14 @@ sub web_submit {
     $teng->txn_begin;
     for my $img (@images) {
         my $id = $image_seq->get_id($teng, 'seq_image');
+        if ($params->{is_icon}) {
+            $user->update_icon_image( $teng,
+                {
+                    image_id => $id,
+                    user_id  => $params->{'user_id'},
+                }
+            );
+        }
         my $_format = $format{$img};
         $image->set_new_image( $teng,
             {
@@ -102,14 +110,16 @@ sub web_submit {
                 format       => $_format,
             }
         );
-        for my $relative_id (@relatives_array_list, $params->{'user_id'}) {
-            $image_user_map->add($teng, {
-                image_id   => $id,
-                user_id    => $relative_id,
-                disabled   => 0,
-                created_at => $unixtime,
-                updated_at => $unixtime,
-            });
+        unless ($params->{is_icon}) {
+            for my $relative_id (@relatives_array_list, $params->{'user_id'}) {
+                $image_user_map->add($teng, {
+                    image_id   => $id,
+                    user_id    => $relative_id,
+                    disabled   => 0,
+                    created_at => $unixtime,
+                    updated_at => $unixtime,
+                });
+            }
         }
         $image_queue->enqueue($teng,
             {

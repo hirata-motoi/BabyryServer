@@ -209,7 +209,8 @@
   <input type='submit' value='edit name' id='name_edit_submit'>
 </div>
 <hr>
-アイコン:<span id="user_icon"></span><br>
+アイコン:
+<div class="image"><img src="https://babyry-image-upload-dev.s3.amazonaws.com/88.jpeg?AWSAccessKeyId=AKIAJ3UH2SSH5JDL7AEQ&Expires=1395053815&Signature=DX660oHlJWeNhYqSnNTDfkFu0CI%3D" class="img-thumbnail" /></div>
 <hr>
 子供たち:<br><span id="child"></span><br>
 <span id='add_child'>

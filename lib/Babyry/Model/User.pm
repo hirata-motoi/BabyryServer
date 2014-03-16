@@ -102,5 +102,18 @@ sub search_by_name {
     return { users => \@users };
 }
 
+sub update_icon_image {
+    my ($self, $teng, $params) = @_;
+    return $teng->update(
+        'user',
+        {
+            icon_image_id => $params->{image_id},
+        },
+        {
+            user_id => $params->{user_id},
+        }
+    );
+}
+
 1;
 
