@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use utf8;
 use parent qw/Babyry::Model::Base/;
+use Carp;
 
 use Log::Minimal;
 
@@ -73,6 +74,32 @@ sub update_by_user_id {
         },
     );
     return {user_id =>$user_id, params => $params};
+}
+
+sub search_by_name {
+    my ($self, $teng, $str) = @_;
+
+    croak "invalid search string: $str" if ! $str;
+
+    my $itr = $teng->search(
+        'user',
+        {
+            user_name => {
+                'like' => '%' . $self->escape4like($str) . '%'
+            },
+            is_verified => 1,
+            disabled    => 0,
+        }
+    );
+
+    my @users = ();
+    while ( my $u = $itr->next ) {
+        push @users, {
+            user_id   => $u->user_id,
+            user_name => $u->user_name,
+        };
+    }
+    return { users => \@users };
 }
 
 1;
