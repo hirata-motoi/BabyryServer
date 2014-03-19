@@ -20,6 +20,16 @@ window.loadingFlg = false
 owlObject = undefined
 showImageDetail = () ->
   $(".img-thumbnail").on("click", () ->
+
+    # headerをdisableする
+    $(".navbar").hide()
+
+    # screenサイズを取得
+    screenWidth = screen.width
+    screenHeight = screen.height
+
+    window.console.log "width: " + screenWidth + " height: " + screenHeight
+
     imageId   = $(this).parents(".item").attr("image_id")
     data = pickData()
     tappedEntryIndex = $(this).attr "entryIndex"
@@ -34,6 +44,7 @@ showImageDetail = () ->
     for i in [0 .. data.found_row_count - 1]
 
       if data.list[i]
+        ## ここで画像の縦横を取得
         image_url = data.list[i].fullsize_image_url
         window.entryIdsInArray.push data.list[i].image_id
         stamps = data.list[i].stamps
@@ -42,7 +53,8 @@ showImageDetail = () ->
         image_url = ""
         image_id  = ""
 
-      $elem = createImageBox image_url, image_id
+      # 画像の縦横を渡し、width/height > screenWidth/screenHeightの場合はmax-widthを、そうでない場合はmax-heightを設定する
+      $elem = createImageBox image_url, image_id, screenWidth, screenHeight
       owlContainer.append $elem
       initialIndex = i if data.list[i] and data.list[i].image_id == imageId
       
@@ -90,6 +102,9 @@ showImageDetail = () ->
 
     # +ボタンのeventを登録
     $(".stamp-attach-icon").on "click", attachStamp
+
+    # commentModalの戻るボタンのeventを登録
+    $(".back-button").on "click", backToWall
   )
 
   $("#comment-submit").on("click", () ->
@@ -179,11 +194,14 @@ showImageDetail = () ->
     })
 
 
-  createImageBox = (image_url, image_id) ->
+  createImageBox = (image_url, image_id, screenWidth, screenHeight) ->
     tmpl = $("#item-tmpl").clone(true)
     owlElem = $(tmpl)
-    owlElem.find(".img-box").attr("image-id", image_id)
-    owlElem.find(".img-box img").attr("src", image_url)
+    owlElem.find(".img-box").attr "image-id", image_id
+    owlElem.find(".img-box").css "background-image", "url(" + image_url + ")"
+    owlElem.css "width", screenWidth
+    owlElem.css "height", screenHeight
+
     owlElem.attr("id", "")
     owlElem.addClass("unloaded") if !image_url
     owlElem.find(".img-box").on("click", () ->
@@ -407,6 +425,9 @@ showImageDetail = () ->
     for stamp, i in stampList
       elem = createStampAttachIcon stamp
       $("#stampAttachModal").find(".modal-body").append elem
+
+  backToWall = () ->
+    location.href = "/"
 
   # stamp attach用のmodalのsetup
   if ! hasElem(window.stampData)
