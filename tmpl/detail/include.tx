@@ -44,9 +44,11 @@
     background-color: #ccc;
     background-position: center center;
     background-repeat: no-repeat;
-    margin: 5px;
-    border: 1px solid #ccc;
-    background-size: cover;
+    background-size: contain;
+  }
+  .full-size-screen {
+    padding-left: 0px;
+    padding-right: 0px;
   }
 </style>
 <script type="text/javascript">

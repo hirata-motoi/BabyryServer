@@ -35,9 +35,11 @@
     $(".img-thumbnail").on("click", function() {
       var $elem, data, i, imageId, image_id, image_url, initialIndex, n, owlContainer, screenHeight, screenWidth, stampElem, stampInfo, stampList, stamps, tappedEntryIndex, _i, _j, _len, _ref;
       $(".navbar").hide();
+      $(".container").addClass("full-size-screen");
       screenWidth = screen.width;
       screenHeight = screen.height;
-      window.console.log("width: " + screenWidth + " height: " + screenHeight);
+      $(".container").css("width", screenWidth);
+      $(".container").css("height", screenHeight);
       imageId = $(this).parents(".item").attr("image_id");
       data = pickData();
       tappedEntryIndex = $(this).attr("entryIndex");
@@ -436,6 +438,7 @@
       return _results;
     };
     backToWall = function() {
+      $(".container").removeClass("full-size-screen");
       return location.href = "/";
     };
     if (!hasElem(window.stampData)) {

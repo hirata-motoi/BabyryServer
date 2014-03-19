@@ -23,12 +23,14 @@ showImageDetail = () ->
 
     # headerをdisableする
     $(".navbar").hide()
+    # .containerのpaddingをなくす
+    $(".container").addClass "full-size-screen"
 
     # screenサイズを取得
     screenWidth = screen.width
     screenHeight = screen.height
-
-    window.console.log "width: " + screenWidth + " height: " + screenHeight
+    $(".container").css "width", screenWidth
+    $(".container").css "height", screenHeight
 
     imageId   = $(this).parents(".item").attr("image_id")
     data = pickData()
@@ -427,6 +429,7 @@ showImageDetail = () ->
       $("#stampAttachModal").find(".modal-body").append elem
 
   backToWall = () ->
+    $(".container").removeClass "full-size-screen"
     location.href = "/"
 
   # stamp attach用のmodalのsetup
