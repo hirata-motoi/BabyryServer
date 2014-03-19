@@ -258,7 +258,8 @@
         elem = unloadedElems[i];
         if (response.data.entries[i]) {
           image_url = response.data.entries[i].fullsize_image_url;
-          $(elem).find(".img-box img").attr("src", image_url);
+          window.console.log(image_url);
+          $(elem).find(".img-box").css("background-image", "url('" + image_url + "')");
           $(elem).find(".loading").removeClass("loading");
           $(elem).removeClass("unloaded");
           window.entryIdsInArray.push(response.data.entries[i].image_id);

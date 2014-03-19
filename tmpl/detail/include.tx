@@ -65,7 +65,7 @@
 </div>
 
 <div id="item-tmpl" style="display:none">
-  <div class="img-box cover" style="position: relative;">
+  <div class="img-box cover" style="position: relative; background-color: black;">
     <!--<img src="" class="img-detail" />-->
     <div class="stamp-container" style="position: absolute; top: 10px; right: 10px; font-size: 30px; text-align: center;">
       <a href="#stampAttachModal" data-toggle="modal" data-backdrop="true" class="glyphicon glyphicon-plus-sign stamp-add-icon" style="text-shadow: 0 0 2px #000; color: #eee;text-decoration:none;" onClick="prevent(event)"></a>

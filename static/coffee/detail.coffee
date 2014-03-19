@@ -263,22 +263,21 @@ showImageDetail = () ->
 
     unloadedElems = $(".unloaded");
     for elem, i in unloadedElems
-        if response.data.entries[i]
-          image_url = response.data.entries[i].fullsize_image_url
-          $(elem).find(".img-box img").attr("src", image_url)
-          $(elem).find(".loading").removeClass("loading")
-          $(elem).removeClass("unloaded")
-          window.entryIdsInArray.push response.data.entries[i].image_id
-        else
-          window.loadingFlg = false
-          break
+      if response.data.entries[i]
+        image_url = response.data.entries[i].fullsize_image_url
+        window.console.log image_url
+        $(elem).find(".img-box").css "background-image", "url('" + image_url + "')"
+        $(elem).find(".loading").removeClass("loading")
+        $(elem).removeClass("unloaded")
+        window.entryIdsInArray.push response.data.entries[i].image_id
+      else
+        window.loadingFlg = false
+        break
     window.loadingFlg = false
-
 
   getNextIds = () ->
     # 取得すべきentryのoffsetと数を取得
     currentEntryId = getCurrentEntryId
-
 
   getCurrentEntryId = () ->
     # 今表示されている投稿のentry_id
