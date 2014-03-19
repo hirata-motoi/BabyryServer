@@ -20,6 +20,18 @@ window.loadingFlg = false
 owlObject = undefined
 showImageDetail = () ->
   $(".img-thumbnail").on("click", () ->
+
+    # headerをdisableする
+    $(".navbar").hide()
+    # .containerのpaddingをなくす
+    $(".container").addClass "full-size-screen"
+
+    # screenサイズを取得
+    screenWidth = screen.width
+    screenHeight = screen.height
+    $(".container").css "width", screenWidth
+    $(".container").css "height", screenHeight
+
     imageId   = $(this).parents(".item").attr("image_id")
     data = pickData()
     tappedEntryIndex = $(this).attr "entryIndex"
@@ -42,7 +54,7 @@ showImageDetail = () ->
         image_url = ""
         image_id  = ""
 
-      $elem = createImageBox image_url, image_id
+      $elem = createImageBox image_url, image_id, screenWidth, screenHeight
       owlContainer.append $elem
       initialIndex = i if data.list[i] and data.list[i].image_id == imageId
       
@@ -90,6 +102,9 @@ showImageDetail = () ->
 
     # +ボタンのeventを登録
     $(".stamp-attach-icon").on "click", attachStamp
+
+    # commentModalの戻るボタンのeventを登録
+    $(".back-button").on "click", backToWall
   )
 
   $("#comment-submit").on("click", () ->
@@ -179,11 +194,14 @@ showImageDetail = () ->
     })
 
 
-  createImageBox = (image_url, image_id) ->
+  createImageBox = (image_url, image_id, screenWidth, screenHeight) ->
     tmpl = $("#item-tmpl").clone(true)
     owlElem = $(tmpl)
-    owlElem.find(".img-box").attr("image-id", image_id)
-    owlElem.find(".img-box img").attr("src", image_url)
+    owlElem.find(".img-box").attr "image-id", image_id
+    owlElem.find(".img-box").css "background-image", "url(" + image_url + ")"
+    owlElem.css "width", screenWidth
+    owlElem.css "height", screenHeight
+
     owlElem.attr("id", "")
     owlElem.addClass("unloaded") if !image_url
     owlElem.find(".img-box").on("click", () ->
@@ -243,22 +261,21 @@ showImageDetail = () ->
 
     unloadedElems = $(".unloaded");
     for elem, i in unloadedElems
-        if response.data.entries[i]
-          image_url = response.data.entries[i].fullsize_image_url
-          $(elem).find(".img-box img").attr("src", image_url)
-          $(elem).find(".loading").removeClass("loading")
-          $(elem).removeClass("unloaded")
-          window.entryIdsInArray.push response.data.entries[i].image_id
-        else
-          window.loadingFlg = false
-          break
+      if response.data.entries[i]
+        image_url = response.data.entries[i].fullsize_image_url
+        window.console.log image_url
+        $(elem).find(".img-box").css "background-image", "url('" + image_url + "')"
+        $(elem).find(".loading").removeClass("loading")
+        $(elem).removeClass("unloaded")
+        window.entryIdsInArray.push response.data.entries[i].image_id
+      else
+        window.loadingFlg = false
+        break
     window.loadingFlg = false
-
 
   getNextIds = () ->
     # 取得すべきentryのoffsetと数を取得
     currentEntryId = getCurrentEntryId
-
 
   getCurrentEntryId = () ->
     # 今表示されている投稿のentry_id
@@ -407,6 +424,10 @@ showImageDetail = () ->
     for stamp, i in stampList
       elem = createStampAttachIcon stamp
       $("#stampAttachModal").find(".modal-body").append elem
+
+  backToWall = () ->
+    $(".container").removeClass "full-size-screen"
+    location.href = "/"
 
   # stamp attach用のmodalのsetup
   if ! hasElem(window.stampData)
