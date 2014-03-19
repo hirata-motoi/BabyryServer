@@ -46,7 +46,6 @@ showImageDetail = () ->
     for i in [0 .. data.found_row_count - 1]
 
       if data.list[i]
-        ## ここで画像の縦横を取得
         image_url = data.list[i].fullsize_image_url
         window.entryIdsInArray.push data.list[i].image_id
         stamps = data.list[i].stamps
@@ -55,7 +54,6 @@ showImageDetail = () ->
         image_url = ""
         image_id  = ""
 
-      # 画像の縦横を渡し、width/height > screenWidth/screenHeightの場合はmax-widthを、そうでない場合はmax-heightを設定する
       $elem = createImageBox image_url, image_id, screenWidth, screenHeight
       owlContainer.append $elem
       initialIndex = i if data.list[i] and data.list[i].image_id == imageId
