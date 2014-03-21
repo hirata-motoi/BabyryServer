@@ -71,6 +71,7 @@ sub execute {
             }
         );
 
+        # 招待者からrelativesの申請を受けたことになっているので承認する
         if ( $invite_record ) {
             $invite->acknowledge($teng, $user_id, $invite_record->{invite_code});
             $relatives->request(
