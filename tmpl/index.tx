@@ -41,6 +41,9 @@
   .img-icon-small {
     width: 10%;
   }
+  .btn-top {
+    width: 49.5%;
+  }
 </style>
 
 <link href="<: uri_for('/static/jquery/plugin/owl/owl-carousel/owl.carousel.css') :>" rel="stylesheet">
@@ -66,59 +69,7 @@
       <img src="/static/img/comment_icon.png" class="img-icon-small"/><%= comment_num %>
   </div>
 </script>
-<script type="text/javascript">
-  if (window.entryData == undefined) {
-    window.entryData = {};
-  }
-  var page = 1;
-  var count = 10;
-  var tmpl = _.template($('#template-item').html());
-  var grid = $('.timeline').get(0);
-  var load_contents = function() {
-    $.ajax({
-      url : '/entry/search.json',
-      dataType: "json",
-      data: {
-        count: count,
-        page: page
-      },
-      success : function(data){
-        var item = [];
-        for (var i = 0; i < data.data.entries.length; i++) {
-          item.push(document.createElement('article'));
-        }
-        salvattore.append_elements(grid, item);
-        for (var i = 0; i < data.data.entries.length; i++) {
-          item[i].outerHTML = tmpl({ 
-            stamp_num: data.data.entries[i].stamps.length,
-            comment_num: data.data.entries[i].comments.length,
-            fullsize_image_url: data.data.entries[i].fullsize_image_url,
-            entryIndex: i + (page -1) * count,
-          });
-        }
-        if (count > (data.data.entries.length + 1)) {
-          $('#load-more').hide();
-        }
-        page++;
-
-        if(window.entryData.entries == undefined) {
-          window.entryData.entries = [];
-        }
-        window.entryData.entries = window.entryData.entries.concat(data.data.entries);
-        window.entryData.metadata = data.metadata;
-        window.util.showImageDetail();
-      },
-      error : function(data){
-        console.log("error");
-      }
-    });
-  }
-  load_contents();
-  $('#load-more').on('click', load_contents);
-  $('#image_upload').on('click', function(){
-    location.href = '/image/web/upload';
-  });
-</script>
+<script type="text/javascript" src="<: uri_for('/static/js/wall.js') :>"></script>
 <script type="text/javascript" src="<: uri_for('/static/js/detail.js') :>"></script>
 
 <script type="text/javascript" src="<: uri_for('/static/jquery/plugin/pageslide/jquery.pageslide.min.js') :>"></script>
@@ -142,12 +93,15 @@ $('#backslide').on('click', function(){
 </div>
 
 <div class="dynamic-container">
-  <button class="btn btn-default btn-lg btn-block" id="image_upload">投稿</button>
+  <button class="btn btn-default btn-lg btn-top" id="image_upload">投稿</button>
+  <button class="btn btn-default btn-lg btn-top" id="group_by_stamp" onClick="showGroupByModal(event)">整理して見る</button>
 
   <div class="timeline row" data-columns style="content: '2 .column.size-1of2';"></div>
 
   <button class="btn btn-default btn-lg btn-block" id="load-more">読み込み</button>
 </div>
+
+: include wall::include
 
 : include detail::include
 
