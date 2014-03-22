@@ -44,9 +44,9 @@
 <script src="<: uri_for('/static/jquery/plugin/owl/owl-carousel/owl.carousel.js') :>"></script>
 
 <script id="template-menu">
-  <div class="item">
+  <div class="item" style="text-align: center;">
     <a href="<%= menu_uri %>">
-      <img src="<%= menu_icon_image %>" class="img-menu-icon" entryIndex="<%= entryIndex %>" />
+      <img src="<%= menu_icon_image %>" class="img-menu-icon" entryIndex="<%= entryIndex %>" /><br>
       <%= menu_title %>
     </a>
   </div>
