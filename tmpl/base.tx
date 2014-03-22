@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="format-detection" content="telephone=no">
     <link href="<: uri_for('/static/bootstrap/css/bootstrap.css') :>" rel="stylesheet" type="text/css">
+    <link href="<: uri_for('/static/jquery/plugin/ui/jquery-ui.css') :>" rel="stylesheet" type="text/css">
     <link href="<: static_file('/static/css/main.css') :>" rel="stylesheet" type="text/css" media="screen">
     <style>
       #footer {
@@ -38,6 +39,12 @@
       .footer-tab:last-child {
         width: 33.4%;
       }
+      .ui-icon {
+        width: 32px;
+        height: 32px;
+        background-size: 512px 480px;
+      }
+      .ui-icon-gear { background-position: -384px -224px; }
     </style>
     : block head -> {}
   </head>
@@ -57,8 +64,7 @@
             <span class="icon-bar"></span>
           </button-->
           <a href="/" class="navbar-brand">Babyry</a>
-          <a href="#slidemenu" class="pageslide navbar-text navbar-left">MENU</a>
-          <p class="navbar-text navbar-left" style="position: absolute; top: 0; right: 20px;"><span class="glyphicon glyphicon-refresh"></a></span>
+          <a href="/menu" class="navbar-brand"><div class="ui-icon ui-icon-gear"></div></a>
         </div>
       </div>
     </nav>
@@ -78,6 +84,7 @@
     <script src="<: static_file('/static/jquery/js/jquery.min.js') :>"></script>
     <script src="<: static_file('/static/bootstrap/js/bootstrap.min.js') :>"></script>
     <script src="<: static_file('/static/underscore/js/underscore-min.js') :>"></script>
+    <script src="<: static_file('/static/jquery/plugin/ui/jquery-ui.min.js') :>"></script>
     <!--script(src!='<: static_file('/static/js/es5-shim.min.js') :>')-->
     <!--script(src!='<: static_file('/static/js/micro_template.js') :>')-->
     <!--script(src!='<: static_file('/static/js/strftime.js') :>')-->
