@@ -16,7 +16,7 @@ searchUser = () ->
   $.ajax({
     "url": "/relatives/search.json",
     "type": "get",
-    "processData"; true,
+    "processData": true,
     "data": {
       "str": searchString,
     },
