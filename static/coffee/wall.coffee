@@ -8,21 +8,27 @@ if window.entryData is "undefined"
 page = 1
 count = 10
 
+window.showGroupByModal
+window.stamp_ids = []
+stamp_ids_hash = []
+
 $ ->
   tmpl = _.template $('#template-item').html()
   grid = $('.timeline').get 0
 
-  load_contents = () ->
+  load_contents = (stamp_ids) ->
     $.ajax {
       url : '/entry/search.json',
       dataType: "json",
+      traditional: true,
       data: {
+        stamp_id: stamp_ids,
         count: count,
         page: page
       },
       success : (data) ->
         item = []
-        for i in [0 .. data.data.entries.length]
+        for i in [0 .. data.data.entries.length - 1]
           item.push document.createElement('article')
 
         salvattore.append_elements grid, item
@@ -48,10 +54,68 @@ $ ->
       error : () ->
         window.console.log "error"
     }
-
-  load_contents()
-
-  $('#load-more').on 'click', load_contents
+  load_contents(window.stamp_ids)
+  $('#load-more').on 'click', () ->
+    load_contents()
   $('#image_upload').on 'click', () ->
     location.href = '/image/web/upload'
 
+
+  tmpl_stamp = _.template $('#template-stamp').html()
+  tmpl_child = _.template $('#template-child').html()
+  window.showGroupByModal = (e) ->
+    e.stopPropagation()
+    $("#groupByStampModal").modal {
+      "backdrop": true
+    }
+    $.ajax {
+      "url" : "/profile/get.json"
+      "type": "get"
+      "processData": true
+      "contentType": false
+      success: (response) ->
+        $("#modal_group_by_child").html ''
+        for i in [0 .. response.child.length - 1]
+          HTML = tmpl_child
+            name: response.child[i].child_name
+            id: response.child[i].child_id
+
+          $("#modal_group_by_child").append HTML
+          $("#" + response.child[i].child_id).on 'click', () ->
+            if $(this).attr('class') == "child-name-color-gray"
+              $(this).attr 'class', 'child-name-color'
+            else
+              $(this).attr 'class', 'child-name-color-gray'
+    }
+
+    $.ajax {
+      "url" : "/stamp/list.json"
+      "type": "get"
+      "processData": true
+      "contentType": false
+      success: (response) ->
+        $("#modal_group_by_stamp").html ''
+        for i in [0 .. response.data.length - 1]
+          HTML = tmpl_stamp
+            id: response.data[i].stamp_id
+            url: response.data[i].icon_url
+          $("#modal_group_by_stamp").append HTML
+          $("#" + response.data[i].stamp_id).on 'click', () ->
+            if $(this).attr('class') == "listed-stamp"
+              $(this).attr 'class', 'listed-stamp gray-image'
+              stamp_ids_hash[$(this).attr('id')] = 0
+            else
+              $(this).attr 'class', 'listed-stamp'
+              stamp_ids_hash[$(this).attr('id')] = 1
+    }
+
+  $("#groupByStampModalSubmit").on 'click', () ->
+    $("#groupByStampModal").modal('hide')
+    $(".column.size-1of2").empty()
+    window.entryData.entries = []
+    page = 1
+    window.stamp_ids = []
+    for key of stamp_ids_hash
+      if stamp_ids_hash[key] == 1
+        window.stamp_ids.push key
+    load_contents(window.stamp_ids)

@@ -68,4 +68,43 @@ QUERY
     return (\@records, $found_row_count);
 }
 
+sub get_by_user_id_stamp_id {
+    my ($teng, $user_id, $stamp_id, $from, $limit) = @_;
+
+    if (!scalar(@{$stamp_id})) {
+        my ($images, $found_row_count) = &get_by_user_id($teng, $user_id, $from, $limit);
+        return ($images, $found_row_count);
+    }
+
+    $limit ||= 10;
+
+    my $stamp_ids = join(',', @{$stamp_id});
+
+    my $sql = <<QUERY;
+    SELECT SQL_CALC_FOUND_ROWS
+        *
+    FROM
+        image_user_map JOIN image_stamp_map
+    WHERE
+        user_id = ?
+    AND
+        image_user_map.image_id = image_stamp_map.image_id
+    AND
+        stamp_id in (?)
+    AND
+        disabled = ?
+    ORDER BY
+        created_at DESC
+    LIMIT ?, ?
+QUERY
+    my @records =$teng->search_by_sql(
+        $sql,
+        [$user_id, $stamp_ids, 0, $from, $limit]
+    );
+    my $found_row_count = $teng->dbh->selectrow_array(q{ SELECT FOUND_ROWS() });
+
+    return (\@records, $found_row_count);
+}
+
+
 1;

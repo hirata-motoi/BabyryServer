@@ -13,7 +13,7 @@ use Data::Dump;
 use Babyry::Common;
 
 #params
-# stamp_id:    int(default: 0)
+# stamp_id:    int(default: [])
 # uploaded_by: int(default: 0)
 # count:       int(default: 10)
 # page:        int(default: 1)
@@ -25,7 +25,7 @@ sub search {
     my $teng = $self->teng('BABYRY_MAIN_R');
     my $from = ($page - 1) * $count || 0;
 
-    my ($images, $found_row_count)  = Babyry::Model::ImageUserMap::get_by_user_id($teng, $uploaded_by, $from, $count);
+    my ($images, $found_row_count)  = Babyry::Model::ImageUserMap::get_by_user_id_stamp_id($teng, $uploaded_by, $stamp_id, $from, $count);
 
     # imagesを他の経路から取ってきたときも、get_entries_by_imagesを使い回せる用にしておく。
     my $entries = $self->get_entries_by_images($images);

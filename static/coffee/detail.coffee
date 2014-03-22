@@ -14,6 +14,7 @@ window.entryData.entries or= []
 window.entryData.metadata or= {}
 window.stampData or= {}
 window.stampsByImagePosition or= {}
+window.stamp_ids or = []
 
 window.entryIdsInArray = []
 window.loadingFlg = false
@@ -170,6 +171,7 @@ showImageDetail = () ->
       "processData": true,
       "contentType": false,
       "data": {
+        stamp_id: window.stamp_ids,
         "page": nextPage,
         "count": countPerPage
       },
@@ -420,7 +422,6 @@ showImageDetail = () ->
         setStampAttachList()
     })
   else
-    window.stampData = response.data
     setStampAttachList()
 
 window.util = []

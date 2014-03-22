@@ -14,75 +14,11 @@
   }
 </style>
 
-<script src="<: static_file('/static/jquery/js/jquery.min.js') :>"></script>
-<script src="<: static_file('/static/underscore/js/underscore-min.js') :>"></script>
-
 <script id="template-child">
-  <span class = "child-name-color-gray" id = "<%= id %>" value = "0"><%= name %></span>
+  <span class = "child-name-color-gray" id = "<%= id %>" ><%= name %></span>
 </script>
 <script id="template-stamp">
-  <img class = "listed-stamp gray-image" id = "<%= name %>" value = "0" src = "<%= url %>" >
-</script>
-
-<script type="text/javascript">
-  var tmpl_stamp = _.template($('#template-stamp').html());
-  var tmpl_child = _.template($('#template-child').html());
-  function showGroupByModal(e) {
-    e.stopPropagation();
-    $("#groupByStampModal").modal({
-      "backdrop": true
-    });
-    $.ajax({
-      "url" : "/profile/get.json",
-      "type": "get",
-      "processData": true,
-      "contentType": false,
-      success: function(response) {
-        $("#modal_group_by_child").html('');
-        for (i = 0; i < response.child.length; i++) {
-          var HTML = tmpl_child({
-            name: response.child[i].child_name,
-            id: response.child[i].child_id
-          });
-          $("#modal_group_by_child").append(HTML);
-          $("#" + response.child[i].child_id).on('click', function(){
-            if ($(this).attr('class') == "child-name-color-gray") {
-              $(this).attr('class', 'child-name-color');
-              $(this).attr('value', '1');
-            } else {
-              $(this).attr('class', 'child-name-color-gray');
-              $(this).attr('value', '0');
-            }
-          });
-        }
-      }
-    });
-    $.ajax({
-      "url" : "/stamp/list.json",
-      "type": "get",
-      "processData": true,
-      "contentType": false,
-      success: function(response) {
-        $("#modal_group_by_stamp").html('');
-        for (i = 0; i < response.data.length; i++) {
-          var HTML = tmpl_stamp({
-            name: response.data[i].stamp_name,
-            url: response.data[i].icon_url
-          });
-          $("#modal_group_by_stamp").append(HTML);
-          $("#" + response.data[i].stamp_name).on('click', function(){
-            if ($(this).attr('class') == "listed-stamp") {
-              $(this).attr('class', 'listed-stamp gray-image');
-              $(this).attr('value', '0');
-            } else {
-              $(this).attr('class', 'listed-stamp');
-              $(this).attr('value', '1');
-            }
-          });
-        }
-      }
-    });
-  }
+  <img class = "listed-stamp gray-image" id = "<%= id %>" src = "<%= url %>" >
 </script>
 
 <div id="groupByStampModal" class="modal fade" style="top: 0px; margin: 0 auto 20px; max-width: 100%; height: 500px;">
@@ -99,6 +35,9 @@
           <span id="modal_group_by_stamp"></span>
         <h4>記念日で絞り込み</h4>
           <span id="modal_group_by_date">Now On Cording...</span>
+        <h3>
+          <button type="button" id="groupByStampModalSubmit">見る</button>
+        </h3>
       </div>
     </div>
   </div>
