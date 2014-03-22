@@ -6,6 +6,7 @@ use utf8;
 use parent qw/Babyry::Service::Base/;
 use Log::Minimal;
 use Data::Dumper;
+use List::MoreUtils qw/uniq/;
 
 use Babyry::Model::TempImageUpload;
 use Babyry::Model::Relatives;
@@ -111,7 +112,7 @@ sub web_submit {
             }
         );
         unless ($params->{is_icon}) {
-            for my $relative_id (@relatives_array_list, $params->{'user_id'}) {
+            for my $relative_id ( uniq( @relatives_array_list, $params->{'user_id'} ) ) {
                 $image_user_map->add($teng, {
                     image_id   => $id,
                     user_id    => $relative_id,
