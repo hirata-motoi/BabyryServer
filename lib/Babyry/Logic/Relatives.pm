@@ -40,5 +40,21 @@ sub admit {
     return $service->admit($user_id, $relative_id);
 }
 
+sub cancel {
+    my ($self, $user_id, $relative_id) = @_;
+
+    my $service = Babyry::Service::Relatives->new;
+
+    return $service->cancel($user_id, $relative_id);
+}
+
+sub reject {
+    my ($self, $user_id, $relative_id) = @_;
+
+    my $service = Babyry::Service::Relatives->new;
+
+    return $service->reject($user_id, $relative_id);
+}
+
 1;
 

@@ -9,9 +9,13 @@ use Babyry::DBI;
 use DBIx::Simple;
 use Teng::Schema::Loader;
 use SQL::Abstract;
+use SQL::Abstract::Plugin::InsertMulti;
 use Data::Dump;
 use Class::Load qw/load_class/;
 use String::CamelCase qw/camelize/;
+use SQL::Maker;
+
+SQL::Maker->load_plugin('InsertMulti');
 
 sub dbh {
     my ($self, $label) = @_;
@@ -40,13 +44,9 @@ sub teng {
         dbh       => $self->dbh($label),
     );
     $teng->load_plugin('Count');
+    $teng->load_plugin('Lookup');
     $self->{teng}{$label} = $teng;
     return $self->{teng}{$label};
-}
-
-sub sql {
-    my ($self) = @_;
-    return SQL::Abstract->new;
 }
 
 sub dump {
