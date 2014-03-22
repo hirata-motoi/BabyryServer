@@ -206,7 +206,7 @@ showImageDetail = () ->
 
     owlElem.attr("id", "")
     owlElem.addClass("unloaded") if !image_url
-    owlElem.find(".img-box").on("click", () ->
+    owlElem.find(".comment-notice").on "click", () ->
       $(".comment-container").empty()
 
       currentPosition = owlObject.currentPosition()
@@ -246,7 +246,7 @@ showImageDetail = () ->
           media.append mediaBody
           $(".comment-container").prepend media
       $("#commentModal").modal("show")
-    )
+
     owlElem.show()
     return owlElem
 

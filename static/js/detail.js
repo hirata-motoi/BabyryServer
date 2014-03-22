@@ -197,7 +197,7 @@
       if (!image_url) {
         owlElem.addClass("unloaded");
       }
-      owlElem.find(".img-box").on("click", function() {
+      owlElem.find(".comment-notice").on("click", function() {
         var comment, comments, currentPosition, h4, icon, img, media, mediaBody, _i, _len;
         $(".comment-container").empty();
         currentPosition = owlObject.currentPosition();
