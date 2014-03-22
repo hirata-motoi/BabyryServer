@@ -93,6 +93,7 @@ $('#backslide').on('click', function(){
 </div>
 
 <div class="dynamic-container">
+  <div style="height: 44px;"></div>
   <button class="btn btn-default btn-lg btn-top" id="image_upload">投稿</button>
   <button class="btn btn-default btn-lg btn-top" id="group_by_stamp" onClick="showGroupByModal(event)">整理して見る</button>
 

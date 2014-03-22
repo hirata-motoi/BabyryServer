@@ -231,32 +231,15 @@ showImageDetail = () ->
         return 0
       )
 
+      tmpl = _.template $('#template-comment-item').html()
       if comments
         for comment in comments
-          media = $("<div>")
-          media.addClass("media")
-          icon = $("<a>")
-          icon.addClass("pull-left")
-          icon.attr("href", "#")
-          img = $("<img>")
-          img.addClass("media-object")
-          img.attr("alt", "64x64")
-          img.attr("src", "/static/img/160x160.png")
-          img.css("width", "64px")
-          img.css("height", "64px")
-          icon.append img
-          media.append icon
-          mediaBody = $("<div>")
-          mediaBody.addClass("media-body")
-          h4 = $("<h4>")
-          h4.addClass("media-heading")
-          h4.val("Media heading")
-          mediaBody.append h4
-          mediaBody.text(comment.comment)
-          media.append mediaBody
-          $(".comment-container").prepend media
+          item = tmpl
+            commenter_icon_url: comment.commented_by_icon_url,
+            commenter_name: comment.commented_by_name,
+            comment_text: comment.comment
+          $(".comment-container").prepend item
       $("#commentModal").modal("show")
-
     owlElem.show()
     return owlElem
 

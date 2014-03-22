@@ -72,6 +72,13 @@
     float: right;
     margin-right: 10px;
   }
+  .bold {
+    font-weight: bold;
+  }
+  .img-64-64 {
+    width: 64px;
+    height: 64px;
+  }
 </style>
 <script type="text/javascript">
   function prevent(e) {
@@ -131,3 +138,15 @@
     </div> <!-- modal-content -->
   </div> <!-- modal-dialog -->
 </div>
+
+<script id="template-comment-item">
+  <div class="media">
+    <a class="pull-left">
+      <img class="media-object img-64-64" alt="" src="<%= commenter_icon_url %>">
+    </a>
+    <div class="media-body">
+      <div class="media-heading bold"><%= commenter_name %></div>
+      <div><%= comment_text %></div>
+    </div>
+  </div>
+</script>
