@@ -13,13 +13,12 @@ getXSRFToken = ->
 searchUser = () ->
   searchString = $("#search-form").val()
   $("#search-result-container").empty()
-  token = getXSRFToken()
   $.ajax({
     "url": "/relatives/search.json",
-    "type": "post",
+    "type": "get",
+    "processData"; true,
     "data": {
       "str": searchString,
-      "XSRF-TOKEN": token,
     },
     "dataType": "json",
     "success": (data) ->
