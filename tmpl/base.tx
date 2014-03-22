@@ -59,8 +59,8 @@
         display: inline;
       }
       .navbar-default {
-        background-color: orange;
-        border-color: orange;
+        background-color: #ffdb99;
+        border-color: #ffdb99;
       }
       .navbar-brand {
       }
@@ -72,7 +72,7 @@
     : block head -> {}
   </head>
 
-  <body>
+  <body style="background-color: #EEEEEE">
 
     : if $no_header {
     : }

@@ -18,6 +18,7 @@
     border-radius: 2px;
     padding: 4px;
     margin: 4px;
+    background-color: #FFFFFF
   }
 
   /* salvattore */
