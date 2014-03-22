@@ -30,10 +30,12 @@
 
   window.loadingFlg = false;
 
+  window.displayedElementsFlg = true;
+
   owlObject = void 0;
 
   showImageDetail = function() {
-    var alreadyAttachedStamp, attachStamp, backToWall, createCommentNavigation, createImageBox, createStamp, createStampAttachIcon, detachStamp, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, setStampAttachList, setStampsByImagePosition, shouldPreLoad, showEntries, showErrorMessage, showLoadingImage, toggleDisplayedElements, upsertStampsByImagePosition;
+    var adjustDisplayedElements, alreadyAttachedStamp, attachStamp, backToWall, createCommentNavigation, createImageBox, createStamp, createStampAttachIcon, detachStamp, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, setStampAttachList, setStampsByImagePosition, shouldPreLoad, showEntries, showErrorMessage, showLoadingImage, toggleDisplayedElements, upsertStampsByImagePosition;
     $(".img-thumbnail").on("click", function() {
       var $elem, comment_count, data, i, imageId, image_id, image_url, initialIndex, n, owlContainer, screenHeight, screenWidth, stampElem, stampInfo, stampList, stamps, tappedEntryIndex, _i, _j, _len, _ref;
       $(".container").addClass("full-size-screen");
@@ -82,6 +84,7 @@
         beforeMove: function() {},
         afterMove: function() {
           var count, currentPageNo, loadingFlg;
+          adjustDisplayedElements();
           if (shouldPreLoad(5)) {
             if (window.loadingFlg) {
               return;
@@ -436,8 +439,40 @@
     };
     toggleDisplayedElements = function() {
       $(".navbar").toggle();
-      $(".stamp-container").toggle();
-      return $(".img-footer").toggle();
+      window.displayedElementsFlg = $(".navbar").css("display") === "none" ? false : true;
+      return adjustDisplayedElements();
+    };
+    adjustDisplayedElements = function() {
+      var currentPosition, elems, i, imageElem, indexes, _i, _j, _len, _results, _results1;
+      currentPosition = parseInt(owlObject.currentPosition(), 10);
+      elems = $(".img-box");
+      if (window.entryData.entries.length < 4) {
+        indexes = (function() {
+          _results = [];
+          for (var _i = 0; 0 <= currentPosition ? _i <= currentPosition : _i >= currentPosition; 0 <= currentPosition ? _i++ : _i--){ _results.push(_i); }
+          return _results;
+        }).apply(this);
+      } else if (currentPosition === 0) {
+        indexes = [0, 1];
+      } else if (currentPosition === window.entryData.entries.length - 1) {
+        indexes = [currentPosition + 0 - 1, currentPosition];
+      } else {
+        indexes = [currentPosition, currentPosition - 1, currentPosition + 0 + 1];
+      }
+      window.console.log(indexes);
+      _results1 = [];
+      for (_j = 0, _len = indexes.length; _j < _len; _j++) {
+        i = indexes[_j];
+        imageElem = $(elems[currentPosition]);
+        if (window.displayedElementsFlg) {
+          imageElem.find(".stamp-container").show();
+          _results1.push(imageElem.find(".img-footer").show());
+        } else {
+          imageElem.find(".stamp-container").hide();
+          _results1.push(imageElem.find(".img-footer").hide());
+        }
+      }
+      return _results1;
     };
     createCommentNavigation = function(comment_count) {
       return "コメント" + comment_count + "件";

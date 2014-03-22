@@ -83,9 +83,6 @@
 <script type="text/javascript">
   function prevent(e) {
     e.stopPropagation();
-    $("#stampAttachModal").modal({
-      "backdrop": true
-    });
   }
 </script>
 
@@ -99,8 +96,8 @@
     <div class="stamp-container"></div>
     <div class="img-footer">
       <!--<a href="#stampAttachModal" data-toggle="modal" data-backdrop="true" class="glyphicon glyphicon-plus-sign stamp-add-icon" style="text-shadow: 0 0 2px #000; color: #eee;text-decoration:none;" onClick="prevent(event)"></a>-->
-      <span class="comment-notice"></span>
-      <span class="stamp-edit">スタンプ編集</span>
+      <span class="comment-notice" onClick="prevent(event)"></span>
+      <span class="stamp-edit" onClick="prevent(event)">スタンプ編集</span>
     </div>
   </div>
 </div>

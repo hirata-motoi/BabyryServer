@@ -18,6 +18,7 @@ window.stamp_ids or = []
 
 window.entryIdsInArray = []
 window.loadingFlg = false
+window.displayedElementsFlg = true
 owlObject = undefined
 showImageDetail = () ->
   $(".img-thumbnail").on("click", () ->
@@ -76,6 +77,7 @@ showImageDetail = () ->
       scrollPerPage: true,
       beforeMove: () ->
       afterMove: () ->
+        adjustDisplayedElements()
         if shouldPreLoad(5)
           return if window.loadingFlg
 
@@ -238,6 +240,7 @@ showImageDetail = () ->
             commenter_icon_url: comment.commented_by_icon_url,
             commenter_name: comment.commented_by_name,
             comment_text: comment.comment
+
           $(".comment-container").prepend item
       $("#commentModal").modal("show")
     owlElem.show()
@@ -425,8 +428,32 @@ showImageDetail = () ->
 
   toggleDisplayedElements = () ->
     $(".navbar").toggle()
-    $(".stamp-container").toggle()
-    $(".img-footer").toggle()
+    window.displayedElementsFlg = if $(".navbar").css("display") == "none" then false else true
+    adjustDisplayedElements()
+
+  adjustDisplayedElements = () ->
+    # currentPositionとその前後2つのimg-box上のdisplayedElementsをtoggleする
+    currentPosition = parseInt owlObject.currentPosition(), 10
+    elems = $(".img-box")
+
+    if window.entryData.entries.length < 4
+      indexes = [0 .. currentPosition]
+    else if currentPosition == 0
+      indexes = [0, 1]
+    else if currentPosition == window.entryData.entries.length - 1
+      indexes = [currentPosition + 0 -1, currentPosition]
+    else
+      indexes = [currentPosition, currentPosition - 1, currentPosition + 0 + 1 ]
+    window.console.log indexes
+
+    for i in indexes
+      imageElem = $( elems[currentPosition] )
+      if window.displayedElementsFlg 
+        imageElem.find(".stamp-container").show()
+        imageElem.find(".img-footer").show()
+      else 
+        imageElem.find(".stamp-container").hide()
+        imageElem.find(".img-footer").hide()
 
   createCommentNavigation = (comment_count) ->
     "コメント" + comment_count + "件"
