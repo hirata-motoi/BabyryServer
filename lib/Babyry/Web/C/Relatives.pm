@@ -52,8 +52,31 @@ sub admit {
 
     my $user_id     = $c->stash->{user_id};
     my $relative_id = $c->req->param('user_id');
+
     my $res = eval {
         Babyry::Logic::Relatives->new->admit($user_id, $relative_id);
+    } || {};
+    return $self->output_response_json($c, { %$res }, $@);
+}
+
+sub cancel {
+    my ($self, $c, $p, $v) = @_;
+
+    my $user_id     = $c->stash->{user_id};
+    my $relative_id = $c->req->param('user_id');
+    my $res = eval {
+        Babyry::Logic::Relatives->new->cancel($user_id, $relative_id);
+    } || {};
+    return $self->output_response_json($c, { %$res }, $@);
+}
+
+sub reject {
+    my ($self, $c, $p, $v) = @_;
+
+    my $user_id     = $c->stash->{user_id};
+    my $relative_id = $c->req->param('user_id');
+    my $res = eval {
+        Babyry::Logic::Relatives->new->reject($user_id, $relative_id);
     } || {};
     return $self->output_response_json($c, { %$res }, $@);
 }

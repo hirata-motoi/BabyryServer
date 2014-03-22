@@ -4,7 +4,6 @@ if typeof (window.console) is "undefined"
 $ ->
 
 getXSRFToken = ->
-  window.console.log document.cookie
   cookies = document.cookie.split(/\s*;\s*/)
   for c in cookies
     matched = c.match(/^XSRF-TOKEN=(.*)$/)
@@ -28,20 +27,12 @@ searchUser = () ->
       for user, index in data.users
         searchResult = $("<li>")
         searchResult.attr "user-id", user.user_id
-        searchResult.addClass "search-result"
+        searchResult.addClass "list-view-item"
 
-        window.console.log user.relative_status
-
-        if user.relative_relation == 'approved'
-          # 既にrelativesになっている場合
-          # serverで除外しているが一応ケアする
+        if user.relative_relation == "approved" || user.relative_relation == "admitting" || user.relative_relation == "applying"
+          # 既にrelativesになっている場合、申請中の場合はここに出さない
+          # approvedの場合はserverで除外しているが一応ケアする
           continue
-        else if user.relative_relation == 'applying'
-          # 自分から申請中
-          applyIcon = createApplyingText()
-        else if user.relative_relation == 'admitting'
-          # 相手から申請中
-          applyIcon = createAdmittingIcon()
         else
           applyIcon = createRelativesApplyIcon()
 
@@ -54,16 +45,29 @@ searchUser = () ->
 
 createAdmittingIcon = () ->
   icon = $("<button>")
-  icon.addClass("relatives-apply-icon")
+  icon.addClass("relatives-operation-icon")
   icon.text("承認する")
   icon.on "click", admitRelativeApply
   return icon
 
+createCancelIcon = () ->
+  icon = $("<button>")
+  icon.addClass("relatives-operation-icon")
+  icon.text("取り消す")
+  icon.on "click", cancelRelativeApply
+  return icon
+
+createRejectIcon = () ->
+  icon = $("<button>")
+  icon.addClass("relatives-operation-icon")
+  icon.text("拒否")
+  icon.on "click", rejectRelativeApply
+  return icon
 
 admitRelativeApply = () ->
   button = $(this)
-  searchResult = button.parents(".search-result")
-  userId = searchResult.attr("user-id")
+  item = button.parents(".list-view-item")
+  userId = item.attr("user-id")
   token = getXSRFToken()
   
   # loadingアイコン
@@ -78,27 +82,33 @@ admitRelativeApply = () ->
       "XSRF-TOKEN": token
     },
     "success": () ->
-      # 承認するボタンを「承認済み」に変更
-      button.remove()
-      admittedText = createAdmittedText()
-      searchResult.append admittedText
+      # 承認待ちlistから消して友達listに追加する
+      clonedItem = item.clone()
+      item.remove()
+      clonedItem.find("button").remove()
+      $("#approved").find("ul").prepend clonedItem
+      # approvedが今まで1件もなかった場合のため
+      $("#approved").show()
 
-      # 友達リストに「承認済み」枠で表示
-      refleshRelativesList()
+      # itemがなくなった項目は非表示にする
+      # list-view-itemが一つもない状態になったら項目自体を隠す
+      container = item.parents(".list-view-item-container")
+      if container.find(".list-view-item").length < 1
+        container.hide()
     "error": () ->
       # 失敗した旨を表示
   })
 
 createRelativesApplyIcon = () ->
   icon = $("<button>")
-  icon.addClass("relatives-apply-icon")
+  icon.addClass("relatives-operation-icon")
   icon.text("申請")
   icon.on "click", sendRelativeApply
   return icon
 
 sendRelativeApply = () ->
   button = $(this)
-  searchResult = button.parents(".search-result")
+  searchResult = button.parents(".list-view-item")
   userId = searchResult.attr("user-id")
   token = getXSRFToken()
 
@@ -127,13 +137,13 @@ sendRelativeApply = () ->
 
 createApplyingText = () ->
   applyingText = $("<span>")
-  applyingText.addClass "relatives-apply-icon"
+  applyingText.addClass "relatives-operation-icon"
   applyingText.text("申請中")
   return applyingText
 
 createAdmittedText = () ->
   applyingText = $("<span>")
-  applyingText.addClass "relatives-apply-icon"
+  applyingText.addClass "relatives-operation-icon"
   applyingText.text("承認済み")
   return applyingText
 
@@ -143,6 +153,47 @@ createloadingIcon = () ->
   img.addClass "loading-image"
   return img
 
+requestRelativeOperate = (button, url) ->
+  target = button.parent(".list-view-item")
+  tab = button.parents(".tab-pane").attr "id"
+  userId = target.attr("user-id")
+  token = getXSRFToken()
+  
+  # loadingアイコン
+  button.text("")
+  button.append createloadingIcon()
+  
+  $.ajax({
+    "url": url,
+    "type": "post",
+    "data": {
+      "user_id": userId,
+      "XSRF-TOKEN": token
+    },
+    "success": () ->
+      # list-view-itemが一つもない状態になったら項目自体を隠す
+      container = target.parents(".list-view-item-container")
+      
+      # 申請中リストから削除
+      target.remove()
+
+      if container.find(".list-view-item").length < 1
+        container.hide()
+
+    "error": () ->
+      # 失敗した旨を表示
+  })
+
+cancelRelativeApply = () ->
+  button = $(this)
+  url = "/relatives/cancel.json"
+  requestRelativeOperate button, url
+
+rejectRelativeApply = () ->
+  button = $(this)
+  url = "/relatives/reject.json"
+  requestRelativeOperate button, url
+
 refleshRelativesList = () ->
   $.ajax({
     "url": "/relatives/list.json",
@@ -151,21 +202,46 @@ refleshRelativesList = () ->
       # relatives listのDOMを入れ替える
       return if ! data.relatives
      
-      elems = []
-      for relative_id of data.relatives
-        email = data.relatives[relative_id].email
-        elem = $("<li>")
-        elem.text relative_id + " : " + email
-        elems.push elem
+      elems = {}
+      for relation of data.relatives
+        elems[relation] = []
+        for relative_id of data.relatives[relation]
+          email = data.relatives[relation][relative_id].email
+          elem = $("<li>")
+          elem.attr "user-id", relative_id
+          elem.addClass "list-view-item"
+          elem.text relative_id + " : " + email
+
+          if relation == "applying"
+            # 申請中の場合はキャンセルボタンを作る
+            elem.append createCancelIcon()
+          else if relation == "admitting"
+            # 承認待ちの場合は承認ボタン・拒否ボタンを作る
+            elem.append createRejectIcon()
+            elem.append createAdmittingIcon("list")
+            
+          elems[relation].push elem
         
       list = $("#list .list-view")
-      list.empty()
-      for e in elems
-        list.append e
+      list.find("li").hide()
+      list.find("ul").empty()
+
+      for r of elems 
+        $("#" + r).show()
+        for e in elems[r]
+          $("#" + r).find("ul").append e
 
     "error": () ->
       # 更新に失敗した旨を表示
   })
+
+
+# タブが切り替わった時には検索条件と検索結果をresetしておく
+# listのタブでrelativesとの関係が変更される可能性があり、
+# searchのタブの内容が実際と食い違う可能性があるため
+$('a[data-toggle="tab"]').on "shown.bs.tab", () ->
+  $("#search-form").val("")
+  $("#search-result-container").empty()
 
 $("#search-submit").on "click", searchUser
 refleshRelativesList()

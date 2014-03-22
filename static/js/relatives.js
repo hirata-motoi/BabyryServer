@@ -1,5 +1,5 @@
 (function() {
-  var admitRelativeApply, console, createAdmittedText, createAdmittingIcon, createApplyingText, createRelativesApplyIcon, createloadingIcon, getXSRFToken, refleshRelativesList, searchUser, sendRelativeApply;
+  var admitRelativeApply, cancelRelativeApply, console, createAdmittedText, createAdmittingIcon, createApplyingText, createCancelIcon, createRejectIcon, createRelativesApplyIcon, createloadingIcon, getXSRFToken, refleshRelativesList, rejectRelativeApply, requestRelativeOperate, searchUser, sendRelativeApply;
 
   if (typeof window.console === "undefined") {
     console = {};
@@ -10,7 +10,6 @@
 
   getXSRFToken = function() {
     var c, cookies, matched, token, _i, _len;
-    window.console.log(document.cookie);
     cookies = document.cookie.split(/\s*;\s*/);
     for (_i = 0, _len = cookies.length; _i < _len; _i++) {
       c = cookies[_i];
@@ -46,14 +45,9 @@
           user = _ref[index];
           searchResult = $("<li>");
           searchResult.attr("user-id", user.user_id);
-          searchResult.addClass("search-result");
-          window.console.log(user.relative_status);
-          if (user.relative_relation === 'approved') {
+          searchResult.addClass("list-view-item");
+          if (user.relative_relation === "approved" || user.relative_relation === "admitting" || user.relative_relation === "applying") {
             continue;
-          } else if (user.relative_relation === 'applying') {
-            applyIcon = createApplyingText();
-          } else if (user.relative_relation === 'admitting') {
-            applyIcon = createAdmittingIcon();
           } else {
             applyIcon = createRelativesApplyIcon();
           }
@@ -70,17 +64,35 @@
   createAdmittingIcon = function() {
     var icon;
     icon = $("<button>");
-    icon.addClass("relatives-apply-icon");
+    icon.addClass("relatives-operation-icon");
     icon.text("承認する");
     icon.on("click", admitRelativeApply);
     return icon;
   };
 
+  createCancelIcon = function() {
+    var icon;
+    icon = $("<button>");
+    icon.addClass("relatives-operation-icon");
+    icon.text("取り消す");
+    icon.on("click", cancelRelativeApply);
+    return icon;
+  };
+
+  createRejectIcon = function() {
+    var icon;
+    icon = $("<button>");
+    icon.addClass("relatives-operation-icon");
+    icon.text("拒否");
+    icon.on("click", rejectRelativeApply);
+    return icon;
+  };
+
   admitRelativeApply = function() {
-    var button, searchResult, token, userId;
+    var button, item, token, userId;
     button = $(this);
-    searchResult = button.parents(".search-result");
-    userId = searchResult.attr("user-id");
+    item = button.parents(".list-view-item");
+    userId = item.attr("user-id");
     token = getXSRFToken();
     button.text("");
     button.append(createloadingIcon());
@@ -92,11 +104,16 @@
         "XSRF-TOKEN": token
       },
       "success": function() {
-        var admittedText;
-        button.remove();
-        admittedText = createAdmittedText();
-        searchResult.append(admittedText);
-        return refleshRelativesList();
+        var clonedItem, container;
+        clonedItem = item.clone();
+        item.remove();
+        clonedItem.find("button").remove();
+        $("#approved").find("ul").prepend(clonedItem);
+        $("#approved").show();
+        container = item.parents(".list-view-item-container");
+        if (container.find(".list-view-item").length < 1) {
+          return container.hide();
+        }
       },
       "error": function() {}
     });
@@ -105,7 +122,7 @@
   createRelativesApplyIcon = function() {
     var icon;
     icon = $("<button>");
-    icon.addClass("relatives-apply-icon");
+    icon.addClass("relatives-operation-icon");
     icon.text("申請");
     icon.on("click", sendRelativeApply);
     return icon;
@@ -114,7 +131,7 @@
   sendRelativeApply = function() {
     var button, searchResult, token, userId;
     button = $(this);
-    searchResult = button.parents(".search-result");
+    searchResult = button.parents(".list-view-item");
     userId = searchResult.attr("user-id");
     token = getXSRFToken();
     button.text("");
@@ -140,7 +157,7 @@
   createApplyingText = function() {
     var applyingText;
     applyingText = $("<span>");
-    applyingText.addClass("relatives-apply-icon");
+    applyingText.addClass("relatives-operation-icon");
     applyingText.text("申請中");
     return applyingText;
   };
@@ -148,7 +165,7 @@
   createAdmittedText = function() {
     var applyingText;
     applyingText = $("<span>");
-    applyingText.addClass("relatives-apply-icon");
+    applyingText.addClass("relatives-operation-icon");
     applyingText.text("承認済み");
     return applyingText;
   };
@@ -161,34 +178,101 @@
     return img;
   };
 
+  requestRelativeOperate = function(button, url) {
+    var tab, target, token, userId;
+    target = button.parent(".list-view-item");
+    tab = button.parents(".tab-pane").attr("id");
+    userId = target.attr("user-id");
+    token = getXSRFToken();
+    button.text("");
+    button.append(createloadingIcon());
+    return $.ajax({
+      "url": url,
+      "type": "post",
+      "data": {
+        "user_id": userId,
+        "XSRF-TOKEN": token
+      },
+      "success": function() {
+        var container;
+        container = target.parents(".list-view-item-container");
+        target.remove();
+        if (container.find(".list-view-item").length < 1) {
+          return container.hide();
+        }
+      },
+      "error": function() {}
+    });
+  };
+
+  cancelRelativeApply = function() {
+    var button, url;
+    button = $(this);
+    url = "/relatives/cancel.json";
+    return requestRelativeOperate(button, url);
+  };
+
+  rejectRelativeApply = function() {
+    var button, url;
+    button = $(this);
+    url = "/relatives/reject.json";
+    return requestRelativeOperate(button, url);
+  };
+
   refleshRelativesList = function() {
     return $.ajax({
       "url": "/relatives/list.json",
       "type": "get",
       "success": function(data) {
-        var e, elem, elems, email, list, relative_id, _i, _len, _results;
+        var e, elem, elems, email, list, r, relation, relative_id, _results;
         if (!data.relatives) {
           return;
         }
-        elems = [];
-        for (relative_id in data.relatives) {
-          email = data.relatives[relative_id].email;
-          elem = $("<li>");
-          elem.text(relative_id + " : " + email);
-          elems.push(elem);
+        elems = {};
+        for (relation in data.relatives) {
+          elems[relation] = [];
+          for (relative_id in data.relatives[relation]) {
+            email = data.relatives[relation][relative_id].email;
+            elem = $("<li>");
+            elem.attr("user-id", relative_id);
+            elem.addClass("list-view-item");
+            elem.text(relative_id + " : " + email);
+            if (relation === "applying") {
+              elem.append(createCancelIcon());
+            } else if (relation === "admitting") {
+              elem.append(createRejectIcon());
+              elem.append(createAdmittingIcon("list"));
+            }
+            elems[relation].push(elem);
+          }
         }
         list = $("#list .list-view");
-        list.empty();
+        list.find("li").hide();
+        list.find("ul").empty();
         _results = [];
-        for (_i = 0, _len = elems.length; _i < _len; _i++) {
-          e = elems[_i];
-          _results.push(list.append(e));
+        for (r in elems) {
+          $("#" + r).show();
+          _results.push((function() {
+            var _i, _len, _ref, _results1;
+            _ref = elems[r];
+            _results1 = [];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              e = _ref[_i];
+              _results1.push($("#" + r).find("ul").append(e));
+            }
+            return _results1;
+          })());
         }
         return _results;
       },
       "error": function() {}
     });
   };
+
+  $('a[data-toggle="tab"]').on("shown.bs.tab", function() {
+    $("#search-form").val("");
+    return $("#search-result-container").empty();
+  });
 
   $("#search-submit").on("click", searchUser);
 

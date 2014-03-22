@@ -5,6 +5,7 @@ use warnings;
 use utf8;
 
 use parent qw/Babyry::Service::Base/;
+use Log::Minimal;
 
 use constant {
     RELATIVE_STATUS_UNADMITTED => 0,
@@ -20,10 +21,11 @@ sub get {
 
     my %relatives_info = ();
     for my $relative_id ( keys %$relatives ) {
-        # 成立していないものは除外
-        next if $relatives->{$relative_id}{relative_relation} ne 'approved';
 
-        $relatives_info{$relative_id} = {
+        my $relation = $relatives->{$relative_id}{relative_relation} || '';
+        $relatives_info{$relation} ||= {};
+
+        $relatives_info{$relation}{$relative_id} = {
             %{ $relatives->{$relative_id} },
             email => $user->{$relative_id}{email},
         }
@@ -41,6 +43,9 @@ sub search_by_name {
 
     my @search_result = ();
     for my $user ( @{ $matched_users->{users} } ) {
+
+        # 自分自身は除外
+        next if $user->{user_id} == $user_id;
 
         # 承認されたrelativesは除外する
         my $relative = $relatives->{ $user->{user_id} };
@@ -76,6 +81,36 @@ sub admit {
     my $teng = $self->teng('BABYRY_MAIN_W');
     $teng->txn_begin;
     $self->model('relatives')->admit(
+        $teng,
+        $user_id,
+        {
+            user_id => $relative_id
+        }
+    );
+    $teng->txn_commit;
+}
+
+sub cancel {
+    my ($self, $user_id, $relative_id) = @_;
+
+    my $teng = $self->teng('BABYRY_MAIN_W');
+    $teng->txn_begin;
+    $self->model('relatives')->cancel(
+        $teng,
+        $user_id,
+        {
+            user_id => $relative_id
+        }
+    );
+    $teng->txn_commit;
+}
+
+sub reject {
+    my ($self, $user_id, $relative_id) = @_;
+
+    my $teng = $self->teng('BABYRY_MAIN_W');
+    $teng->txn_begin;
+    $self->model('relatives')->reject(
         $teng,
         $user_id,
         {
