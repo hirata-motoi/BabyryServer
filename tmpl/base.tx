@@ -57,12 +57,18 @@
       }
       .nav li a {
         display: inline;
+        padding: 15px 15px;
       }
       .navbar-default {
-        background-color: #ffdb99;
-        border-color: #ffdb99;
+        background-image: -moz-linear-gradient(top, #ffe4b2, #ffa500);
+        background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffe4b2), to(#ffa500));
+        background-image: -webkit-linear-gradient(top, #ffe4b2, #ffa500);
+        background-image: -o-linear-gradient(top, #ffe4b2, #ffa500);
+        background-image: linear-gradient(to bottom, #ffe4b2, #ffa500);
+        border-color: #ffa500;
       }
-      .navbar-brand {
+      .navbar-default .navbar-brand {
+        color: #FFFFFF;
       }
       .navbar { height: 44px; min-height:44px}
       .navbar-default { height: 44px; }
