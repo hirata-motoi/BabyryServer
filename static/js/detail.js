@@ -34,9 +34,15 @@
   owlObject = void 0;
 
   showImageDetail = function() {
-    var alreadyAttachedStamp, attachStamp, createImageBox, createStamp, createStampAttachIcon, detachStamp, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, setStampAttachList, setStampsByImagePosition, shouldPreLoad, showEntries, showErrorMessage, showLoadingImage, upsertStampsByImagePosition;
+    var alreadyAttachedStamp, attachStamp, backToWall, createImageBox, createStamp, createStampAttachIcon, detachStamp, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, setStampAttachList, setStampsByImagePosition, shouldPreLoad, showEntries, showErrorMessage, showLoadingImage, upsertStampsByImagePosition;
     $(".img-thumbnail").on("click", function() {
-      var $elem, data, i, imageId, image_id, image_url, initialIndex, n, owlContainer, stampElem, stampInfo, stampList, stamps, tappedEntryIndex, _i, _j, _len, _ref;
+      var $elem, data, i, imageId, image_id, image_url, initialIndex, n, owlContainer, screenHeight, screenWidth, stampElem, stampInfo, stampList, stamps, tappedEntryIndex, _i, _j, _len, _ref;
+      $(".navbar").hide();
+      $(".container").addClass("full-size-screen");
+      screenWidth = screen.width;
+      screenHeight = screen.height;
+      $(".container").css("width", screenWidth);
+      $(".container").css("height", screenHeight);
       imageId = $(this).parents(".item").attr("image_id");
       data = pickData();
       tappedEntryIndex = $(this).attr("entryIndex");
@@ -53,7 +59,7 @@
           image_url = "";
           image_id = "";
         }
-        $elem = createImageBox(image_url, image_id);
+        $elem = createImageBox(image_url, image_id, screenWidth, screenHeight);
         owlContainer.append($elem);
         if (data.list[i] && data.list[i].image_id === imageId) {
           initialIndex = i;
@@ -90,7 +96,8 @@
       });
       owlObject = $(".owl-carousel").data("owlCarousel");
       owlObject.jumpTo(tappedEntryIndex);
-      return $(".stamp-attach-icon").on("click", attachStamp);
+      $(".stamp-attach-icon").on("click", attachStamp);
+      return $(".back-button").on("click", backToWall);
     });
     $("#comment-submit").on("click", function() {
       var comment, currentPosition, imageElem, imageId, token;
@@ -179,12 +186,14 @@
         "error": errorCallback
       });
     };
-    createImageBox = function(image_url, image_id) {
+    createImageBox = function(image_url, image_id, screenWidth, screenHeight) {
       var owlElem, tmpl;
       tmpl = $("#item-tmpl").clone(true);
       owlElem = $(tmpl);
       owlElem.find(".img-box").attr("image-id", image_id);
-      owlElem.find(".img-box img").attr("src", image_url);
+      owlElem.find(".img-box").css("background-image", "url(" + image_url + ")");
+      owlElem.css("width", screenWidth);
+      owlElem.css("height", screenHeight);
       owlElem.attr("id", "");
       if (!image_url) {
         owlElem.addClass("unloaded");
@@ -253,7 +262,8 @@
         elem = unloadedElems[i];
         if (response.data.entries[i]) {
           image_url = response.data.entries[i].fullsize_image_url;
-          $(elem).find(".img-box img").attr("src", image_url);
+          window.console.log(image_url);
+          $(elem).find(".img-box").css("background-image", "url('" + image_url + "')");
           $(elem).find(".loading").removeClass("loading");
           $(elem).removeClass("unloaded");
           window.entryIdsInArray.push(response.data.entries[i].image_id);
@@ -431,6 +441,10 @@
         _results.push($("#stampAttachModal").find(".modal-body").append(elem));
       }
       return _results;
+    };
+    backToWall = function() {
+      $(".container").removeClass("full-size-screen");
+      return location.href = "/";
     };
     if (!hasElem(window.stampData)) {
       return $.ajax({
