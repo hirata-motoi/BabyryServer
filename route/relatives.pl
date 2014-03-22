@@ -14,6 +14,12 @@
     '/relatives/list.json' => +{
         controller => 'Relatives', action => 'list',
     },
+    '/relatives/cancel.json' => +{
+        controller => 'Relatives', action => 'cancel',
+    },
+    '/relatives/reject.json' => +{
+        controller => 'Relatives', action => 'reject',
+    },
 }
 
 

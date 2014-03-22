@@ -14,9 +14,12 @@
     border-collapse: collapse;
     margin-top: -1px;
   }
-  .relatives-apply-icon {
+  .list-view-item-container {
+    display: none;
+  }
+  .relatives-operation-icon {
     float: right;
-    margin-right: 30px;
+    margin-right: 10px;
     line-height: 20px;
   }
   .loading-image {
@@ -65,10 +68,20 @@
       </form>
       <button id="search-submit">検索</button>
     </div>
-    <ul id="search-result-container" class="list-view"></ul>
+    <ul id="search-result-container" class="list-view">
+    </ul>
   </div>
   <div class="tab-pane fade" id="list">
     <ul class="list-view">
+      <li id="admitting" class="list-view-item-container">承認待ち
+        <ul></ul>
+      </li>
+      <li id="approved" class="list-view-item-container">友達
+        <ul></ul>
+      </li>
+      <li id="applying" class="list-view-item-container">申請中
+        <ul></ul>
+      </li>
     </ul>
   </div>
 </div>
