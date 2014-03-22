@@ -33,10 +33,9 @@
   owlObject = void 0;
 
   showImageDetail = function() {
-    var alreadyAttachedStamp, attachStamp, backToWall, createImageBox, createStamp, createStampAttachIcon, detachStamp, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, setStampAttachList, setStampsByImagePosition, shouldPreLoad, showEntries, showErrorMessage, showLoadingImage, upsertStampsByImagePosition;
+    var alreadyAttachedStamp, attachStamp, backToWall, createCommentNavigation, createImageBox, createStamp, createStampAttachIcon, detachStamp, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, setStampAttachList, setStampsByImagePosition, shouldPreLoad, showEntries, showErrorMessage, showLoadingImage, toggleDisplayedElements, upsertStampsByImagePosition;
     $(".img-thumbnail").on("click", function() {
-      var $elem, data, i, imageId, image_id, image_url, initialIndex, n, owlContainer, screenHeight, screenWidth, stampElem, stampInfo, stampList, stamps, tappedEntryIndex, _i, _j, _len, _ref;
-      $(".navbar").hide();
+      var $elem, comment_count, data, i, imageId, image_id, image_url, initialIndex, n, owlContainer, screenHeight, screenWidth, stampElem, stampInfo, stampList, stamps, tappedEntryIndex, _i, _j, _len, _ref;
       $(".container").addClass("full-size-screen");
       screenWidth = screen.width;
       screenHeight = screen.height;
@@ -54,11 +53,13 @@
           window.entryIdsInArray.push(data.list[i].image_id);
           stamps = data.list[i].stamps;
           image_id = data.list[i].image_id;
+          comment_count = data.list[i].comments.length;
         } else {
           image_url = "";
           image_id = "";
+          comment_count = 0;
         }
-        $elem = createImageBox(image_url, image_id, screenWidth, screenHeight);
+        $elem = createImageBox(image_url, image_id, comment_count, screenWidth, screenHeight);
         owlContainer.append($elem);
         if (data.list[i] && data.list[i].image_id === imageId) {
           initialIndex = i;
@@ -115,7 +116,7 @@
         },
         "dataType": "json",
         "success": function(data) {
-          var h4, icon, img, media, mediaBody;
+          var commentCount, h4, icon, img, media, mediaBody;
           media = $("<div>");
           media.addClass("media");
           icon = $("<a>");
@@ -141,7 +142,9 @@
           window.entryData.entries[currentPosition].comments.push({
             "comment": comment
           });
-          return $("#comment-textarea").val("");
+          $("#comment-textarea").val("");
+          commentCount = window.entryData.entries[currentPosition].comments.length;
+          return $(imageElem).find(".comment-notice").text(createCommentNavigation(commentCount));
         }
       });
     });
@@ -185,18 +188,20 @@
         "error": errorCallback
       });
     };
-    createImageBox = function(image_url, image_id, screenWidth, screenHeight) {
-      var owlElem, tmpl;
+    createImageBox = function(image_url, image_id, comment_count, screenWidth, screenHeight) {
+      var commentNoticeString, owlElem, tmpl;
       tmpl = $("#item-tmpl").clone(true);
       owlElem = $(tmpl);
       owlElem.find(".img-box").attr("image-id", image_id);
       owlElem.find(".img-box").css("background-image", "url(" + image_url + ")");
       owlElem.css("width", screenWidth);
       owlElem.css("height", screenHeight);
-      owlElem.attr("id", "");
       if (!image_url) {
         owlElem.addClass("unloaded");
       }
+      owlElem.find(".img-box").on("click", toggleDisplayedElements);
+      commentNoticeString = createCommentNavigation(comment_count);
+      owlElem.find(".comment-notice").text(commentNoticeString);
       owlElem.find(".comment-notice").on("click", function() {
         var comment, comments, currentPosition, h4, icon, img, media, mediaBody, _i, _len;
         $(".comment-container").empty();
@@ -261,7 +266,6 @@
         elem = unloadedElems[i];
         if (response.data.entries[i]) {
           image_url = response.data.entries[i].fullsize_image_url;
-          window.console.log(image_url);
           $(elem).find(".img-box").css("background-image", "url('" + image_url + "')");
           $(elem).find(".loading").removeClass("loading");
           $(elem).removeClass("unloaded");
@@ -444,6 +448,14 @@
     backToWall = function() {
       $(".container").removeClass("full-size-screen");
       return location.href = "/";
+    };
+    toggleDisplayedElements = function() {
+      $(".navbar").toggle();
+      $(".stamp-container").toggle();
+      return $(".img-footer").toggle();
+    };
+    createCommentNavigation = function(comment_count) {
+      return "コメント" + comment_count + "件";
     };
     if (!hasElem(window.stampData)) {
       return $.ajax({

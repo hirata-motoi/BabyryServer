@@ -23,13 +23,19 @@
     text-shadow: 0 0 2px #000;
     color: #eee;
     text-decoration:none;
-    display: block;
+    display: inline;
   }
   .stamp-icon {
     width: 36px;
     height: 36px;
-    display: block;
+    display: inline;
     margin: 5px;
+  }
+  .stamp-container {
+    position: absolute;
+    width: 100%;
+    bottom: 44px;
+    font-size: 30px;
   }
   .listed-stamp {
     width: 36px;
@@ -53,12 +59,18 @@
   .img-footer {
     position: absolute;
     bottom: 0px;
-    height: 44px;
+    height: 30px;
     width: 100%;
+    font-size: 30px;
   }
   .comment-notice {
     font-size: 14px;
     float: right;
+  }
+  .stamp-edit {
+    font-size: 14px;
+    float: right;
+    margin-right: 10px;
   }
 </style>
 <script type="text/javascript">
@@ -77,12 +89,11 @@
 <div id="item-tmpl" style="display:none">
   <div class="img-box cover" style="position: relative; background-color: black;">
     <!--<img src="" class="img-detail" />-->
-    <div class="stamp-container" style="position: absolute; top: 10px; right: 10px; font-size: 30px; text-align: center;">
-      <a href="#stampAttachModal" data-toggle="modal" data-backdrop="true" class="glyphicon glyphicon-plus-sign stamp-add-icon" style="text-shadow: 0 0 2px #000; color: #eee;text-decoration:none;" onClick="prevent(event)"></a>
-    </div>
+    <div class="stamp-container"></div>
     <div class="img-footer">
-      <a href="#stampAttachModal" data-toggle="modal" data-backdrop="true" class="glyphicon glyphicon-plus-sign stamp-add-icon" style="text-shadow: 0 0 2px #000; color: #eee;text-decoration:none;" onClick="prevent(event)"></a>
-      <span href="#commentModal" class="comment-notice">コメント4件</span>
+      <!--<a href="#stampAttachModal" data-toggle="modal" data-backdrop="true" class="glyphicon glyphicon-plus-sign stamp-add-icon" style="text-shadow: 0 0 2px #000; color: #eee;text-decoration:none;" onClick="prevent(event)"></a>-->
+      <span class="comment-notice"></span>
+      <span class="stamp-edit">スタンプ編集</span>
     </div>
   </div>
 </div>
@@ -104,7 +115,6 @@
   <div class="modal-dialog">
     <div class="modal-content" style="background-color: black; margin-top: 100px; color: white;">
       <div class="modal-header" style="height: 40px;">
-        <button type="button" class="back-button" data-dismiss="modal" aria-hidden="true" style="opacity:0.8; margin-top: -10px;">戻る</button>
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin-top: -8px; opacity:0.8">×</button>
       </div>
       <div class="modal-body">
