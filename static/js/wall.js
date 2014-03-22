@@ -73,6 +73,9 @@
     $('#image_upload').on('click', function() {
       return location.href = '/image/web/upload';
     });
+    $('#group_by_stamp').on('click', function(e) {
+      return window.showGroupByModal(e);
+    });
     tmpl_stamp = _.template($('#template-stamp').html());
     tmpl_child = _.template($('#template-child').html());
     window.showGroupByModal = function(e) {

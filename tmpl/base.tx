@@ -44,7 +44,30 @@
         height: 32px;
         background-size: 512px 480px;
       }
-      .ui-icon-gear { background-position: -384px -224px; }
+      .ui-icon-gear {
+        width: 32px;
+        height: 32px;
+        background-position: -384px -224px;
+      }
+      .nav {
+        padding: 5px;
+      }
+      .nav li {
+        display: inline;
+      }
+      .nav li a {
+        display: inline;
+      }
+      .navbar-default {
+        background-color: orange;
+        border-color: orange;
+      }
+      .navbar-brand {
+      }
+      .navbar { height: 44px; min-height:44px}
+      .navbar-default { height: 44px; }
+      .navbar-inner { height: 44px; }
+      .navbar-brand { height: 44px; }
     </style>
     : block head -> {}
   </head>
@@ -54,20 +77,18 @@
     : if $no_header {
     : }
     : else {
-    <nav class="navbar navbar-default" role="navigation">
-      <div class="container-fluid">
-        <div class="navbar-header" style="position: relative;">
-          <!--button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button-->
-          <a href="/" class="navbar-brand">Babyry</a>
-          <a href="/menu" class="navbar-brand"><div class="ui-icon ui-icon-gear"></div></a>
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="navbar-brand" href="/">Babyry</a>
+          <ul class="nav">
+            <li><a href="/image/web/upload"><img src="/static/img/menu/icon_folder_upload.png"></a></li>
+            <li><a id="group_by_stamp"><img src="/static/img/menu/icon_star_alt.png"></a></li>
+            <li><a href="/menu"><img src="/static/img/menu/icon_cog.png"></a></li>
+          </ul>
         </div>
       </div>
-    </nav>
+    </div>
     : }
 
     : if $container_fluid {
