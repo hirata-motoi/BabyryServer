@@ -209,6 +209,7 @@ showImageDetail = () ->
     owlElem.find(".img-box").css "background-image", "url(" + image_url + ")"
     owlElem.css "width", screenWidth
     owlElem.css "height", screenHeight
+    owlElem.attr "id", ""
 
     owlElem.addClass("unloaded") if !image_url
     owlElem.find(".img-box").on "click", toggleDisplayedElements
@@ -437,17 +438,18 @@ showImageDetail = () ->
     elems = $(".img-box")
 
     if window.entryData.entries.length < 4
-      indexes = [0 .. currentPosition]
+      indexes = [0 .. window.entryData.entries.length - 1]
     else if currentPosition == 0
+      # first image
       indexes = [0, 1]
     else if currentPosition == window.entryData.entries.length - 1
+      # last image
       indexes = [currentPosition + 0 -1, currentPosition]
     else
       indexes = [currentPosition, currentPosition - 1, currentPosition + 0 + 1 ]
-    window.console.log indexes
 
     for i in indexes
-      imageElem = $( elems[currentPosition] )
+      imageElem = $( elems[i] )
       if window.displayedElementsFlg 
         imageElem.find(".stamp-container").show()
         imageElem.find(".img-footer").show()

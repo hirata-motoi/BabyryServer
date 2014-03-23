@@ -199,6 +199,7 @@
       owlElem.find(".img-box").css("background-image", "url(" + image_url + ")");
       owlElem.css("width", screenWidth);
       owlElem.css("height", screenHeight);
+      owlElem.attr("id", "");
       if (!image_url) {
         owlElem.addClass("unloaded");
       }
@@ -443,13 +444,13 @@
       return adjustDisplayedElements();
     };
     adjustDisplayedElements = function() {
-      var currentPosition, elems, i, imageElem, indexes, _i, _j, _len, _results, _results1;
+      var currentPosition, elems, i, imageElem, indexes, _i, _j, _len, _ref, _results, _results1;
       currentPosition = parseInt(owlObject.currentPosition(), 10);
       elems = $(".img-box");
       if (window.entryData.entries.length < 4) {
         indexes = (function() {
           _results = [];
-          for (var _i = 0; 0 <= currentPosition ? _i <= currentPosition : _i >= currentPosition; 0 <= currentPosition ? _i++ : _i--){ _results.push(_i); }
+          for (var _i = 0, _ref = window.entryData.entries.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; 0 <= _ref ? _i++ : _i--){ _results.push(_i); }
           return _results;
         }).apply(this);
       } else if (currentPosition === 0) {
@@ -459,11 +460,10 @@
       } else {
         indexes = [currentPosition, currentPosition - 1, currentPosition + 0 + 1];
       }
-      window.console.log(indexes);
       _results1 = [];
       for (_j = 0, _len = indexes.length; _j < _len; _j++) {
         i = indexes[_j];
-        imageElem = $(elems[currentPosition]);
+        imageElem = $(elems[i]);
         if (window.displayedElementsFlg) {
           imageElem.find(".stamp-container").show();
           _results1.push(imageElem.find(".img-footer").show());
