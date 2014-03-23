@@ -27,6 +27,7 @@ $ ->
         page: page
       },
       success : (data) ->
+        return if data.data.entries.length < 1
         item = []
         for i in [0 .. data.data.entries.length - 1]
           item.push document.createElement('article')

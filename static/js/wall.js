@@ -36,6 +36,9 @@
         },
         success: function(data) {
           var i, item, _i, _j, _ref, _ref1;
+          if (data.data.entries.length < 1) {
+            return;
+          }
           item = [];
           for (i = _i = 0, _ref = data.data.entries.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
             item.push(document.createElement('article'));
