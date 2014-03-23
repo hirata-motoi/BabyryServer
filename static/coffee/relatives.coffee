@@ -228,7 +228,8 @@ refleshRelativesList = () ->
       for r of elems 
         $("#" + r).show()
         for e in elems[r]
-          $("#" + r).find("ul").append e
+          #$("#" + r).find("ul").append e
+          $("#" + r + "-list").append e
 
     "error": () ->
       # 更新に失敗した旨を表示
