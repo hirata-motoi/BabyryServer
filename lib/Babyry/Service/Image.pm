@@ -7,6 +7,7 @@ use parent qw/Babyry::Service::Base/;
 use Log::Minimal;
 use Data::Dumper;
 use List::MoreUtils qw/uniq/;
+use Carp;
 
 use Babyry::Model::TempImageUpload;
 use Babyry::Model::Relatives;
@@ -59,13 +60,19 @@ sub web_submit {
     # relatives exist and verified?
     my $relatives = Babyry::Model::Relatives->new()->get_by_user_id($teng_r, $params->{'user_id'});
     my $user = Babyry::Model::User->new();
-    my @relatives_array_list;
-    for my $rel (keys %{$relatives}) {
-        push @relatives_array_list, $relatives->{$rel}->{relative_id};
-    }
-    my $relatives_list = join('|', @relatives_array_list);
-    for my $share_id (@{$params->{user}}) {
-        return {error => 'NOT RELATIVES'} if ($share_id !~ /^($relatives_list)$/ or !$user->is_verified($teng_r, $params));
+    my @relatives_array_list = keys %$relatives;
+
+    # TODO move to validator
+    # verify済みユーザかのチェック
+    croak sprintf('user_id:%d is not verified user', $params->{user_id})
+        if !$user->is_verified($teng_r, $params);
+    # 本当にrelatives関係なのかをチェック
+    if ( my @not_relatives_users = grep { ! $relatives->{$_} } @{$params->{user}} ) {
+        croak sprintf(
+            'user_ids(shared users):%s is not relatives of user_id:%d',
+            join(',', @not_relatives_users),
+            $params->{user_id}
+        );
     }
 
     # tmp image exist?
