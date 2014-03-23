@@ -19,6 +19,25 @@ sub get_by_image_id {
     );
 }
 
+sub get_by_image_ids {
+    my ($self, $teng, $image_ids) = @_;
+
+    return if ! @$image_ids;
+
+    my $itr = $teng->search(
+        'image',
+        {
+            image_id => $image_ids,
+            disabled => 0,
+        }
+    );
+    my %images = ();
+    while ( my $r = $itr->next ) {
+        $images{ $r->image_id } = $r->get_columns;
+    }
+    return \%images;
+}
+
 sub get_by_uploaded_by{
     my ($teng, $uploaded_by, $from, $limit) = @_;
 

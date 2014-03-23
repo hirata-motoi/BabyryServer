@@ -18,9 +18,20 @@ window.stamp_ids or = []
 
 window.entryIdsInArray = []
 window.loadingFlg = false
+window.displayedElementsFlg = true
 owlObject = undefined
 showImageDetail = () ->
   $(".img-thumbnail").on("click", () ->
+
+    # .containerのpaddingをなくす
+    $(".container").addClass "full-size-screen"
+
+    # screenサイズを取得
+    screenWidth = screen.width
+    screenHeight = screen.height
+    $(".container.content-body").css "width", screenWidth
+    $(".container.content-body").css "height", screenHeight
+
     imageId   = $(this).parents(".item").attr("image_id")
     data = pickData()
     tappedEntryIndex = $(this).attr "entryIndex"
@@ -39,11 +50,13 @@ showImageDetail = () ->
         window.entryIdsInArray.push data.list[i].image_id
         stamps = data.list[i].stamps
         image_id = data.list[i].image_id
+        comment_count = data.list[i].comments.length
       else 
         image_url = ""
         image_id  = ""
+        comment_count = 0
 
-      $elem = createImageBox image_url, image_id
+      $elem = createImageBox image_url, image_id, comment_count, screenWidth, screenHeight
       owlContainer.append $elem
       initialIndex = i if data.list[i] and data.list[i].image_id == imageId
       
@@ -53,6 +66,8 @@ showImageDetail = () ->
           stampElem = createStamp(stampInfo.stamp_id, stampInfo.icon_url)
           $elem.find(".stamp-container").append stampElem
 
+    # hide navbar-space
+    $("#navbar-space").hide()
     # replace html of container
     $(".dynamic-container").html( owlContainer )
     $(window).scrollTop(0)
@@ -64,6 +79,7 @@ showImageDetail = () ->
       scrollPerPage: true,
       beforeMove: () ->
       afterMove: () ->
+        adjustDisplayedElements()
         if shouldPreLoad(5)
           return if window.loadingFlg
 
@@ -91,6 +107,9 @@ showImageDetail = () ->
 
     # +ボタンのeventを登録
     $(".stamp-attach-icon").on "click", attachStamp
+
+    # commentModalの戻るボタンのeventを登録
+    $(".back-button").on "click", backToWall
   )
 
   $("#comment-submit").on("click", () ->
@@ -144,6 +163,10 @@ showImageDetail = () ->
 
         # textareaを空にする
         $("#comment-textarea").val("")
+
+        # コメント件数を変更
+        commentCount = window.entryData.entries[currentPosition].comments.length
+        $(imageElem).find(".comment-notice").text createCommentNavigation(commentCount)
     })
     
   )
@@ -181,18 +204,28 @@ showImageDetail = () ->
     })
 
 
-  createImageBox = (image_url, image_id) ->
+  createImageBox = (image_url, image_id, comment_count, screenWidth, screenHeight) ->
     tmpl = $("#item-tmpl").clone(true)
     owlElem = $(tmpl)
-    owlElem.find(".img-box").attr("image-id", image_id)
-    owlElem.find(".img-box img").attr("src", image_url)
-    owlElem.attr("id", "")
+    owlElem.find(".img-box").attr "image-id", image_id
+    owlElem.find(".img-box").css "background-image", "url(" + image_url + ")"
+    owlElem.css "width", screenWidth
+    owlElem.css "height", screenHeight
+    owlElem.attr "id", ""
+
     owlElem.addClass("unloaded") if !image_url
-    owlElem.find(".img-box").on("click", () ->
+    owlElem.find(".img-box").on "click", toggleDisplayedElements
+
+    # コメントの件数表示
+    commentNoticeString = createCommentNavigation(comment_count)
+    owlElem.find(".comment-notice").text commentNoticeString
+
+    owlElem.find(".comment-notice").on "click", () ->
       $(".comment-container").empty()
 
       currentPosition = owlObject.currentPosition()
       comments = window.entryData.entries[currentPosition].comments
+
       comments.sort( (a, b) ->
         aCreatedAt = a.created_at
         bCreatedAt = b.created_at
@@ -203,32 +236,16 @@ showImageDetail = () ->
         return 0
       )
 
+      tmpl = _.template $('#template-comment-item').html()
       if comments
         for comment in comments
-          media = $("<div>")
-          media.addClass("media")
-          icon = $("<a>")
-          icon.addClass("pull-left")
-          icon.attr("href", "#")
-          img = $("<img>")
-          img.addClass("media-object")
-          img.attr("alt", "64x64")
-          img.attr("src", "/static/img/160x160.png")
-          img.css("width", "64px")
-          img.css("height", "64px")
-          icon.append img
-          media.append icon
-          mediaBody = $("<div>")
-          mediaBody.addClass("media-body")
-          h4 = $("<h4>")
-          h4.addClass("media-heading")
-          h4.val("Media heading")
-          mediaBody.append h4
-          mediaBody.text(comment.comment)
-          media.append mediaBody
-          $(".comment-container").prepend media
+          item = tmpl
+            commenter_icon_url: comment.commented_by_icon_url,
+            commenter_name: comment.commented_by_name,
+            comment_text: comment.comment
+
+          $(".comment-container").prepend item
       $("#commentModal").modal("show")
-    )
     owlElem.show()
     return owlElem
 
@@ -245,22 +262,20 @@ showImageDetail = () ->
 
     unloadedElems = $(".unloaded");
     for elem, i in unloadedElems
-        if response.data.entries[i]
-          image_url = response.data.entries[i].fullsize_image_url
-          $(elem).find(".img-box img").attr("src", image_url)
-          $(elem).find(".loading").removeClass("loading")
-          $(elem).removeClass("unloaded")
-          window.entryIdsInArray.push response.data.entries[i].image_id
-        else
-          window.loadingFlg = false
-          break
+      if response.data.entries[i]
+        image_url = response.data.entries[i].fullsize_image_url
+        $(elem).find(".img-box").css "background-image", "url('" + image_url + "')"
+        $(elem).find(".loading").removeClass("loading")
+        $(elem).removeClass("unloaded")
+        window.entryIdsInArray.push response.data.entries[i].image_id
+      else
+        window.loadingFlg = false
+        break
     window.loadingFlg = false
-
 
   getNextIds = () ->
     # 取得すべきentryのoffsetと数を取得
     currentEntryId = getCurrentEntryId
-
 
   getCurrentEntryId = () ->
     # 今表示されている投稿のentry_id
@@ -409,6 +424,43 @@ showImageDetail = () ->
     for stamp, i in stampList
       elem = createStampAttachIcon stamp
       $("#stampAttachModal").find(".modal-body").append elem
+
+  backToWall = () ->
+    $(".container").removeClass "full-size-screen"
+    location.href = "/"
+
+  toggleDisplayedElements = () ->
+    $(".navbar").toggle()
+    window.displayedElementsFlg = if $(".navbar").css("display") == "none" then false else true
+    adjustDisplayedElements()
+
+  adjustDisplayedElements = () ->
+    # currentPositionとその前後2つのimg-box上のdisplayedElementsをtoggleする
+    currentPosition = parseInt owlObject.currentPosition(), 10
+    elems = $(".img-box")
+
+    if window.entryData.entries.length < 4
+      indexes = [0 .. window.entryData.entries.length - 1]
+    else if currentPosition == 0
+      # first image
+      indexes = [0, 1]
+    else if currentPosition == window.entryData.entries.length - 1
+      # last image
+      indexes = [currentPosition + 0 -1, currentPosition]
+    else
+      indexes = [currentPosition, currentPosition - 1, currentPosition + 0 + 1 ]
+
+    for i in indexes
+      imageElem = $( elems[i] )
+      if window.displayedElementsFlg 
+        imageElem.find(".stamp-container").show()
+        imageElem.find(".img-footer").show()
+      else 
+        imageElem.find(".stamp-container").hide()
+        imageElem.find(".img-footer").hide()
+
+  createCommentNavigation = (comment_count) ->
+    "コメント" + comment_count + "件"
 
   # stamp attach用のmodalのsetup
   if ! hasElem(window.stampData)

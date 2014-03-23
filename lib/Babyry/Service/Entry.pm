@@ -11,6 +11,7 @@ use Babyry::Model::ImageStampMap;
 use Babyry::Model::Comment;
 use Data::Dump;
 use Babyry::Common;
+use List::MoreUtils qw/uniq/;
 
 #params
 # stamp_id:    int(default: [])
@@ -66,14 +67,30 @@ sub get_entries_by_images{
 
         # comments
         my $comments = Babyry::Model::Comment::get_by_image_id($teng, $image->image_id, 0, 10);
+
+        # user_name & user_icon_url
+        my @uniq_user_ids = uniq( map { $_->commented_by } @{$comments} );
+        my $users = $self->model('user')->get_by_user_ids($teng, \@uniq_user_ids);
+
+        # user_icon_url
+        my $images = $self->model('image')->get_by_image_ids(
+            $teng,
+            [ map { $users->{$_}{icon_image_id} } keys %$users ]
+        ) || {};
+
         my $cmt_array = [];
         for my $cmt (@{$comments}) {
+
+            my $commented_by  = $cmt->commented_by;
+
             push @{$cmt_array}, {
-                comment_id => $cmt->comment_id,
-                image_id => $cmt->image_id,
-                comment => $cmt->comment,
-                created_at => $cmt->created_at,
-                user_id => $cmt->commented_by,
+                comment_id            => $cmt->comment_id,
+                image_id              => $cmt->image_id,
+                comment               => $cmt->comment,
+                created_at            => $cmt->created_at,
+                user_id               => $commented_by,
+                commented_by_name     => $users->{$commented_by}{user_name},
+                commented_by_icon_url => _get_user_icon_url($commented_by, $users, $images),
             };
         }
 
@@ -86,6 +103,20 @@ sub get_entries_by_images{
     }
     
     return \@entries;
+}
+
+sub _get_user_icon_url {
+    my ($user_id, $users, $images) = @_;
+
+    my $default_user_icon_url = Babyry::Common->config->{default_user_icon_url};
+
+    my $icon_url = eval {
+        my $icon_image_id = $users->{$user_id}{icon_image_id} or die;
+        my $icon_image    = $images->{$icon_image_id} or die;
+        $icon_image->{url} or die;
+    };
+    return $default_user_icon_url if $@;
+    $icon_url;
 }
 
 sub get_url_by_image_id {
