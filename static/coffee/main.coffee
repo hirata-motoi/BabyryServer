@@ -26,7 +26,15 @@ setXSRFTokenToForm = () ->
     $(form).append($input)
   )
 
-setXSRFTokenToForm()
+showPageLoading = () ->
+  $("#page-loading").show()
 
+hidePageLoading = () ->
+  $("#page-loading").hide()
+
+setXSRFTokenToForm()
+window.util ||= {}
+window.util.showPageLoading = showPageLoading
+window.util.hidePageLoading = hidePageLoading
 
 

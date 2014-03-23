@@ -75,6 +75,18 @@
       .navbar-inner { height: 44px; }
       .navbar-brand { height: 44px; }
       #navbar-space { height: 44px; }
+      #page-loading {
+        opacity: 0.6;
+        display: none;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        z-index: 1;
+        vertical-align: middle;
+        text-align: center;
+      }
     </style>
     : block head -> {}
   </head>
@@ -109,6 +121,9 @@
     </div>
 
     <div style="display:none" class="relatives-data" data-json="<: encode_json_kolon($wall.relatives) :>" ></div>
+    <div id="page-loading">
+      <img src="/static/img/page-loading.gif" style="width: 220px;">
+    </div>
 
     <script src="<: static_file('/static/jquery/js/jquery.min.js') :>"></script>
     <script src="<: static_file('/static/bootstrap/js/bootstrap.min.js') :>"></script>

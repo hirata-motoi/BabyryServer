@@ -23,6 +23,8 @@ owlObject = undefined
 showImageDetail = () ->
   $(".img-thumbnail").on("click", () ->
 
+    window.util.showPageLoading()
+
     # .containerのpaddingをなくす
     $(".container").addClass "full-size-screen"
 
@@ -108,8 +110,7 @@ showImageDetail = () ->
     # +ボタンのeventを登録
     $(".stamp-attach-icon").on "click", attachStamp
 
-    # commentModalの戻るボタンのeventを登録
-    $(".back-button").on "click", backToWall
+    window.util.hidePageLoading()
   )
 
   $("#comment-submit").on("click", () ->
@@ -476,5 +477,5 @@ showImageDetail = () ->
   else
     setStampAttachList()
 
-window.util = []
+window.util ||= {}
 window.util.showImageDetail = showImageDetail

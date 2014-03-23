@@ -1,5 +1,5 @@
 (function() {
-  var console, getXSRFToken, setXSRFTokenToForm;
+  var console, getXSRFToken, hidePageLoading, setXSRFTokenToForm, showPageLoading;
 
   if (typeof window.console === "undefined") {
     console = {};
@@ -39,7 +39,21 @@
     });
   };
 
+  showPageLoading = function() {
+    return $("#page-loading").show();
+  };
+
+  hidePageLoading = function() {
+    return $("#page-loading").hide();
+  };
+
   setXSRFTokenToForm();
+
+  window.util || (window.util = {});
+
+  window.util.showPageLoading = showPageLoading;
+
+  window.util.hidePageLoading = hidePageLoading;
 
 }).call(this);
 

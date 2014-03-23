@@ -38,6 +38,7 @@
     var adjustDisplayedElements, alreadyAttachedStamp, attachStamp, backToWall, createCommentNavigation, createImageBox, createStamp, createStampAttachIcon, detachStamp, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, setStampAttachList, setStampsByImagePosition, shouldPreLoad, showEntries, showErrorMessage, showLoadingImage, toggleDisplayedElements, upsertStampsByImagePosition;
     $(".img-thumbnail").on("click", function() {
       var $elem, comment_count, data, i, imageId, image_id, image_url, initialIndex, n, owlContainer, screenHeight, screenWidth, stampElem, stampInfo, stampList, stamps, tappedEntryIndex, _i, _j, _len, _ref;
+      window.util.showPageLoading();
       $(".container").addClass("full-size-screen");
       screenWidth = screen.width;
       screenHeight = screen.height;
@@ -101,7 +102,7 @@
       owlObject = $(".owl-carousel").data("owlCarousel");
       owlObject.jumpTo(tappedEntryIndex);
       $(".stamp-attach-icon").on("click", attachStamp);
-      return $(".back-button").on("click", backToWall);
+      return window.util.hidePageLoading();
     });
     $("#comment-submit").on("click", function() {
       var comment, currentPosition, imageElem, imageId, token;
@@ -494,7 +495,7 @@
     }
   };
 
-  window.util = [];
+  window.util || (window.util = {});
 
   window.util.showImageDetail = showImageDetail;
 
