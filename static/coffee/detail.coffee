@@ -23,14 +23,16 @@ owlObject = undefined
 showImageDetail = () ->
   $(".img-thumbnail").on("click", () ->
 
+    window.util.showPageLoading()
+
     # .containerのpaddingをなくす
     $(".container").addClass "full-size-screen"
 
     # screenサイズを取得
-    screenWidth = screen.width
-    screenHeight = screen.height
-    $(".container.content-body").css "width", screenWidth
-    $(".container.content-body").css "height", screenHeight
+    innerWidth = window.innerWidth
+    innerHeight = window.innerHeight
+    $(".container.content-body").css "width", innerWidth
+    $(".container.content-body").css "height", innerHeight
 
     imageId   = $(this).parents(".item").attr("image_id")
     data = pickData()
@@ -56,7 +58,7 @@ showImageDetail = () ->
         image_id  = ""
         comment_count = 0
 
-      $elem = createImageBox image_url, image_id, comment_count, screenWidth, screenHeight
+      $elem = createImageBox image_url, image_id, comment_count, innerWidth, innerHeight
       owlContainer.append $elem
       initialIndex = i if data.list[i] and data.list[i].image_id == imageId
       
@@ -105,11 +107,7 @@ showImageDetail = () ->
     # タップされた画像を初期位置へ
     owlObject.jumpTo(tappedEntryIndex)
 
-    # +ボタンのeventを登録
-    $(".stamp-attach-icon").on "click", attachStamp
-
-    # commentModalの戻るボタンのeventを登録
-    $(".back-button").on "click", backToWall
+    window.util.hidePageLoading()
   )
 
   $("#comment-submit").on("click", () ->
@@ -204,17 +202,21 @@ showImageDetail = () ->
     })
 
 
-  createImageBox = (image_url, image_id, comment_count, screenWidth, screenHeight) ->
+  createImageBox = (image_url, image_id, comment_count, innerWidth, innerHeight) ->
     tmpl = $("#item-tmpl").clone(true)
     owlElem = $(tmpl)
     owlElem.find(".img-box").attr "image-id", image_id
     owlElem.find(".img-box").css "background-image", "url(" + image_url + ")"
-    owlElem.css "width", screenWidth
-    owlElem.css "height", screenHeight
+    owlElem.css "width", innerWidth
+    owlElem.css "height", innerHeight
     owlElem.attr "id", ""
 
     owlElem.addClass("unloaded") if !image_url
     owlElem.find(".img-box").on "click", toggleDisplayedElements
+
+    # stamp編集ボタン
+    owlElem.find(".stamp-edit").on "click", () ->
+      $("#stampAttachModal").modal("show")
 
     # コメントの件数表示
     commentNoticeString = createCommentNavigation(comment_count)
@@ -294,7 +296,7 @@ showImageDetail = () ->
       for stamp, n in entry.stamps
         window.stampsByImagePosition[i][stamp.stamp_id] = true
 
-  attachStamp = () ->
+  toggleStamp = () ->
     # スタンプをタップされたら画像にstampをつける
     # stampのidはaタグのstamp-idというattrに仕込んでおく
 
@@ -303,43 +305,68 @@ showImageDetail = () ->
     # image_idはowlのcurrentPositionから取得する
     currentPosition = owlObject.currentPosition()
 
-    # 既にattach済なら何もしない
-    return if alreadyAttachedStamp stampId, currentPosition
-
     stampHash = getStampHash()
     stampIconUrl = stampHash[stampId].icon_url
     targetImgBox = $(".img-box")[currentPosition]
     imageId = $(targetImgBox).attr("image-id")
 
-    # stampのDOMを作ってappend
-    stampElem = createStamp(stampId, stampIconUrl)
-    $(targetImgBox).find(".stamp-container").append stampElem
+    # 既にattach済ならdetachする
+    if alreadyAttachedStamp stampId, currentPosition
+      # detach
+      # stampを非表示にする
+      targetStamp = $(targetImgBox).find('img[stamp-id="' + stampId + '"]').parent()
+      targetStamp.hide()
 
-    # stampsByImagePositionを更新
-    setStampsByImagePosition stampId, currentPosition, true
-
-    token = getXSRFToken()
-    $.ajax({
-      "url" : "/stamp/attach.json",
-      "type": "post",
-      "data": {
-        "image_id": imageId,
-        "stamp_id": stampId,
-        "XSRF-TOKEN": token
-      },
-      "dataType": "json",
-      "error"   : (xhr, textStatus, errorThrown) ->
-        # TODO リクエストに失敗したらstampsByImagePositionをfalseにする
-        # ただし、「既にstampされています」というメッセージだった場合だけは何もしない
-        # 心苦しいが正規表現で暫定対応する カンベン
-        res = $.parseJSON(xhr.responseText)
-        regexp = new RegExp("stamp", "i")
-        if res.error_messages.stamp_id and  res.error_messages.stamp_id[0].match(regexp)
-          # 多分「既にstampされています」なのでスルー
-        else
+      token = getXSRFToken()
+      $.ajax({
+        "url" : "/stamp/detach.json",
+        "type": "post",
+        "data": {
+          "image_id": imageId,
+          "stamp_id": stampId,
+          "XSRF-TOKEN": token
+        },
+        "dataType": "json",
+        "success": (response) ->
+          # successならDOMを消す
+          targetStamp.remove()
           # stampsByImagePositionをfalseにする
-          stampsByImagePosition[currentPosition][stampId] = false
-    })
+          window.stampsByImagePosition[currentPosition][stampId] = false
+        "error": (xhr, textStatus, errorThrown) ->
+          targetStamp.show()
+      })
+    else
+      # attach
+      # stampのDOMを作ってappend
+      stampElem = createStamp(stampId, stampIconUrl)
+      $(targetImgBox).find(".stamp-container").append stampElem
+
+      # stampsByImagePositionを更新
+      setStampsByImagePosition stampId, currentPosition, true
+
+      token = getXSRFToken()
+      $.ajax({
+        "url" : "/stamp/attach.json",
+        "type": "post",
+        "data": {
+          "image_id": imageId,
+          "stamp_id": stampId,
+          "XSRF-TOKEN": token
+        },
+        "dataType": "json",
+        "error"   : (xhr, textStatus, errorThrown) ->
+          # TODO リクエストに失敗したらstampsByImagePositionをfalseにする
+          # ただし、「既にstampされています」というメッセージだった場合だけは何もしない
+          # 心苦しいが正規表現で暫定対応する カンベン
+          res = $.parseJSON(xhr.responseText)
+          regexp = new RegExp("stamp", "i")
+          if res.error_messages.stamp_id and  res.error_messages.stamp_id[0].match(regexp)
+            # 多分「既にstampされています」なのでスルー
+          else
+            # stampsByImagePositionをfalseにする
+            window.stampsByImagePosition[currentPosition][stampId] = false
+      })
+
 
   createStamp = (stampId, stampIconUrl) ->
     stampElem = $("<li>")
@@ -350,41 +377,8 @@ showImageDetail = () ->
     stampImage.attr "src", stampIconUrl
     stampImage.attr "stamp-id", stampId
 
-    # detach event
-    stampImage.on "click", detachStamp
-
     stampElem.append stampImage
     return stampElem
-
-  detachStamp = (e) ->
-    e.stopPropagation()
-
-    elem = $(this)
-    stampId = elem.attr("stamp-id")
-    imageId = elem.parents(".img-box").attr("image-id")
-    currentPosition = owlObject.currentPosition()
-
-    # stampを非表示にする
-    elem.hide()
-
-    token = getXSRFToken()
-    $.ajax({
-      "url" : "/stamp/detach.json",
-      "type": "post",
-      "data": {
-        "image_id": imageId,
-        "stamp_id": stampId,
-        "XSRF-TOKEN": token
-      },
-      "dataType": "json",
-      "success": (response) ->
-        # successならDOMを消す
-        elem.remove()
-        # stampsByImagePositionをfalseにする
-        stampsByImagePosition[currentPosition][stampId] = false
-      "error": (xhr, textStatus, errorThrown) ->
-        elem.show()
-    })
 
   getStampHash = () ->
     #return window.stampData
@@ -409,6 +403,7 @@ showImageDetail = () ->
     img.addClass("listed-stamp")
 
     elem.append img
+    elem.on "click", toggleStamp 
     return elem
 
   hasElem = (data) ->
@@ -476,5 +471,5 @@ showImageDetail = () ->
   else
     setStampAttachList()
 
-window.util = []
+window.util ||= {}
 window.util.showImageDetail = showImageDetail
