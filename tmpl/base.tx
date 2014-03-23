@@ -122,7 +122,7 @@
 
     <div style="display:none" class="relatives-data" data-json="<: encode_json_kolon($wall.relatives) :>" ></div>
     <div id="page-loading">
-      <img src="/static/img/page-loading.gif" style="width: 220px;">
+      <img src="/static/img/page-loading.gif" style="width: 50px; margin-top: 80%;">
     </div>
 
     <script src="<: static_file('/static/jquery/js/jquery.min.js') :>"></script>
