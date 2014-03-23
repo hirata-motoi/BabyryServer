@@ -35,7 +35,7 @@
   owlObject = void 0;
 
   showImageDetail = function() {
-    var adjustDisplayedElements, alreadyAttachedStamp, attachStamp, backToWall, createCommentNavigation, createImageBox, createStamp, createStampAttachIcon, detachStamp, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, setStampAttachList, setStampsByImagePosition, shouldPreLoad, showEntries, showErrorMessage, showLoadingImage, toggleDisplayedElements, upsertStampsByImagePosition;
+    var adjustDisplayedElements, alreadyAttachedStamp, backToWall, createCommentNavigation, createImageBox, createStamp, createStampAttachIcon, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, setStampAttachList, setStampsByImagePosition, shouldPreLoad, showEntries, showErrorMessage, showLoadingImage, toggleDisplayedElements, toggleStamp, upsertStampsByImagePosition;
     $(".img-thumbnail").on("click", function() {
       var $elem, comment_count, data, i, imageId, image_id, image_url, initialIndex, n, owlContainer, screenHeight, screenWidth, stampElem, stampInfo, stampList, stamps, tappedEntryIndex, _i, _j, _len, _ref;
       window.util.showPageLoading();
@@ -101,7 +101,6 @@
       });
       owlObject = $(".owl-carousel").data("owlCarousel");
       owlObject.jumpTo(tappedEntryIndex);
-      $(".stamp-attach-icon").on("click", attachStamp);
       return window.util.hidePageLoading();
     });
     $("#comment-submit").on("click", function() {
@@ -206,6 +205,9 @@
         owlElem.addClass("unloaded");
       }
       owlElem.find(".img-box").on("click", toggleDisplayedElements);
+      owlElem.find(".stamp-edit").on("click", function() {
+        return $("#stampAttachModal").modal("show");
+      });
       commentNoticeString = createCommentNavigation(comment_count);
       owlElem.find(".comment-notice").text(commentNoticeString);
       owlElem.find(".comment-notice").on("click", function() {
@@ -306,41 +308,61 @@
       }
       return _results;
     };
-    attachStamp = function() {
-      var currentPosition, imageId, stampElem, stampHash, stampIconUrl, stampId, targetImgBox, token;
+    toggleStamp = function() {
+      var currentPosition, imageId, stampElem, stampHash, stampIconUrl, stampId, targetImgBox, targetStamp, token;
       stampId = $(this).attr("stamp-id");
       currentPosition = owlObject.currentPosition();
-      if (alreadyAttachedStamp(stampId, currentPosition)) {
-        return;
-      }
       stampHash = getStampHash();
       stampIconUrl = stampHash[stampId].icon_url;
       targetImgBox = $(".img-box")[currentPosition];
       imageId = $(targetImgBox).attr("image-id");
-      stampElem = createStamp(stampId, stampIconUrl);
-      $(targetImgBox).find(".stamp-container").append(stampElem);
-      setStampsByImagePosition(stampId, currentPosition, true);
-      token = getXSRFToken();
-      return $.ajax({
-        "url": "/stamp/attach.json",
-        "type": "post",
-        "data": {
-          "image_id": imageId,
-          "stamp_id": stampId,
-          "XSRF-TOKEN": token
-        },
-        "dataType": "json",
-        "error": function(xhr, textStatus, errorThrown) {
-          var regexp, res;
-          res = $.parseJSON(xhr.responseText);
-          regexp = new RegExp("stamp", "i");
-          if (res.error_messages.stamp_id && res.error_messages.stamp_id[0].match(regexp)) {
-
-          } else {
-            return stampsByImagePosition[currentPosition][stampId] = false;
+      if (alreadyAttachedStamp(stampId, currentPosition)) {
+        targetStamp = $(targetImgBox).find('img[stamp-id="' + stampId + '"]').parent();
+        targetStamp.hide();
+        token = getXSRFToken();
+        return $.ajax({
+          "url": "/stamp/detach.json",
+          "type": "post",
+          "data": {
+            "image_id": imageId,
+            "stamp_id": stampId,
+            "XSRF-TOKEN": token
+          },
+          "dataType": "json",
+          "success": function(response) {
+            targetStamp.remove();
+            return window.stampsByImagePosition[currentPosition][stampId] = false;
+          },
+          "error": function(xhr, textStatus, errorThrown) {
+            return targetStamp.show();
           }
-        }
-      });
+        });
+      } else {
+        stampElem = createStamp(stampId, stampIconUrl);
+        $(targetImgBox).find(".stamp-container").append(stampElem);
+        setStampsByImagePosition(stampId, currentPosition, true);
+        token = getXSRFToken();
+        return $.ajax({
+          "url": "/stamp/attach.json",
+          "type": "post",
+          "data": {
+            "image_id": imageId,
+            "stamp_id": stampId,
+            "XSRF-TOKEN": token
+          },
+          "dataType": "json",
+          "error": function(xhr, textStatus, errorThrown) {
+            var regexp, res;
+            res = $.parseJSON(xhr.responseText);
+            regexp = new RegExp("stamp", "i");
+            if (res.error_messages.stamp_id && res.error_messages.stamp_id[0].match(regexp)) {
+
+            } else {
+              return window.stampsByImagePosition[currentPosition][stampId] = false;
+            }
+          }
+        });
+      }
     };
     createStamp = function(stampId, stampIconUrl) {
       var stampElem, stampImage;
@@ -350,36 +372,8 @@
       stampImage.addClass("stamp-icon");
       stampImage.attr("src", stampIconUrl);
       stampImage.attr("stamp-id", stampId);
-      stampImage.on("click", detachStamp);
       stampElem.append(stampImage);
       return stampElem;
-    };
-    detachStamp = function(e) {
-      var currentPosition, elem, imageId, stampId, token;
-      e.stopPropagation();
-      elem = $(this);
-      stampId = elem.attr("stamp-id");
-      imageId = elem.parents(".img-box").attr("image-id");
-      currentPosition = owlObject.currentPosition();
-      elem.hide();
-      token = getXSRFToken();
-      return $.ajax({
-        "url": "/stamp/detach.json",
-        "type": "post",
-        "data": {
-          "image_id": imageId,
-          "stamp_id": stampId,
-          "XSRF-TOKEN": token
-        },
-        "dataType": "json",
-        "success": function(response) {
-          elem.remove();
-          return stampsByImagePosition[currentPosition][stampId] = false;
-        },
-        "error": function(xhr, textStatus, errorThrown) {
-          return elem.show();
-        }
-      });
     };
     getStampHash = function() {
       var stamp, stampHash, _i, _len, _ref;
@@ -412,6 +406,7 @@
       img.attr("src", stamp.icon_url);
       img.addClass("listed-stamp");
       elem.append(img);
+      elem.on("click", toggleStamp);
       return elem;
     };
     hasElem = function(data) {
