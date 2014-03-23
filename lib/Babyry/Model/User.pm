@@ -63,6 +63,25 @@ sub get_by_user_id {
     return $res;
 }
 
+sub get_by_user_ids {
+    my ($self, $teng, $user_ids) = @_;
+
+    return if ! @$user_ids;
+
+    my $itr = $teng->search(
+        'user',
+        {
+            user_id => $user_ids
+        }
+    );
+
+    my %users = ();
+    while ( my $r = $itr->next ) {
+        $users{$r->user_id} = $r->get_columns;
+    }
+    return \%users;
+}
+
 sub update_by_user_id {
     my ($self, $teng, $user_id, $params) = @_;
 

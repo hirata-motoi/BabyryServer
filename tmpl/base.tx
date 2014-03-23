@@ -73,6 +73,7 @@
       .navbar-default { height: 44px; }
       .navbar-inner { height: 44px; }
       .navbar-brand { height: 44px; }
+      #navbar-space { height: 44px; }
     </style>
     : block head -> {}
   </head>
@@ -100,8 +101,9 @@
     <div class="container-fluid">
     : }
     : else {
-    <div class="container">
+    <div class="container content-body">
     : }
+      <div id="navbar-space"></div>
       : block content -> {}
     </div>
 

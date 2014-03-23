@@ -22,16 +22,15 @@
   };
 
   searchUser = function() {
-    var searchString, token;
+    var searchString;
     searchString = $("#search-form").val();
     $("#search-result-container").empty();
-    token = getXSRFToken();
     return $.ajax({
       "url": "/relatives/search.json",
-      "type": "post",
+      "type": "get",
+      "processData": true,
       "data": {
-        "str": searchString,
-        "XSRF-TOKEN": token
+        "str": searchString
       },
       "dataType": "json",
       "success": function(data) {

@@ -4,7 +4,6 @@
     width: 100%;
   }
   .img-detail {
-    width: 100%;
   }
   .footer {
     display: -webkit-box;
@@ -24,26 +23,66 @@
     text-shadow: 0 0 2px #000;
     color: #eee;
     text-decoration:none;
-    display: block;
+    display: inline;
   }
   .stamp-icon {
     width: 36px;
     height: 36px;
-    display: block;
+    display: inline;
     margin: 5px;
+  }
+  .stamp-container {
+    position: absolute;
+    width: 100%;
+    bottom: 44px;
+    font-size: 30px;
   }
   .listed-stamp {
     width: 36px;
     height: 36px;
     margin: 5px;
   }
+  .modal-header {
+    padding-top: 10px;
+  }
+  .cover {
+    display: inline-block;
+    background-color: #ccc;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+  .full-size-screen {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+  .img-footer {
+    position: absolute;
+    bottom: 0px;
+    height: 30px;
+    width: 100%;
+    font-size: 30px;
+  }
+  .comment-notice {
+    font-size: 14px;
+    float: right;
+  }
+  .stamp-edit {
+    font-size: 14px;
+    float: right;
+    margin-right: 10px;
+  }
+  .bold {
+    font-weight: bold;
+  }
+  .img-64-64 {
+    width: 64px;
+    height: 64px;
+  }
 </style>
 <script type="text/javascript">
   function prevent(e) {
     e.stopPropagation();
-    $("#stampAttachModal").modal({
-      "backdrop": true
-    });
   }
 </script>
 
@@ -52,10 +91,13 @@
 </div>
 
 <div id="item-tmpl" style="display:none">
-  <div class="img-box" style="position: relative;">
-    <img src="" class="img-detail" />
-    <div class="stamp-container" style="position: absolute; top: 10px; right: 10px; font-size: 30px; text-align: center;">
-      <a href="#stampAttachModal" data-toggle="modal" data-backdrop="true" class="glyphicon glyphicon-plus-sign stamp-add-icon" style="text-shadow: 0 0 2px #000; color: #eee;text-decoration:none;" onClick="prevent(event)"></a>
+  <div class="img-box cover" style="position: relative; background-color: black;">
+    <!--<img src="" class="img-detail" />-->
+    <div class="stamp-container"></div>
+    <div class="img-footer">
+      <!--<a href="#stampAttachModal" data-toggle="modal" data-backdrop="true" class="glyphicon glyphicon-plus-sign stamp-add-icon" style="text-shadow: 0 0 2px #000; color: #eee;text-decoration:none;" onClick="prevent(event)"></a>-->
+      <span class="comment-notice" onClick="prevent(event)"></span>
+      <span class="stamp-edit" onClick="prevent(event)">スタンプ編集</span>
     </div>
   </div>
 </div>
@@ -76,8 +118,8 @@
 <div id="commentModal" class="modal fade" style="top: auto; margin: 0 auto 20px; max-width: 100%; height: 500px;">
   <div class="modal-dialog">
     <div class="modal-content" style="background-color: black; margin-top: 100px; color: white;">
-      <div class="modal-header" style="height: 20px;">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin-top: -15px; opacity:0.8">×</button>
+      <div class="modal-header" style="height: 40px;">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="margin-top: -8px; opacity:0.8">×</button>
       </div>
       <div class="modal-body">
 
@@ -93,3 +135,15 @@
     </div> <!-- modal-content -->
   </div> <!-- modal-dialog -->
 </div>
+
+<script id="template-comment-item">
+  <div class="media">
+    <a class="pull-left">
+      <img class="media-object img-64-64" alt="" src="<%= commenter_icon_url %>">
+    </a>
+    <div class="media-body">
+      <div class="media-heading bold"><%= commenter_name %></div>
+      <div><%= comment_text %></div>
+    </div>
+  </div>
+</script>
