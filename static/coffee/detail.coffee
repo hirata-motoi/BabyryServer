@@ -29,10 +29,10 @@ showImageDetail = () ->
     $(".container").addClass "full-size-screen"
 
     # screenサイズを取得
-    screenWidth = screen.width
-    screenHeight = screen.height
-    $(".container.content-body").css "width", screenWidth
-    $(".container.content-body").css "height", screenHeight
+    innerWidth = window.innerWidth
+    innerHeight = window.innerHeight
+    $(".container.content-body").css "width", innerWidth
+    $(".container.content-body").css "height", innerHeight
 
     imageId   = $(this).parents(".item").attr("image_id")
     data = pickData()
@@ -58,7 +58,7 @@ showImageDetail = () ->
         image_id  = ""
         comment_count = 0
 
-      $elem = createImageBox image_url, image_id, comment_count, screenWidth, screenHeight
+      $elem = createImageBox image_url, image_id, comment_count, innerWidth, innerHeight
       owlContainer.append $elem
       initialIndex = i if data.list[i] and data.list[i].image_id == imageId
       
@@ -202,13 +202,13 @@ showImageDetail = () ->
     })
 
 
-  createImageBox = (image_url, image_id, comment_count, screenWidth, screenHeight) ->
+  createImageBox = (image_url, image_id, comment_count, innerWidth, innerHeight) ->
     tmpl = $("#item-tmpl").clone(true)
     owlElem = $(tmpl)
     owlElem.find(".img-box").attr "image-id", image_id
     owlElem.find(".img-box").css "background-image", "url(" + image_url + ")"
-    owlElem.css "width", screenWidth
-    owlElem.css "height", screenHeight
+    owlElem.css "width", innerWidth
+    owlElem.css "height", innerHeight
     owlElem.attr "id", ""
 
     owlElem.addClass("unloaded") if !image_url
