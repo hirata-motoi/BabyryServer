@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="format-detection" content="telephone=no">
     <link href="<: uri_for('/static/bootstrap/css/bootstrap.css') :>" rel="stylesheet" type="text/css">
+    <link href="<: uri_for('/static/jquery/plugin/ui/jquery-ui.css') :>" rel="stylesheet" type="text/css">
     <link href="<: static_file('/static/css/main.css') :>" rel="stylesheet" type="text/css" media="screen">
     <style>
       #footer {
@@ -38,30 +39,62 @@
       .footer-tab:last-child {
         width: 33.4%;
       }
+      .ui-icon {
+        width: 32px;
+        height: 32px;
+        background-size: 512px 480px;
+      }
+      .ui-icon-gear {
+        width: 32px;
+        height: 32px;
+        background-position: -384px -224px;
+      }
+      .nav {
+        padding: 5px;
+      }
+      .nav li {
+        display: inline;
+      }
+      .nav li a {
+        display: inline;
+        padding: 15px 15px;
+      }
+      .navbar-default {
+        background-image: -moz-linear-gradient(top, #ffe4b2, #ffa500);
+        background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffe4b2), to(#ffa500));
+        background-image: -webkit-linear-gradient(top, #ffe4b2, #ffa500);
+        background-image: -o-linear-gradient(top, #ffe4b2, #ffa500);
+        background-image: linear-gradient(to bottom, #ffe4b2, #ffa500);
+        border-color: #ffa500;
+      }
+      .navbar-default .navbar-brand {
+        color: #FFFFFF;
+      }
+      .navbar { height: 44px; min-height:44px}
+      .navbar-default { height: 44px; }
+      .navbar-inner { height: 44px; }
+      .navbar-brand { height: 44px; }
     </style>
     : block head -> {}
   </head>
 
-  <body>
+  <body style="background-color: #EEEEEE">
 
     : if $no_header {
     : }
     : else {
-    <nav class="navbar navbar-default" role="navigation">
-      <div class="container-fluid">
-        <div class="navbar-header" style="position: relative;">
-          <!--button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button-->
-          <a href="/" class="navbar-brand">Babyry</a>
-          <a href="#slidemenu" class="pageslide navbar-text navbar-left">MENU</a>
-          <p class="navbar-text navbar-left" style="position: absolute; top: 0; right: 20px;"><span class="glyphicon glyphicon-refresh"></a></span>
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="navbar-brand" href="/">Babyry</a>
+          <ul class="nav">
+            <li><a href="/image/web/upload"><img src="/static/img/menu/icon_folder_upload.png"></a></li>
+            <li><a id="group_by_stamp"><img src="/static/img/menu/icon_star_alt.png"></a></li>
+            <li><a href="/menu"><img src="/static/img/menu/icon_cog.png"></a></li>
+          </ul>
         </div>
       </div>
-    </nav>
+    </div>
     : }
 
     : if $container_fluid {
@@ -78,6 +111,7 @@
     <script src="<: static_file('/static/jquery/js/jquery.min.js') :>"></script>
     <script src="<: static_file('/static/bootstrap/js/bootstrap.min.js') :>"></script>
     <script src="<: static_file('/static/underscore/js/underscore-min.js') :>"></script>
+    <script src="<: static_file('/static/jquery/plugin/ui/jquery-ui.min.js') :>"></script>
     <!--script(src!='<: static_file('/static/js/es5-shim.min.js') :>')-->
     <!--script(src!='<: static_file('/static/js/micro_template.js') :>')-->
     <!--script(src!='<: static_file('/static/js/strftime.js') :>')-->

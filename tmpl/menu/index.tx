@@ -1,0 +1,64 @@
+: cascade base
+
+: around head -> {
+<style>
+  .item {
+    border: 1px solid #eee;
+    border-radius: 2px;
+    padding: 4px;
+    margin: 4px;
+    background-color: #FFFFFF;
+  }
+
+  /* salvattore */
+  .timeline[data-columns]::before {
+    content: '2 .column.size-1of2';
+  }
+  .column {
+    float: left;
+  }
+  .size-1of2 {
+    width: 50%;
+  }
+  [data-columns]::before {
+    display: none;
+  }
+  .img-menu-icon {
+    height: 64px;
+    width: 64px;
+    padding: 0px 0px 0px 0px;
+    border: none;
+    border-radius: 4px;
+  }
+</style>
+: }
+
+: around javascript -> {
+<script type="text/javascript" src="<: uri_for('/static/backbone/js/backbone-min.js') :>"></script>
+<!-- grid layout
+  http://salvattore.com/
+  http://suprb.com/apps/nested/
+-->
+<script type="text/javascript" src="<: uri_for('/static/salvattore/js/salvattore.min.js') :>"></script>
+
+<!-- for owl -->
+<script src="<: uri_for('/static/jquery/plugin/owl/owl-carousel/owl.carousel.js') :>"></script>
+
+<script id="template-menu">
+  <div class="item" style="text-align: center;">
+    <a href="<%= menu_uri %>">
+      <img src="<%= menu_icon_image %>" class="img-menu-icon" entryIndex="<%= entryIndex %>" /><br>
+      <%= menu_title %>
+    </a>
+  </div>
+</script>
+<script type="text/javascript" src="<: uri_for('/static/js/menu.js') :>"></script>
+: }
+
+: around content -> {
+
+<div class="dynamic-container">
+  <div class="timeline row" data-columns style="content: '2 .column.size-1of2';"></div>
+</div>
+
+: }

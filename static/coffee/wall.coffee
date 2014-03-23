@@ -60,7 +60,8 @@ $ ->
     load_contents()
   $('#image_upload').on 'click', () ->
     location.href = '/image/web/upload'
-
+  $('#group_by_stamp').on 'click', (e) ->
+    window.showGroupByModal(e)
 
   tmpl_stamp = _.template $('#template-stamp').html()
   tmpl_child = _.template $('#template-child').html()
