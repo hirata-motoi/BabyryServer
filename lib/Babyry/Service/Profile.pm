@@ -38,7 +38,6 @@ sub get {
         my $child = $self->model('Child')->get_by_child_id($teng_r, $row->child_id);
         $child_hash->{child_id} = $child->[0]->child_id;
         $child_hash->{child_name} = $child->[0]->child_name;
-        $child_hash->{stamp_id} = $child->[0]->stamp_id;
         push @{$child_array}, $child_hash;
     }
     $profile->{'child'} = $child_array;
@@ -69,7 +68,7 @@ sub add_child {
 
     # insert child data
     $self->model('UserChildMap')->add_child($teng, $params->{user_id}, $child_id, $unixtime);
-    $self->model('Child')->add_child($teng, $child_id, $params->{child_name}, $params->{stamp_id});
+    $self->model('Child')->add_child($teng, $child_id, $params->{child_name});
 
     $teng->txn_commit;
 

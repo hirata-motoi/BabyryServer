@@ -37,10 +37,17 @@
   #left-column {
     width: 40%;
     float:left;
+    display: inline;
+  }
+  #center-column {
+    width: 40%;
+    float: left;
+    display: inline;
   }
   #right-column {
-    width: 60%;
-    float:right;
+    width: 20%;
+    float: left;
+    display: inline;
   }
 </style>
 : }
@@ -58,7 +65,7 @@
       <img class="img-thumbnail img-profile" src="<%= url %>"><br>
       <%= name %>
     </div>
-    <div id="right-column">
+    <div id="center-column">
       投稿数 143<br>
       こども 4人<br>
       ぬーん<br>
@@ -71,10 +78,14 @@
       <img class="img-thumbnail img-profile" src="/static/img/160x160.png"><br>
       <%= name %>
     </div>
-    <div id="right-column">
-      誕生日：１月１日<br>
-      ２歳
+    <div id="center-column">
+      BirthDay 1984/12/07<br>
+      Age 29
     </div>
+    <div id="right-column">
+      <img class="img-thumbnail img-profile" src="/static/img/icon_pencil-edit_alt.png"><br>
+    </div>
+  </div>
 </script>
 <script type="text/javascript" src="<: uri_for('/static/js/profile.js') :>"></script>
 : }
