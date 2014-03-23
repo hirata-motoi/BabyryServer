@@ -24,18 +24,20 @@
           url: data.icon_image_url,
           name: data.user_name
         });
-        child_item = [];
-        for (i = _i = 0, _ref = data.child.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-          child_item.push(document.createElement('article'));
+        if (data.child.length !== 0) {
+          child_item = [];
+          for (i = _i = 0, _ref = data.child.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+            child_item.push(document.createElement('article'));
+          }
+          salvattore.append_elements(grid_child, child_item);
+          _results = [];
+          for (i = _j = 0, _ref1 = data.child.length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
+            _results.push(child_item[i].outerHTML = tmpl_child({
+              name: data.child[i].child_name
+            }));
+          }
+          return _results;
         }
-        salvattore.append_elements(grid_child, child_item);
-        _results = [];
-        for (i = _j = 0, _ref1 = data.child.length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
-          _results.push(child_item[i].outerHTML = tmpl_child({
-            name: data.child[i].child_name
-          }));
-        }
-        return _results;
       },
       error: function() {
         return window.console.log("error");

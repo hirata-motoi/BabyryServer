@@ -20,15 +20,16 @@ $ ->
         name: data.user_name,
       }
 
-      child_item = []
-      for i in [0 .. data.child.length - 1]
-        child_item.push document.createElement('article')
+      if data.child.length != 0
+        child_item = []
+        for i in [0 .. data.child.length - 1]
+          child_item.push document.createElement('article')
 
-      salvattore.append_elements grid_child, child_item
-      for i in [0 .. data.child.length - 1]
-        child_item[i].outerHTML = tmpl_child {
-          name: data.child[i].child_name
-        }
+        salvattore.append_elements grid_child, child_item
+        for i in [0 .. data.child.length - 1]
+          child_item[i].outerHTML = tmpl_child {
+            name: data.child[i].child_name
+          }
      error: () ->
        window.console.log "error"
    }
