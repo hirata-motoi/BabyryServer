@@ -29,8 +29,8 @@ showImageDetail = () ->
     # screenサイズを取得
     screenWidth = screen.width
     screenHeight = screen.height
-    $(".container").css "width", screenWidth
-    $(".container").css "height", screenHeight
+    $(".container.content-body").css "width", screenWidth
+    $(".container.content-body").css "height", screenHeight
 
     imageId   = $(this).parents(".item").attr("image_id")
     data = pickData()
