@@ -75,6 +75,7 @@
           }
         }
       }
+      $("#navbar-space").hide();
       $(".dynamic-container").html(owlContainer);
       $(window).scrollTop(0);
       $(".owl-carousel.displayed").owlCarousel({

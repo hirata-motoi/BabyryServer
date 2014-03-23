@@ -66,6 +66,8 @@ showImageDetail = () ->
           stampElem = createStamp(stampInfo.stamp_id, stampInfo.icon_url)
           $elem.find(".stamp-container").append stampElem
 
+    # hide navbar-space
+    $("#navbar-space").hide()
     # replace html of container
     $(".dynamic-container").html( owlContainer )
     $(window).scrollTop(0)
