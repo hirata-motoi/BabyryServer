@@ -27,10 +27,10 @@ setXSRFTokenToForm = () ->
   )
 
 showPageLoading = () ->
-  $("#page-loading").show()
+  $.mobile.loading("show")
 
 hidePageLoading = () ->
-  $("#page-loading").hide()
+  $.mobile.loading("hide")
 
 setXSRFTokenToForm()
 window.util ||= {}

@@ -37,20 +37,10 @@
 : }
 
 : around content -> {
-<div id="slidemenu" style="display:none;">
-  : if $user_id {
-  <p>Welcome <: $user_id :><br>
-  <p><a id="backslide">HOME</a></p>
-  <a href="<: uri_for('/logout') :>">Logout</a></p>
-  : }
-  <p><a href="/profile">Profile</a></p>
-  <p><a id="show-relatives">Relatives</a></p>
-</div>
-
 <ul class="nav nav-tabs">
-  <li class="active"><a href="#invite" data-toggle="tab">招待</a></li>
-  <li><a href="#search" data-toggle="tab">友達を探す</a></li>
-  <li><a href="#list" data-toggle="tab">友達リスト</a></li>
+  <li class="active"><a href="#invite" data-toggle="tab" data-ajax="false">招待</a></li>
+  <li><a href="#search" data-toggle="tab" data-ajax="false">友達を探す</a></li>
+  <li><a href="#list" data-toggle="tab" data-ajax="false">友達リスト</a></li>
 </ul>
 
 <div class="tab-content">

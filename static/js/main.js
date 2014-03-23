@@ -40,11 +40,11 @@
   };
 
   showPageLoading = function() {
-    return $("#page-loading").show();
+    return $.mobile.loading("show");
   };
 
   hidePageLoading = function() {
-    return $("#page-loading").hide();
+    return $.mobile.loading("hide");
   };
 
   setXSRFTokenToForm();

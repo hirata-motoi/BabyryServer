@@ -138,7 +138,7 @@
 
 <script id="template-comment-item">
   <div class="media">
-    <a class="pull-left">
+    <a class="pull-left" data-ajax="false">
       <img class="media-object img-64-64" alt="" src="<%= commenter_icon_url %>">
     </a>
     <div class="media-body">

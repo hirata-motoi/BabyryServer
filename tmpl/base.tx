@@ -10,6 +10,7 @@
     <link href="<: uri_for('/static/bootstrap/css/bootstrap.css') :>" rel="stylesheet" type="text/css">
     <link href="<: uri_for('/static/jquery/plugin/ui/jquery-ui.css') :>" rel="stylesheet" type="text/css">
     <link href="<: static_file('/static/css/main.css') :>" rel="stylesheet" type="text/css" media="screen">
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css" />
     <style>
       #footer {
         height: 46px;
@@ -99,11 +100,11 @@
     <div class="navbar navbar-default navbar-fixed-top" role="navigation">
       <div class="navbar-inner">
         <div class="container">
-          <a class="navbar-brand" href="/">Babyry</a>
+          <a class="navbar-brand" href="/" data-ajax="false">Babyry</a>
           <ul class="nav">
-            <li><a href="/image/web/upload"><img src="/static/img/menu/icon_folder_upload.png"></a></li>
-            <li><a id="group_by_stamp"><img src="/static/img/menu/icon_star_alt.png"></a></li>
-            <li><a href="/menu"><img src="/static/img/menu/icon_cog.png"></a></li>
+            <li><a href="/image/web/upload" data-ajax="false"><img src="/static/img/menu/icon_folder_upload.png"></a></li>
+            <li><a id="group_by_stamp" data-ajax="false"><img src="/static/img/menu/icon_star_alt.png"></a></li>
+            <li><a href="/menu" data-ajax="false"><img src="/static/img/menu/icon_cog.png"></a></li>
           </ul>
         </div>
       </div>
@@ -127,6 +128,7 @@
     <script src="<: static_file('/static/bootstrap/js/bootstrap.min.js') :>"></script>
     <script src="<: static_file('/static/underscore/js/underscore-min.js') :>"></script>
     <script src="<: static_file('/static/jquery/plugin/ui/jquery-ui.min.js') :>"></script>
+    <script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
     <!--script(src!='<: static_file('/static/js/es5-shim.min.js') :>')-->
     <!--script(src!='<: static_file('/static/js/micro_template.js') :>')-->
     <!--script(src!='<: static_file('/static/js/strftime.js') :>')-->
