@@ -11,10 +11,12 @@
     max-width: 320px;
   }
 </style>
-<form action="http://babyryserver5001/profile/edit_child.json" method="post" enctype="multipart/form-data">edit child sample:</br>
+<form action="/profile/edit_child.json" method="post" enctype="multipart/form-data">edit child sample:</br>
   child_id <input type="text" name="child_id"/><br/>
   child_name <input type="text" name="child_name"/><br/>
-  stamp_id <input type="text" name="stamp_id"/><br/>
+  year <input type="text" name="birth_year"/><br/>
+  month <input type="text" name="birth_month"/><br/>
+  day <input type="text" name="birth_day"/><br/>
   <input type="submit" value="sumbit"/>
 </form>
 : }

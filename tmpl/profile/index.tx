@@ -2,6 +2,9 @@
 
 : around head -> {
 <style>
+  #image-post-form {
+    display: none;
+  }
   .item {
     border: 1px solid #eee;
     border-radius: 2px;
@@ -75,16 +78,20 @@
 <script type="text/template" id="template-child-profile">
   <div class="item" style="text-align: center;">
     <div id="left-column">
-      <img class="img-thumbnail img-profile" src="/static/img/160x160.png"><br>
+      <img class="img-thumbnail img-profile" src="<%= url %>"><br>
       <%= name %>
     </div>
     <div id="center-column">
-      BirthDay 1984/12/07<br>
-      Age 29
+      BD <%= birth_year %>/<%= birth_month %>/<%= birth_day %><br>
     </div>
     <div id="right-column">
-      <img class="img-thumbnail img-profile" src="/static/img/icon_pencil-edit_alt.png"><br>
+      <img class="img-thumbnail img-profile" id="child_edit_button_<%= id %>" child_id="<%= id %>" src="/static/img/icon_pencil-edit_alt.png"><br>
     </div>
+  </div>
+</script>
+<script type="text/template" id="template-new-child-profile">
+  <div class="item" style="text-align: center;" id="add-new-child-pannel">
+  こどもを追加
   </div>
 </script>
 <script type="text/javascript" src="<: uri_for('/static/js/profile.js') :>"></script>
@@ -98,6 +105,40 @@
 <div class="dynamic-container">
   <div class="child-timeline row" data-columns style="content: '2 .column.size-1of2';"></div>
 </div>
+
+<div id="editChildModal" class="modal fade" style="top: 0px; margin: 0 auto 20px; max-width: 100%; height: 1000px;">
+  <div class="modal-dialog" style="height: 0px;">
+    <div class="modal-content" style="top: 200px;">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>
+          edit child
+          <button type="button" class="btn btn-default" id="child_edit_delete" data-dismiss="modal">Delete Child</button>
+        </h3>
+      </div>
+      <div class="modal-body">
+        <h4>なまえ</h4>
+        <input type='text' name='child_name' id='child_modal_child_name'>
+        <h4>アイコン</h4>
+        <img class = "img-profile" src="" id="child_modal_child_icon">
+        <button type="button" class="btn btn-default" id="child_modal_change_icon">Change Icon</button>
+        <h4>誕生日</h4>
+        <select id="child_birthday_year"><option value="0">----</option></select>年
+        <select id="child_birthday_month"><option value="0">--</option></select>月
+        <select id="child_birthday_day"><option value="0">--</option></select>日
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" id="child_edit_cancel" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="child_edit_submit" data-dismiss="modal">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<form method="post" action="/image/web/upload_execute.json" enctype="multipart/form-data" target="next-ajax-post-Image" id="image-post-form">
+  <input type="file" name="file">
+  <input type="submit" value="hoge">
+</form>
 
 : }
 

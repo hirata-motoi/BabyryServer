@@ -60,11 +60,13 @@ sub web_submit {
 
     my @image_list = $c->req->param('image_tmp_names[]');
     my @user_list  = $c->req->param('shared_user_ids[]');
+    my $child_id = $c->req->param('child_id') || "";
 
     my $params = {
         user_id => $c->stash->{'user_id'},
         user    => \@user_list,
         image   => \@image_list,
+        child_id => $child_id,
     };
 
     my $logic = Babyry::Logic::Image->new;
