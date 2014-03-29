@@ -460,21 +460,26 @@ showImageDetail = () ->
     # コメントの入れ替え
     $("#recent-comment-container").empty()
     comments = window.entryData.entries[currentPosition].comments
-    comments.sort( (a, b) ->
-      aCreatedAt = a.created_at
-      bCreatedAt = b.created_at
-      if aCreatedAt < bCreatedAt
-        return -1
-      if aCreatedAt > bCreatedAt
-        return 1
-      return 0
-    )
-    commentItem = $("<span>")
-    commentItem.text comments[0].comment
-    $("#recent-comment-container").append commentItem
+
+    if comments and comments.length > 0
+      comments.sort( (a, b) ->
+        aCreatedAt = a.created_at
+        bCreatedAt = b.created_at
+        if aCreatedAt < bCreatedAt
+          return -1
+        if aCreatedAt > bCreatedAt
+          return 1
+        return 0
+      )
+      commentItem = $("<span>")
+      commentItem.text comments[0].comment
+      $("#recent-comment-container").append commentItem
+      commentCount = comments.length
+    else
+      commentCount = 0
 
     # コメント件数の入れ替え
-    commentCountText = createCommentNavigation window.entryData.entries[currentPosition].comments.length
+    commentCountText = createCommentNavigation commentCount
     $("#comment-count").text commentCountText
 
   createCommentNavigation = (comment_count) ->

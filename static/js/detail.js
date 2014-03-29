@@ -460,29 +460,34 @@
       return _results1;
     };
     replaceToolBoxContent = function() {
-      var commentCountText, commentItem, comments, currentPosition, elems, stampContainer;
+      var commentCount, commentCountText, commentItem, comments, currentPosition, elems, stampContainer;
       currentPosition = parseInt(owlObject.currentPosition(), 10);
       elems = $(".img-box");
       stampContainer = $($(elems)[currentPosition]).find(".stamp-container").clone(true);
       $("#attached-stamps-container").find("ul").html(stampContainer.html());
       $("#recent-comment-container").empty();
       comments = window.entryData.entries[currentPosition].comments;
-      comments.sort(function(a, b) {
-        var aCreatedAt, bCreatedAt;
-        aCreatedAt = a.created_at;
-        bCreatedAt = b.created_at;
-        if (aCreatedAt < bCreatedAt) {
-          return -1;
-        }
-        if (aCreatedAt > bCreatedAt) {
-          return 1;
-        }
-        return 0;
-      });
-      commentItem = $("<span>");
-      commentItem.text(comments[0].comment);
-      $("#recent-comment-container").append(commentItem);
-      commentCountText = createCommentNavigation(window.entryData.entries[currentPosition].comments.length);
+      if (comments && comments.length > 0) {
+        comments.sort(function(a, b) {
+          var aCreatedAt, bCreatedAt;
+          aCreatedAt = a.created_at;
+          bCreatedAt = b.created_at;
+          if (aCreatedAt < bCreatedAt) {
+            return -1;
+          }
+          if (aCreatedAt > bCreatedAt) {
+            return 1;
+          }
+          return 0;
+        });
+        commentItem = $("<span>");
+        commentItem.text(comments[0].comment);
+        $("#recent-comment-container").append(commentItem);
+        commentCount = comments.length;
+      } else {
+        commentCount = 0;
+      }
+      commentCountText = createCommentNavigation(commentCount);
       return $("#comment-count").text(commentCountText);
     };
     createCommentNavigation = function(comment_count) {
