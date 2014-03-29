@@ -17,6 +17,7 @@ use Babyry::Model::Image;
 use Babyry::Model::ImageUserMap;
 use Babyry::Model::Comment;
 use Babyry::Model::ImageQueue;
+use Babyry::Model::Child;
 
 sub is_valid_image_id {
    my ($self, $image_id) = @_;
@@ -122,7 +123,7 @@ sub web_submit {
         # is_icon : ユーザーのicon
         # child_id : こどものidがあった場合はimage_user_mapに入れない Entryに表示されないように
         if (!$params->{'is_icon'} && !$params->{'child_id'}) {
-            for my $relative_id ( uniq( @relatives_array_list, $params->{'user_id'} ) ) {
+            for my $relative_id ( uniq( @{$params->{user}}, $params->{'user_id'} ) ) {
                 $image_user_map->add($teng, {
                     image_id   => $id,
                     user_id    => $relative_id,
