@@ -9,7 +9,7 @@ use utf8;
 sub add {
     my ($self, $teng, $params) = @_;
 
-    $teng->insert(
+    return $teng->insert(
         'comment',
         {
             comment_id   => $params->{comment_id},
@@ -20,8 +20,6 @@ sub add {
             commented_by => $params->{user_id},
         }
     );
-
-    return;
 }
 
 sub get_by_image_id {

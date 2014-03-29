@@ -17,6 +17,7 @@ use Babyry::Model::Image;
 use Babyry::Model::ImageUserMap;
 use Babyry::Model::Comment;
 use Babyry::Model::ImageQueue;
+use Babyry::Service::Entry;
 
 sub is_valid_image_id {
    my ($self, $image_id) = @_;
@@ -144,6 +145,7 @@ sub web_submit {
     return;
 }
 
+# Service/Commentに切り出し
 sub comment {
     my ($self, $params) = @_;
 
@@ -151,22 +153,30 @@ sub comment {
     my $teng_r = $self->teng('BABYRY_MAIN_R');
 
     # image_id check
-    my $image = Babyry::Model::Image->new();
+    my $image = $self->model('image');
     my $res = $image->get_by_image_id($teng_r, $params->{'image_id'});
     return {error => 'NO_TARGET_IMAGE'} unless ($res->{row_data});
     # insert comment
-    my $comment = Babyry::Model::Comment->new();
-    my $comment_seq = Babyry::Model::Sequence->new();
+    my $comment = $self->model('comment');
+    my $comment_seq = $self->model('sequence');
     $teng->txn_begin;
     my $id = $comment_seq->get_id($teng, 'seq_comment');
     my $unixtime = time();
     $params->{'comment_id'} = $id;
     $params->{'created_at'} = $unixtime;
     $params->{'updated_at'} = $unixtime;
-    $comment->add($teng, $params);
+    my $ret = $comment->add($teng, $params);
     $teng->txn_commit;
 
-    return;
+    # TODO 共通methodを使うように色々直す
+    my $users = $self->model('user')->get_by_user_ids($teng, [ $ret->commented_by ]);
+    # user_icon_url
+    my $images = $self->model('image')->get_by_image_ids(
+        $teng,
+        [ map { $users->{$_}{icon_image_id} } keys %$users ]
+    ) || {};
+
+    return Babyry::Service::Entry::comment_info($ret, $users, $images);
 }
 
 

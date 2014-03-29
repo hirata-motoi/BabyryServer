@@ -78,31 +78,32 @@ sub get_entries_by_images{
             [ map { $users->{$_}{icon_image_id} } keys %$users ]
         ) || {};
 
-        my $cmt_array = [];
-        for my $cmt (@{$comments}) {
+        my @cmt_array = map { comment_info($_, $users, $images) } @$comments;
 
-            my $commented_by  = $cmt->commented_by;
-
-            push @{$cmt_array}, {
-                comment_id            => $cmt->comment_id,
-                image_id              => $cmt->image_id,
-                comment               => $cmt->comment,
-                created_at            => $cmt->created_at,
-                user_id               => $commented_by,
-                commented_by_name     => $users->{$commented_by}{user_name},
-                commented_by_icon_url => _get_user_icon_url($commented_by, $users, $images),
-            };
-        }
-
-        push(@entries,{
+        push @entries, {
             %$columns,
-            stamps => \@stamp_info,
-            comments => $cmt_array,
+            stamps             => \@stamp_info,
+            comments           => \@cmt_array,
             fullsize_image_url => $url,
-        });
+        };
     }
     
     return \@entries;
+}
+
+sub comment_info {
+    my ($cmt, $users, $images) = @_;
+
+    my $commented_by  = $cmt->commented_by;
+    return +{
+        comment_id            => $cmt->comment_id,
+        image_id              => $cmt->image_id,
+        comment               => $cmt->comment,
+        created_at            => $cmt->created_at,
+        user_id               => $commented_by,
+        commented_by_name     => $users->{$commented_by}{user_name},
+        commented_by_icon_url => _get_user_icon_url($commented_by, $users, $images),
+    };
 }
 
 sub _get_user_icon_url {

@@ -35,7 +35,7 @@
   owlObject = void 0;
 
   showImageDetail = function() {
-    var adjustDisplayedElements, alreadyAttachedStamp, backToWall, createCommentNavigation, createImageBox, createStamp, createStampAttachIcon, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, setStampAttachList, setStampsByImagePosition, shouldPreLoad, showEntries, showErrorMessage, showLoadingImage, toggleDisplayedElements, toggleStamp, upsertStampsByImagePosition;
+    var adjustDisplayedElements, alreadyAttachedStamp, backToWall, closeComments, createCommentNavigation, createImageBox, createStamp, createStampAttachIcon, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, replaceToolBoxContent, setStampAttachList, setStampsByImagePosition, shouldPreLoad, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements, toggleStamp, upsertStampsByImagePosition;
     $(".img-thumbnail").on("click", function() {
       var $elem, comment_count, data, i, imageId, image_id, image_url, initialIndex, innerHeight, innerWidth, n, owlContainer, stampElem, stampInfo, stampList, stamps, tappedEntryIndex, _i, _j, _len, _ref;
       window.util.showPageLoading();
@@ -73,6 +73,7 @@
             stampInfo = stamps[n];
             stampElem = createStamp(stampInfo.stamp_id, stampInfo.icon_url);
             $elem.find(".stamp-container").append(stampElem);
+            $elem.find(".stamp-container").hide();
           }
         }
       }
@@ -86,6 +87,7 @@
         beforeMove: function() {},
         afterMove: function() {
           var count, currentPageNo, loadingFlg;
+          replaceToolBoxContent();
           adjustDisplayedElements();
           if (shouldPreLoad(5)) {
             if (window.loadingFlg) {
@@ -101,7 +103,8 @@
       });
       owlObject = $(".owl-carousel").data("owlCarousel");
       owlObject.jumpTo(tappedEntryIndex);
-      return window.util.hidePageLoading();
+      window.util.hidePageLoading();
+      return showNavBarFooter();
     });
     $("#comment-submit").on("click", function() {
       var comment, currentPosition, imageElem, imageId, token;
@@ -120,29 +123,14 @@
         },
         "dataType": "json",
         "success": function(data) {
-          var commentCount, h4, icon, img, media, mediaBody;
-          media = $("<div>");
-          media.addClass("media");
-          icon = $("<a>");
-          icon.addClass("pull-left");
-          icon.attr("href", "#");
-          img = $("<img>");
-          img.addClass("media-object");
-          img.attr("alt", "64x64");
-          img.attr("src", "/static/img/160x160.png");
-          img.css("width", "64px");
-          img.css("height", "64px");
-          icon.append(img);
-          media.append(icon);
-          mediaBody = $("<div>");
-          mediaBody.addClass("media-body");
-          h4 = $("<h4>");
-          h4.addClass("media-heading");
-          h4.val("Media heading");
-          mediaBody.append(h4);
-          mediaBody.text(comment);
-          media.append(mediaBody);
-          $(".comment-container").prepend(media);
+          var commentCount, item, tmpl;
+          tmpl = _.template($('#template-comment-item').html());
+          item = tmpl({
+            commenter_icon_url: data.commented_by_icon_url,
+            commenter_name: data.commented_by_name,
+            comment_text: data.comment
+          });
+          $("#all-comment-container").find("ul").append(item);
           window.entryData.entries[currentPosition].comments.push({
             "comment": comment
           });
@@ -193,7 +181,7 @@
       });
     };
     createImageBox = function(image_url, image_id, comment_count, innerWidth, innerHeight) {
-      var commentNoticeString, owlElem, tmpl;
+      var owlElem, tmpl;
       tmpl = $("#item-tmpl").clone(true);
       owlElem = $(tmpl);
       owlElem.find(".img-box").attr("image-id", image_id);
@@ -205,11 +193,6 @@
         owlElem.addClass("unloaded");
       }
       owlElem.find(".img-box").on("click", toggleDisplayedElements);
-      owlElem.find(".stamp-edit").on("click", function() {
-        return $("#stampAttachModal").modal("show");
-      });
-      commentNoticeString = createCommentNavigation(comment_count);
-      owlElem.find(".comment-notice").text(commentNoticeString);
       owlElem.find(".comment-notice").on("click", function() {
         var comment, comments, currentPosition, item, _i, _len;
         $(".comment-container").empty();
@@ -471,8 +454,93 @@
       }
       return _results1;
     };
+    replaceToolBoxContent = function() {
+      var commentItem, comments, currentPosition, elems, stampContainer;
+      currentPosition = parseInt(owlObject.currentPosition(), 10);
+      elems = $(".img-box");
+      stampContainer = $($(elems)[currentPosition]).find(".stamp-container").clone(true);
+      $("#attached-stamps-container").find("ul").html(stampContainer.html());
+      comments = window.entryData.entries[currentPosition].comments;
+      comments.sort(function(a, b) {
+        var aCreatedAt, bCreatedAt;
+        aCreatedAt = a.created_at;
+        bCreatedAt = b.created_at;
+        if (aCreatedAt < bCreatedAt) {
+          return -1;
+        }
+        if (aCreatedAt > bCreatedAt) {
+          return 1;
+        }
+        return 0;
+      });
+      commentItem = $("<span>");
+      commentItem.text(comments[0].comment);
+      $("#recent-comment-container").empty();
+      return $("#recent-comment-container").append(commentItem);
+    };
     createCommentNavigation = function(comment_count) {
       return "コメント" + comment_count + "件";
+    };
+    showNavBarFooter = function() {
+      $("#comment-count").on("click", showComments);
+      $("#comment-box").on("click", showComments);
+      $("#modal-header").on("click", closeComments);
+      return $(".navbar-footer").show();
+    };
+    showComments = function() {
+      var comment, comments, container, currentPosition, item, list, tmpl;
+      container = $("#all-comment-container");
+      currentPosition = parseInt(owlObject.currentPosition(), 10);
+      comments = window.entryData.entries[currentPosition].comments;
+      comments.sort(function(a, b) {
+        var aCreatedAt, bCreatedAt;
+        aCreatedAt = a.created_at;
+        bCreatedAt = b.created_at;
+        if (aCreatedAt < bCreatedAt) {
+          return -1;
+        }
+        if (aCreatedAt > bCreatedAt) {
+          return 1;
+        }
+        return 0;
+      });
+      if (comments) {
+        tmpl = _.template($('#template-comment-item').html());
+        list = (function() {
+          var _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = comments.length; _i < _len; _i++) {
+            comment = comments[_i];
+            _results.push(item = tmpl({
+              commenter_icon_url: comment.commented_by_icon_url,
+              commenter_name: comment.commented_by_name,
+              comment_text: comment.comment
+            }));
+          }
+          return _results;
+        })();
+      }
+      container.find("ul").empty();
+      container.find("ul").append(list);
+      $(".navbar-footer").addClass("all-comment-container-opened");
+      $("#attached-stamps-container").hide();
+      $("#stamp-edit-container").hide();
+      $("#recent-comment-container").hide();
+      $("#comment-operation-container").hide();
+      $("#comment-input-container").show();
+      $("#modal-header").show();
+      return container.show();
+    };
+    closeComments = function() {
+      window.console.log("aaaaaaaaaaaa");
+      $(".navbar-footer").removeClass("all-comment-container-opened");
+      $("#attached-stamps-container").show();
+      $("#stamp-edit-container").hide();
+      $("#recent-comment-container").show();
+      $("#comment-operation-container").show();
+      $("#comment-input-container").hide();
+      $("#all-comment-container").hide();
+      return $("#modal-header").hide();
     };
     if (!hasElem(window.stampData)) {
       return $.ajax({

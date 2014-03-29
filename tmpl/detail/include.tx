@@ -79,23 +79,94 @@
     width: 64px;
     height: 64px;
   }
+  .navbar-footer {
+    height: 100px;
+    background-color: black;
+    opacity: 0.4;
+  }
+  #stamp-edit-container {
+    display: none;
+  }
+  #stamp-edit-container img {
+    width: 44px;
+    height: 44px;
+  }
+  #comment-input-container {
+    display: none;
+  }
+  #comment-operation-container ul {
+    list-style-type: none;
+  }
+  #comment-operation-container ul li {
+    display: inline;
+  }
+  .all-comment-container-opened {
+    height: 100%;
+  }
+  .all-comment-container-opened #all-comment-container {
+    height: 300px;
+  }
+  #all-comment-container {
+    background-color: blue;
+    overflow: scroll;
+    display: none;
+  }
 </style>
 <script type="text/javascript">
   function prevent(e) {
     e.stopPropagation();
+  }
+  function enlarge(e) {
+    $(".navbar-footer").css("height", "200px");
   }
 </script>
 
 <div class="detail-container" style="display:none">
   <div class="owl-carousel owl-theme"></div>
 </div>
+<div class="navbar navbar-footer navbar-fixed-bottom" role="navigation" style="display:none;">
+  <div class="navbar-inner">
+    <div class="container">
+      <div id="modal-header" style="text-align: right; display: none; height: 44px;" onclick="prevent(event)">閉じる</div>
+      <div>
+        <div id="attached-stamps-container">
+          <ul style="display: inline;"></ul>
+          <img src="/static/img/160x160.png" style="width: 44px; height: 44px; float: right; margin-right: 10px;">
+        </div>
+        <div id="stamp-edit-container">
+          <ul>
+            <li><img src="/static/img/stamp/icon/1.jpeg"></li>
+            <li><img src="/static/img/stamp/icon/2.jpeg"></li>
+            <li><img src="/static/img/stamp/icon/3.jpeg"></li>
+            <li><img src="/static/img/stamp/icon/4.jpeg"></li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <div id="recent-comment-container">
+        </div>
+        <div id="all-comment-container">
+          <ul></ul>
+        </div>
+        <div id="comment-operation-container">
+          <ul>
+            <li><span id="comment-count">コメント全10件</span></li>
+            <li><span id="comment-box">コメントする</span></li>
+          </ul>
+        </div>
+        <div id="comment-input-container" class="navbar-fixed-bottom">
+          <textarea rows=2 style="width: 80%;" id="comment-textarea"></textarea>
+          <button type="submit" id="comment-submit">投稿</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div id="item-tmpl" style="display:none">
-  <div class="img-box cover" style="position: relative; background-color: black;">
-    <!--<img src="" class="img-detail" />-->
+  <div class="img-box cover" style="position: relative; background-color: white;">
     <div class="stamp-container"></div>
     <div class="img-footer">
-      <!--<a href="#stampAttachModal" data-toggle="modal" data-backdrop="true" class="glyphicon glyphicon-plus-sign stamp-add-icon" style="text-shadow: 0 0 2px #000; color: #eee;text-decoration:none;" onClick="prevent(event)"></a>-->
       <span class="comment-notice" onClick="prevent(event)"></span>
       <span class="stamp-edit" onClick="prevent(event)">スタンプ編集</span>
     </div>
@@ -115,6 +186,7 @@
   </div>
 </div>
 
+<!--
 <div id="commentModal" class="modal fade" style="top: auto; margin: 0 auto 20px; max-width: 100%; height: 500px;">
   <div class="modal-dialog">
     <div class="modal-content" style="background-color: black; margin-top: 100px; color: white;">
@@ -126,15 +198,15 @@
         <div class="comment-container" style="background-color: black; padding-top: 10px; padding-bottom: 10px; overflow: scroll; height: 250px;">
           <div class="media">
           </div>
-        </div> <!-- comment-container -->
+        </div> --><!-- comment-container --><!--
         <div>
           <textarea rows=2 style="width: 80%;" id="comment-textarea"></textarea>
           <button type="submit" id="comment-submit">投稿</button>
         </div>
-      </div> <!-- modal-body -->
-    </div> <!-- modal-content -->
-  </div> <!-- modal-dialog -->
-</div>
+      </div>--> <!-- modal-body --><!--
+    </div>--> <!-- modal-content --><!--
+  </div>--> <!-- modal-dialog --><!--
+</div>-->
 
 <script id="template-comment-item">
   <div class="media">
