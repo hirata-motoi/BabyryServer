@@ -22,6 +22,8 @@ window.displayedElementsFlg = true
 owlObject = undefined
 showImageDetail = () ->
   $(".img-thumbnail").on("click", () ->
+    # styleに画面の大きさを設定
+    setUpScreenSize()
 
     window.util.showPageLoading()
 
@@ -67,7 +69,7 @@ showImageDetail = () ->
         for stampInfo, n in stamps
           stampElem = createStamp(stampInfo.stamp_id, stampInfo.icon_url)
           $elem.find(".stamp-container").append stampElem
-          $elem.find(".stamp-container").hide()
+      $elem.find(".stamp-container").hide()
 
     # hide navbar-space
     $("#navbar-space").hide()
@@ -83,7 +85,7 @@ showImageDetail = () ->
       beforeMove: () ->
       afterMove: () ->
         replaceToolBoxContent()
-        adjustDisplayedElements()
+#adjustDisplayedElements()
         if shouldPreLoad(5)
           return if window.loadingFlg
 
@@ -291,12 +293,14 @@ showImageDetail = () ->
     stampIconUrl = stampHash[stampId].icon_url
     targetImgBox = $(".img-box")[currentPosition]
     imageId = $(targetImgBox).attr("image-id")
+    target = $("#attached-stamps-container")
 
     # 既にattach済ならdetachする
     if alreadyAttachedStamp stampId, currentPosition
       # detach
       # stampを非表示にする
-      targetStamp = $(targetImgBox).find('img[stamp-id="' + stampId + '"]').parent()
+#targetStamp = $(targetImgBox).find('img[stamp-id="' + stampId + '"]').parent()
+      targetStamp = target.find('img[stamp-id="' + stampId + '"]').parent()
       targetStamp.hide()
 
       token = getXSRFToken()
@@ -312,6 +316,12 @@ showImageDetail = () ->
         "success": (response) ->
           # successならDOMを消す
           targetStamp.remove()
+
+          # stamp-containerからも消す
+          window.console.log $(targetImgBox).find('img[stamp-id="' + stampId + '"]').parent()
+          stampContainer = $(targetImgBox).find('img[stamp-id="' + stampId + '"]').parent()
+          stampContainer.remove()
+
           # stampsByImagePositionをfalseにする
           window.stampsByImagePosition[currentPosition][stampId] = false
         "error": (xhr, textStatus, errorThrown) ->
@@ -321,7 +331,9 @@ showImageDetail = () ->
       # attach
       # stampのDOMを作ってappend
       stampElem = createStamp(stampId, stampIconUrl)
-      $(targetImgBox).find(".stamp-container").append stampElem
+      aa = 
+      $("#attached-stamps-container").find("ul").append stampElem
+      $(targetImgBox).find(".stamp-container").append stampElem.clone(true)
 
       # stampsByImagePositionを更新
       setStampsByImagePosition stampId, currentPosition, true
@@ -400,7 +412,8 @@ showImageDetail = () ->
     stampList = getStampData()
     for stamp, i in stampList
       elem = createStampAttachIcon stamp
-      $("#stampAttachModal").find(".modal-body").append elem
+      #$("#stampAttachModal").find(".modal-body").append elem
+      $("#stamp-edit-container").append elem
 
   backToWall = () ->
     $(".container").removeClass "full-size-screen"
@@ -409,7 +422,7 @@ showImageDetail = () ->
   toggleDisplayedElements = () ->
     $(".navbar").toggle()
     window.displayedElementsFlg = if $(".navbar").css("display") == "none" then false else true
-    adjustDisplayedElements()
+#adjustDisplayedElements()
 
   # TODO 不要になるかも
   adjustDisplayedElements = () ->
@@ -445,8 +458,8 @@ showImageDetail = () ->
     $("#attached-stamps-container").find("ul").html stampContainer.html()
 
     # コメントの入れ替え
+    $("#recent-comment-container").empty()
     comments = window.entryData.entries[currentPosition].comments
-
     comments.sort( (a, b) ->
       aCreatedAt = a.created_at
       bCreatedAt = b.created_at
@@ -458,10 +471,11 @@ showImageDetail = () ->
     )
     commentItem = $("<span>")
     commentItem.text comments[0].comment
-    $("#recent-comment-container").empty()
     $("#recent-comment-container").append commentItem
 
     # コメント件数の入れ替え
+    commentCountText = createCommentNavigation window.entryData.entries[currentPosition].comments.length
+    $("#comment-count").text commentCountText
 
   createCommentNavigation = (comment_count) ->
     "コメント" + comment_count + "件"
@@ -470,6 +484,7 @@ showImageDetail = () ->
     $("#comment-count").on "click", showComments
     $("#comment-box").on "click", showComments
     $("#modal-header").on "click", closeComments
+    $("#stamp-edit").on "click", editStamps
     $(".navbar-footer").show()
 
   showComments = () ->
@@ -505,7 +520,6 @@ showImageDetail = () ->
     container.show()
 
   closeComments = () ->
-    window.console.log "aaaaaaaaaaaa"
     $(".navbar-footer").removeClass("all-comment-container-opened")
     $("#attached-stamps-container").show()
     $("#stamp-edit-container").hide()
@@ -514,6 +528,26 @@ showImageDetail = () ->
     $("#comment-input-container").hide()
     $("#all-comment-container").hide()
     $("#modal-header").hide()
+
+  editStamps = () ->
+    # attachedStampsとeditStamp以外は非表示
+    $(".navbar-footer").addClass("all-comment-container-opened")
+    $("#stamp-edit-container").show()
+    $("#recent-comment-container").hide()
+    $("#comment-operation-container").hide()
+    $("#comment-input-container").hide()
+    $("#modal-header").show()
+
+  setUpScreenSize = () ->
+    screenHeight = window.innerHeight - 44
+    rule = ".all-comment-container-opened { height: " + screenHeight + 'px; }'
+    ss = document.styleSheets
+    $(ss).each () ->
+      window.console.log $(this)[0].title
+      if $(this)[0].title == "dynamic"
+        idx = $(this)[0].cssRules.length;
+        $(this)[0].insertRule rule, idx
+
 
   # stamp attach用のmodalのsetup
   if ! hasElem(window.stampData)

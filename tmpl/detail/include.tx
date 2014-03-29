@@ -80,12 +80,18 @@
     height: 64px;
   }
   .navbar-footer {
-    height: 100px;
+    height: 120px;
     background-color: black;
     opacity: 0.4;
   }
   #stamp-edit-container {
     display: none;
+  }
+  #stamp-edit-container ul {
+    list-style-type: none;
+  }
+  #stamp-edit-container li {
+    display: inline;
   }
   #stamp-edit-container img {
     width: 44px;
@@ -100,9 +106,6 @@
   #comment-operation-container ul li {
     display: inline;
   }
-  .all-comment-container-opened {
-    height: 100%;
-  }
   .all-comment-container-opened #all-comment-container {
     height: 300px;
   }
@@ -111,6 +114,14 @@
     overflow: scroll;
     display: none;
   }
+  #attached-stamps-container {
+    height: 50px;
+  }
+  .border-bottom {
+    border-bottom: solid 1px white;
+  }
+</style>
+<style title="dynamic">
 </style>
 <script type="text/javascript">
   function prevent(e) {
@@ -127,30 +138,31 @@
 <div class="navbar navbar-footer navbar-fixed-bottom" role="navigation" style="display:none;">
   <div class="navbar-inner">
     <div class="container">
-      <div id="modal-header" style="text-align: right; display: none; height: 44px;" onclick="prevent(event)">閉じる</div>
+      <div id="modal-header" class="border-bottom" style="text-align: right; display: none; height: 44px;" onclick="prevent(event)">閉じる</div>
       <div>
-        <div id="attached-stamps-container">
-          <ul style="display: inline;"></ul>
-          <img src="/static/img/160x160.png" style="width: 44px; height: 44px; float: right; margin-right: 10px;">
+        <div id="attached-stamps-container" class="border-bottom">
+          <ul style="display: inline; padding: 0px;"></ul>
+          <img id="stamp-edit" src="/static/img/160x160.png" style="width: 44px; height: 44px; float: right; margin-right: 10px;">
         </div>
-        <div id="stamp-edit-container">
+        <div id="stamp-edit-container" class="border-bottom">
+<!--
           <ul>
             <li><img src="/static/img/stamp/icon/1.jpeg"></li>
             <li><img src="/static/img/stamp/icon/2.jpeg"></li>
             <li><img src="/static/img/stamp/icon/3.jpeg"></li>
             <li><img src="/static/img/stamp/icon/4.jpeg"></li>
           </ul>
+-->
         </div>
       </div>
       <div>
-        <div id="recent-comment-container">
-        </div>
-        <div id="all-comment-container">
+        <div id="recent-comment-container" class="border-bottom"></div>
+        <div id="all-comment-container" class="border-bottom">
           <ul></ul>
         </div>
         <div id="comment-operation-container">
           <ul>
-            <li><span id="comment-count">コメント全10件</span></li>
+            <li><span id="comment-count"></span></li>
             <li><span id="comment-box">コメントする</span></li>
           </ul>
         </div>

@@ -35,9 +35,10 @@
   owlObject = void 0;
 
   showImageDetail = function() {
-    var adjustDisplayedElements, alreadyAttachedStamp, backToWall, closeComments, createCommentNavigation, createImageBox, createStamp, createStampAttachIcon, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, replaceToolBoxContent, setStampAttachList, setStampsByImagePosition, shouldPreLoad, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements, toggleStamp, upsertStampsByImagePosition;
+    var adjustDisplayedElements, alreadyAttachedStamp, backToWall, closeComments, createCommentNavigation, createImageBox, createStamp, createStampAttachIcon, editStamps, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, replaceToolBoxContent, setStampAttachList, setStampsByImagePosition, setUpScreenSize, shouldPreLoad, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements, toggleStamp, upsertStampsByImagePosition;
     $(".img-thumbnail").on("click", function() {
       var $elem, comment_count, data, i, imageId, image_id, image_url, initialIndex, innerHeight, innerWidth, n, owlContainer, stampElem, stampInfo, stampList, stamps, tappedEntryIndex, _i, _j, _len, _ref;
+      setUpScreenSize();
       window.util.showPageLoading();
       $(".container").addClass("full-size-screen");
       innerWidth = window.innerWidth;
@@ -73,9 +74,9 @@
             stampInfo = stamps[n];
             stampElem = createStamp(stampInfo.stamp_id, stampInfo.icon_url);
             $elem.find(".stamp-container").append(stampElem);
-            $elem.find(".stamp-container").hide();
           }
         }
+        $elem.find(".stamp-container").hide();
       }
       $("#navbar-space").hide();
       $(".dynamic-container").html(owlContainer);
@@ -88,7 +89,6 @@
         afterMove: function() {
           var count, currentPageNo, loadingFlg;
           replaceToolBoxContent();
-          adjustDisplayedElements();
           if (shouldPreLoad(5)) {
             if (window.loadingFlg) {
               return;
@@ -292,15 +292,16 @@
       return _results;
     };
     toggleStamp = function() {
-      var currentPosition, imageId, stampElem, stampHash, stampIconUrl, stampId, targetImgBox, targetStamp, token;
+      var aa, currentPosition, imageId, stampElem, stampHash, stampIconUrl, stampId, target, targetImgBox, targetStamp, token;
       stampId = $(this).attr("stamp-id");
       currentPosition = owlObject.currentPosition();
       stampHash = getStampHash();
       stampIconUrl = stampHash[stampId].icon_url;
       targetImgBox = $(".img-box")[currentPosition];
       imageId = $(targetImgBox).attr("image-id");
+      target = $("#attached-stamps-container");
       if (alreadyAttachedStamp(stampId, currentPosition)) {
-        targetStamp = $(targetImgBox).find('img[stamp-id="' + stampId + '"]').parent();
+        targetStamp = target.find('img[stamp-id="' + stampId + '"]').parent();
         targetStamp.hide();
         token = getXSRFToken();
         return $.ajax({
@@ -313,7 +314,11 @@
           },
           "dataType": "json",
           "success": function(response) {
+            var stampContainer;
             targetStamp.remove();
+            window.console.log($(targetImgBox).find('img[stamp-id="' + stampId + '"]').parent());
+            stampContainer = $(targetImgBox).find('img[stamp-id="' + stampId + '"]').parent();
+            stampContainer.remove();
             return window.stampsByImagePosition[currentPosition][stampId] = false;
           },
           "error": function(xhr, textStatus, errorThrown) {
@@ -322,7 +327,8 @@
         });
       } else {
         stampElem = createStamp(stampId, stampIconUrl);
-        $(targetImgBox).find(".stamp-container").append(stampElem);
+        aa = $("#attached-stamps-container").find("ul").append(stampElem);
+        $(targetImgBox).find(".stamp-container").append(stampElem.clone(true));
         setStampsByImagePosition(stampId, currentPosition, true);
         token = getXSRFToken();
         return $.ajax({
@@ -410,7 +416,7 @@
       for (i = _i = 0, _len = stampList.length; _i < _len; i = ++_i) {
         stamp = stampList[i];
         elem = createStampAttachIcon(stamp);
-        _results.push($("#stampAttachModal").find(".modal-body").append(elem));
+        _results.push($("#stamp-edit-container").append(elem));
       }
       return _results;
     };
@@ -420,8 +426,7 @@
     };
     toggleDisplayedElements = function() {
       $(".navbar").toggle();
-      window.displayedElementsFlg = $(".navbar").css("display") === "none" ? false : true;
-      return adjustDisplayedElements();
+      return window.displayedElementsFlg = $(".navbar").css("display") === "none" ? false : true;
     };
     adjustDisplayedElements = function() {
       var currentPosition, elems, i, imageElem, indexes, _i, _j, _len, _ref, _results, _results1;
@@ -455,11 +460,12 @@
       return _results1;
     };
     replaceToolBoxContent = function() {
-      var commentItem, comments, currentPosition, elems, stampContainer;
+      var commentCountText, commentItem, comments, currentPosition, elems, stampContainer;
       currentPosition = parseInt(owlObject.currentPosition(), 10);
       elems = $(".img-box");
       stampContainer = $($(elems)[currentPosition]).find(".stamp-container").clone(true);
       $("#attached-stamps-container").find("ul").html(stampContainer.html());
+      $("#recent-comment-container").empty();
       comments = window.entryData.entries[currentPosition].comments;
       comments.sort(function(a, b) {
         var aCreatedAt, bCreatedAt;
@@ -475,8 +481,9 @@
       });
       commentItem = $("<span>");
       commentItem.text(comments[0].comment);
-      $("#recent-comment-container").empty();
-      return $("#recent-comment-container").append(commentItem);
+      $("#recent-comment-container").append(commentItem);
+      commentCountText = createCommentNavigation(window.entryData.entries[currentPosition].comments.length);
+      return $("#comment-count").text(commentCountText);
     };
     createCommentNavigation = function(comment_count) {
       return "コメント" + comment_count + "件";
@@ -485,6 +492,7 @@
       $("#comment-count").on("click", showComments);
       $("#comment-box").on("click", showComments);
       $("#modal-header").on("click", closeComments);
+      $("#stamp-edit").on("click", editStamps);
       return $(".navbar-footer").show();
     };
     showComments = function() {
@@ -532,7 +540,6 @@
       return container.show();
     };
     closeComments = function() {
-      window.console.log("aaaaaaaaaaaa");
       $(".navbar-footer").removeClass("all-comment-container-opened");
       $("#attached-stamps-container").show();
       $("#stamp-edit-container").hide();
@@ -541,6 +548,28 @@
       $("#comment-input-container").hide();
       $("#all-comment-container").hide();
       return $("#modal-header").hide();
+    };
+    editStamps = function() {
+      $(".navbar-footer").addClass("all-comment-container-opened");
+      $("#stamp-edit-container").show();
+      $("#recent-comment-container").hide();
+      $("#comment-operation-container").hide();
+      $("#comment-input-container").hide();
+      return $("#modal-header").show();
+    };
+    setUpScreenSize = function() {
+      var rule, screenHeight, ss;
+      screenHeight = window.innerHeight - 44;
+      rule = ".all-comment-container-opened { height: " + screenHeight + 'px; }';
+      ss = document.styleSheets;
+      return $(ss).each(function() {
+        var idx;
+        window.console.log($(this)[0].title);
+        if ($(this)[0].title === "dynamic") {
+          idx = $(this)[0].cssRules.length;
+          return $(this)[0].insertRule(rule, idx);
+        }
+      });
     };
     if (!hasElem(window.stampData)) {
       return $.ajax({
