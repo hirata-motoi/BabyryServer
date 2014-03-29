@@ -108,7 +108,7 @@
 
 <div id="editChildModal" class="modal fade" style="top: 0px; margin: 0 auto 20px; max-width: 100%; height: 1000px;">
   <div class="modal-dialog" style="height: 0px;">
-    <div class="modal-content" style="top: 200px;">
+    <div class="modal-content" style="top: 20px;">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3>
