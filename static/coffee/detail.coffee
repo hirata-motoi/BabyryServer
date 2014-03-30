@@ -304,9 +304,11 @@ showImageDetail = () ->
     if alreadyAttachedStamp stampId, currentPosition
       # detach
       # stampを非表示にする
-#targetStamp = $(targetImgBox).find('img[stamp-id="' + stampId + '"]').parent()
       targetStamp = target.find('img[stamp-id="' + stampId + '"]').parent()
       targetStamp.hide()
+
+      # edit-stamp-container内のスタンプのgrayscaleを外す
+      $(this).find("img").removeClass "icon-grayscale"
 
       token = getXSRFToken()
       $.ajax({
@@ -331,14 +333,17 @@ showImageDetail = () ->
           window.stampsByImagePosition[currentPosition][stampId] = false
         "error": (xhr, textStatus, errorThrown) ->
           targetStamp.show()
+          $(this).find("img").addClass "icon-grayscale"
       })
     else
       # attach
       # stampのDOMを作ってappend
       stampElem = createStamp(stampId, stampIconUrl)
-      aa = 
       $("#attached-stamps-container").find("ul").append stampElem
       $(targetImgBox).find(".stamp-container").append stampElem.clone(true)
+      
+      # edit-stamp-container内のスタンプのgrayscaleを外す
+      $(this).find("img").addClass "icon-grayscale"
 
       # stampsByImagePositionを更新
       setStampsByImagePosition stampId, currentPosition, true
@@ -364,6 +369,8 @@ showImageDetail = () ->
           else
             # stampsByImagePositionをfalseにする
             window.stampsByImagePosition[currentPosition][stampId] = false
+            stampElem.remove()
+            $(this).find("img").removeClass "icon-grayscale"
       })
 
 
@@ -545,6 +552,8 @@ showImageDetail = () ->
     # attachedStampsとeditStamp以外は非表示
     $(".navbar-footer").addClass("all-comment-container-opened")
     $("#stamp-edit-container").show()
+    # stamp-edit-containerのアイコンのgrayscaleをセット
+    setEditStampGrayscale()
     $("#recent-comment-container").hide()
     $("#comment-operation-container").hide()
     $("#comment-input-container").hide()
@@ -560,6 +569,13 @@ showImageDetail = () ->
         idx = $(this)[0].cssRules.length;
         $(this)[0].insertRule rule, idx
 
+  setEditStampGrayscale = () ->
+    container = $("#stamp-edit-container")
+    currentPosition = parseInt owlObject.currentPosition(), 10
+    stamps = window.stampsByImagePosition[currentPosition]
+    for stampId of stamps
+      if stamps[stampId] == true
+        container.find("a[stamp-id=" + stampId + "]").find("img").addClass "icon-grayscale"
 
   # stamp attach用のmodalのsetup
   if ! hasElem(window.stampData)

@@ -37,7 +37,7 @@
   defaultTextareaHeight = "30px";
 
   showImageDetail = function() {
-    var adjustDisplayedElements, alreadyAttachedStamp, backToWall, closeComments, createCommentNavigation, createImageBox, createStamp, createStampAttachIcon, editStamps, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, replaceToolBoxContent, setStampAttachList, setStampsByImagePosition, setUpScreenSize, shouldPreLoad, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements, toggleStamp, upsertStampsByImagePosition;
+    var adjustDisplayedElements, alreadyAttachedStamp, backToWall, closeComments, createCommentNavigation, createImageBox, createStamp, createStampAttachIcon, editStamps, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, replaceToolBoxContent, setEditStampGrayscale, setStampAttachList, setStampsByImagePosition, setUpScreenSize, shouldPreLoad, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements, toggleStamp, upsertStampsByImagePosition;
     $(".img-thumbnail").on("click", function() {
       var $elem, comment_count, data, i, imageId, image_id, image_url, initialIndex, innerHeight, innerWidth, n, owlContainer, stampElem, stampInfo, stampList, stamps, tappedEntryIndex, _i, _j, _len, _ref;
       setUpScreenSize();
@@ -295,7 +295,7 @@
       return _results;
     };
     toggleStamp = function() {
-      var aa, currentPosition, imageId, stampElem, stampHash, stampIconUrl, stampId, target, targetImgBox, targetStamp, token;
+      var currentPosition, imageId, stampElem, stampHash, stampIconUrl, stampId, target, targetImgBox, targetStamp, token;
       stampId = $(this).attr("stamp-id");
       currentPosition = owlObject.currentPosition();
       stampHash = getStampHash();
@@ -306,6 +306,7 @@
       if (alreadyAttachedStamp(stampId, currentPosition)) {
         targetStamp = target.find('img[stamp-id="' + stampId + '"]').parent();
         targetStamp.hide();
+        $(this).find("img").removeClass("icon-grayscale");
         token = getXSRFToken();
         return $.ajax({
           "url": "/stamp/detach.json",
@@ -325,13 +326,15 @@
             return window.stampsByImagePosition[currentPosition][stampId] = false;
           },
           "error": function(xhr, textStatus, errorThrown) {
-            return targetStamp.show();
+            targetStamp.show();
+            return $(this).find("img").addClass("icon-grayscale");
           }
         });
       } else {
         stampElem = createStamp(stampId, stampIconUrl);
-        aa = $("#attached-stamps-container").find("ul").append(stampElem);
+        $("#attached-stamps-container").find("ul").append(stampElem);
         $(targetImgBox).find(".stamp-container").append(stampElem.clone(true));
+        $(this).find("img").addClass("icon-grayscale");
         setStampsByImagePosition(stampId, currentPosition, true);
         token = getXSRFToken();
         return $.ajax({
@@ -350,7 +353,9 @@
             if (res.error_messages.stamp_id && res.error_messages.stamp_id[0].match(regexp)) {
 
             } else {
-              return window.stampsByImagePosition[currentPosition][stampId] = false;
+              window.stampsByImagePosition[currentPosition][stampId] = false;
+              stampElem.remove();
+              return $(this).find("img").removeClass("icon-grayscale");
             }
           }
         });
@@ -564,6 +569,7 @@
     editStamps = function() {
       $(".navbar-footer").addClass("all-comment-container-opened");
       $("#stamp-edit-container").show();
+      setEditStampGrayscale();
       $("#recent-comment-container").hide();
       $("#comment-operation-container").hide();
       $("#comment-input-container").hide();
@@ -582,6 +588,21 @@
           return $(this)[0].insertRule(rule, idx);
         }
       });
+    };
+    setEditStampGrayscale = function() {
+      var container, currentPosition, stampId, stamps, _results;
+      container = $("#stamp-edit-container");
+      currentPosition = parseInt(owlObject.currentPosition(), 10);
+      stamps = window.stampsByImagePosition[currentPosition];
+      _results = [];
+      for (stampId in stamps) {
+        if (stamps[stampId] === true) {
+          _results.push(container.find("a[stamp-id=" + stampId + "]").find("img").addClass("icon-grayscale"));
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
     };
     if (!hasElem(window.stampData)) {
       return $.ajax({

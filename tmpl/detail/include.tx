@@ -120,6 +120,11 @@
   .border-bottom {
     border-bottom: solid 1px white;
   }
+  .icon-grayscale {
+    -webkit-filter: grayscale(1); /* Webkit */
+    filter: gray; /* IE6-9 */
+    filter: grayscale(1); /* W3C */
+  }
 </style>
 <style title="dynamic">
 </style>
@@ -145,14 +150,6 @@
           <img id="stamp-edit" src="/static/img/160x160.png" style="width: 44px; height: 44px; float: right; margin-right: 10px;">
         </div>
         <div id="stamp-edit-container" class="border-bottom">
-<!--
-          <ul>
-            <li><img src="/static/img/stamp/icon/1.jpeg"></li>
-            <li><img src="/static/img/stamp/icon/2.jpeg"></li>
-            <li><img src="/static/img/stamp/icon/3.jpeg"></li>
-            <li><img src="/static/img/stamp/icon/4.jpeg"></li>
-          </ul>
--->
         </div>
       </div>
       <div>
