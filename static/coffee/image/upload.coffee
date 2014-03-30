@@ -77,11 +77,13 @@ submit = () ->
   token = getXSRFToken() 
 
   relatives = pickedSharedRelatives()
+  target_child = pickedTargetChild()
 
   $.ajax( "/image/web/submit.json", {
       type: "post",
       data: {
         "shared_user_ids": relatives,
+        "target_child_ids": target_child,
         "image_tmp_names": filenames,
         "XSRF-TOKEN": token
       },
@@ -108,6 +110,11 @@ getXSRFToken = ->
 
 pickedSharedRelatives = () ->
   for elem in $(".js-shared-relatives")
+    continue if $(elem).prop("checked") isnt true
+    $(elem).val()
+
+pickedTargetChild = () ->
+  for elem in $(".js-target-child")
     continue if $(elem).prop("checked") isnt true
     $(elem).val()
 
