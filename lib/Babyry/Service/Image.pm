@@ -18,6 +18,7 @@ use Babyry::Model::ImageUserMap;
 use Babyry::Model::Comment;
 use Babyry::Model::ImageQueue;
 use Babyry::Model::Child;
+use Babyry::Model::ImageChildMap;
 
 sub is_valid_image_id {
    my ($self, $image_id) = @_;
@@ -96,6 +97,7 @@ sub web_submit {
     my $image_seq = Babyry::Model::Sequence->new();
     my $image = Babyry::Model::Image->new();
     my $image_user_map = Babyry::Model::ImageUserMap->new();
+    my $image_child_map = Babyry::Model::ImageChildMap->new();
     my $image_queue = Babyry::Model::ImageQueue->new();
     my $child = Babyry::Model::Child->new();
     my $unixtime = time();
@@ -148,6 +150,15 @@ sub web_submit {
                     child_id => $params->{'child_id'},
                 },
             );
+        }
+        for my $child_id (@{$params->{'child'}}) {
+            $image_child_map->add($teng, {
+                image_id   => $id,
+                child_id    => $child_id,
+                disabled   => 0,
+                created_at => $unixtime,
+                updated_at => $unixtime,
+            });
         }
     }
     $teng->txn_commit;
