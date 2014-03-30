@@ -20,6 +20,7 @@ window.entryIdsInArray = []
 window.loadingFlg = false
 window.displayedElementsFlg = true
 owlObject = undefined
+defaultTextareaHeight = "30px"
 showImageDetail = () ->
   $(".img-thumbnail").on("click", () ->
     # styleに画面の大きさを設定
@@ -145,10 +146,14 @@ showImageDetail = () ->
 
         # textareaを空にする
         $("#comment-textarea").val("")
+        
+        # textareaの高さを戻す
+        $("#comment-textarea").css "height", defaultTextareaHeight
 
         # コメント件数を変更
         commentCount = window.entryData.entries[currentPosition].comments.length
         $(imageElem).find(".comment-notice").text createCommentNavigation(commentCount)
+
     })
     
   )
@@ -505,7 +510,7 @@ showImageDetail = () ->
         return 1
       return 0
     )
-    if comments
+    if comments.length > 0
       tmpl = _.template $('#template-comment-item').html()
       list = for comment in comments
         item = tmpl
@@ -513,6 +518,7 @@ showImageDetail = () ->
           commenter_name: comment.commented_by_name,
           comment_text: comment.comment
 
+    window.console.log comments.length
     container.find("ul").empty()
     container.find("ul").append list
     $(".navbar-footer").addClass("all-comment-container-opened")
@@ -521,6 +527,7 @@ showImageDetail = () ->
     $("#recent-comment-container").hide()
     $("#comment-operation-container").hide()
     $("#comment-input-container").show()
+    $("#comment-input-container").find("textarea").focus() if ! comments.length
     $("#modal-header").show()
     container.show()
 

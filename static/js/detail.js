@@ -1,5 +1,5 @@
 (function() {
-  var console, owlObject, showImageDetail, _base, _base1;
+  var console, defaultTextareaHeight, owlObject, showImageDetail, _base, _base1;
 
   if (typeof window.console === "undefined") {
     console = {};
@@ -33,6 +33,8 @@
   window.displayedElementsFlg = true;
 
   owlObject = void 0;
+
+  defaultTextareaHeight = "30px";
 
   showImageDetail = function() {
     var adjustDisplayedElements, alreadyAttachedStamp, backToWall, closeComments, createCommentNavigation, createImageBox, createStamp, createStampAttachIcon, editStamps, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, replaceToolBoxContent, setStampAttachList, setStampsByImagePosition, setUpScreenSize, shouldPreLoad, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements, toggleStamp, upsertStampsByImagePosition;
@@ -135,6 +137,7 @@
             "comment": comment
           });
           $("#comment-textarea").val("");
+          $("#comment-textarea").css("height", defaultTextareaHeight);
           commentCount = window.entryData.entries[currentPosition].comments.length;
           return $(imageElem).find(".comment-notice").text(createCommentNavigation(commentCount));
         }
@@ -517,7 +520,7 @@
         }
         return 0;
       });
-      if (comments) {
+      if (comments.length > 0) {
         tmpl = _.template($('#template-comment-item').html());
         list = (function() {
           var _i, _len, _results;
@@ -533,6 +536,7 @@
           return _results;
         })();
       }
+      window.console.log(comments.length);
       container.find("ul").empty();
       container.find("ul").append(list);
       $(".navbar-footer").addClass("all-comment-container-opened");
@@ -541,6 +545,9 @@
       $("#recent-comment-container").hide();
       $("#comment-operation-container").hide();
       $("#comment-input-container").show();
+      if (!comments.length) {
+        $("#comment-input-container").find("textarea").focus();
+      }
       $("#modal-header").show();
       return container.show();
     };

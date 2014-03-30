@@ -81,8 +81,8 @@
   }
   .navbar-footer {
     height: 120px;
-    background-color: black;
-    opacity: 0.4;
+    background: rgba(45,45,45, 0.7);
+    color: white;
   }
   #stamp-edit-container {
     display: none;
@@ -99,6 +99,7 @@
   }
   #comment-input-container {
     display: none;
+    padding: 8px;
   }
   #comment-operation-container ul {
     list-style-type: none;
@@ -110,7 +111,6 @@
     height: 300px;
   }
   #all-comment-container {
-    background-color: blue;
     overflow: scroll;
     display: none;
   }
@@ -167,8 +167,8 @@
           </ul>
         </div>
         <div id="comment-input-container" class="navbar-fixed-bottom">
-          <textarea rows=2 style="width: 80%;" id="comment-textarea"></textarea>
-          <button type="submit" id="comment-submit">投稿</button>
+          <textarea rows=1 style="width: 80%; display: inline;" id="comment-textarea"></textarea>
+          <button type="submit" id="comment-submit" data-inline="true" style="padding-left: 0px; padding-right: 0px; width: 15%; height: 30px; font-size: 15px; ">投稿</button>
         </div>
       </div>
     </div>
