@@ -101,7 +101,7 @@
       <div class="navbar-inner">
         <div class="container">
           <a class="navbar-brand" href="/" data-ajax="false">Babyry</a>
-          <a id="group_by_stamp" data-ajax="false" style="float: right; display: none;"><img src="/static/img/menu/icon_star_alt.png"></a>
+          <a id="group_by_stamp" data-ajax="false" style="float: right; display: none; margin-right: 10px;"><img src="/static/img/menu/icon_star_alt.png"></a>
         </div>
       </div>
     </div>
