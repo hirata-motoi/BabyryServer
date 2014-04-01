@@ -415,6 +415,7 @@ showImageDetail = () ->
     return window.stampData
 
   setStampAttachList = () ->
+    $("#stampAttachModal").find(".modal-body").empty()
     stampList = getStampData()
     for stamp, i in stampList
       elem = createStampAttachIcon stamp
