@@ -37,6 +37,16 @@
 : }
 
 : around content -> {
+<div data-role="header" data-position="fixed" style="margin-top: 44px;">
+  <div data-role="navbar">
+    <ul>
+      <li class="active"><a href="#invite" data-toggle="tab" data-ajax="false">招待</a></li>
+      <li><a href="#search" data-toggle="tab" data-ajax="false">友達を探す</a></li>
+      <li><a href="#list" data-toggle="tab" data-ajax="false">友達リスト</a></li>
+    </ul>
+  </div>
+</div>
+
 <div class="tab-content">
   <div class="tab-pane fade in active" id="invite">
     <ul data-role="listview" data-theme="g" class="list-view">
@@ -69,16 +79,6 @@
       <span id="applying-list"><span>
       <!--<ul></ul>-->
       </li>
-    </ul>
-  </div>
-</div>
-
-<div data-role="footer" data-position="fixed">
-  <div data-role="navbar">
-    <ul>
-      <li class="active"><a href="#invite" data-toggle="tab" data-ajax="false">招待</a></li>
-      <li><a href="#search" data-toggle="tab" data-ajax="false">友達を探す</a></li>
-      <li><a href="#list" data-toggle="tab" data-ajax="false">友達リスト</a></li>
     </ul>
   </div>
 </div>
