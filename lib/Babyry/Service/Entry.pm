@@ -21,12 +21,12 @@ use List::MoreUtils qw/uniq/;
 # searchの条件は今後増えるかもしれないので、search自体は、dispatchするだけにする。
 sub search {
     my ($self, $params) = @_;
-    my ($stamp_id, $uploaded_by, $count, $page) = @$params{qw/stamp_id uploaded_by count page/};
+    my ($stamp_id, $child_id, $uploaded_by, $count, $page) = @$params{qw/stamp_id child_id uploaded_by count page/};
 
     my $teng = $self->teng('BABYRY_MAIN_R');
     my $from = ($page - 1) * $count || 0;
 
-    my ($images, $found_row_count)  = Babyry::Model::ImageUserMap::get_by_user_id_stamp_id($teng, $uploaded_by, $stamp_id, $from, $count);
+    my ($images, $found_row_count)  = Babyry::Model::ImageUserMap::get_by_user_id_stamp_id_child_id($teng, $uploaded_by, $stamp_id, $child_id, $from, $count);
 
     # imagesを他の経路から取ってきたときも、get_entries_by_imagesを使い回せる用にしておく。
     my $entries = $self->get_entries_by_images($images);

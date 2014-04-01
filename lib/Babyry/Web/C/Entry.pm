@@ -11,12 +11,14 @@ sub search {
     my ($self, $c) = @_;
 
     my @stamp_id    = $c->req->param('stamp_id');
+    my @child_id    = $c->req->param('child_id');
     my $uploaded_by = $c->req->param('uploaded_by') || $c->stash->{user_id};
     my $count       = $c->req->param('count')       || 10;
     my $page        = $c->req->param('page')        || 1;
 
     my $params = {
         stamp_id    => \@stamp_id,
+        child_id    => \@child_id,
         uploaded_by => $uploaded_by,
         count       => $count,
         page        => $page,
