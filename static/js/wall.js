@@ -24,6 +24,7 @@
     var grid, load_contents, tmpl, tmpl_child, tmpl_stamp;
     tmpl = _.template($('#template-item').html());
     grid = $('.timeline').get(0);
+    $("#group_by_stamp").show();
     load_contents = function(stamp_ids) {
       return $.ajax({
         url: '/entry/search.json',

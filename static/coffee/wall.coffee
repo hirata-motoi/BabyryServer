@@ -16,6 +16,9 @@ $ ->
   tmpl = _.template $('#template-item').html()
   grid = $('.timeline').get 0
 
+  # setup groupByIcon
+  $("#group_by_stamp").show();
+
   load_contents = (stamp_ids) ->
     $.ajax {
       url : '/entry/search.json',

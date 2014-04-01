@@ -37,10 +37,12 @@
   defaultTextareaHeight = "30px";
 
   showImageDetail = function() {
-    var adjustDisplayedElements, alreadyAttachedStamp, backToWall, closeComments, createCommentNavigation, createImageBox, createStamp, createStampAttachIcon, editStamps, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, replaceToolBoxContent, setEditStampGrayscale, setStampAttachList, setStampsByImagePosition, setUpScreenSize, shouldPreLoad, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements, toggleStamp, upsertStampsByImagePosition;
+    var adjustDisplayedElements, alreadyAttachedStamp, backToWall, closeComments, createCommentNavigation, createImageBox, createStamp, createStampAttachIcon, editStamps, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, replaceToolBoxContent, setEditStampGrayscale, setStampAttachList, setStampsByImagePosition, setUpScreenSize, setupGlobalFooter, setupGroupbyIcon, shouldPreLoad, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements, toggleStamp, upsertStampsByImagePosition;
     $(".img-thumbnail").on("click", function() {
       var $elem, comment_count, data, i, imageId, image_id, image_url, initialIndex, innerHeight, innerWidth, n, owlContainer, stampElem, stampInfo, stampList, stamps, tappedEntryIndex, _i, _j, _len, _ref;
       setUpScreenSize();
+      setupGroupbyIcon();
+      setupGlobalFooter();
       window.util.showPageLoading();
       $(".container").addClass("full-size-screen");
       innerWidth = window.innerWidth;
@@ -488,12 +490,13 @@
           }
           return 0;
         });
-        commentItem = $("<span>");
+        commentItem = $("<p>");
         commentItem.text(comments[0].comment);
         $("#recent-comment-container").append(commentItem);
         commentCount = comments.length;
       } else {
         commentCount = 0;
+        $("#recent-comment-container").hide();
       }
       commentCountText = createCommentNavigation(commentCount);
       return $("#comment-count").text(commentCountText);
@@ -568,6 +571,8 @@
     };
     editStamps = function() {
       $(".navbar-footer").addClass("all-comment-container-opened");
+      $("#attached-stamps-container").hide();
+      $("#stamp-edit-container").hide();
       $("#stamp-edit-container").show();
       setEditStampGrayscale();
       $("#recent-comment-container").hide();
@@ -603,6 +608,12 @@
         }
       }
       return _results;
+    };
+    setupGroupbyIcon = function() {
+      return $("#group_by_stamp").show();
+    };
+    setupGlobalFooter = function() {
+      return $("#global-footer").hide();
     };
     if (!hasElem(window.stampData)) {
       return $.ajax({

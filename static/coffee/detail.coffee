@@ -26,6 +26,10 @@ showImageDetail = () ->
     # styleに画面の大きさを設定
     setUpScreenSize()
 
+    setupGroupbyIcon()
+
+    setupGlobalFooter()
+
     window.util.showPageLoading()
 
     # .containerのpaddingをなくす
@@ -483,12 +487,13 @@ showImageDetail = () ->
           return 1
         return 0
       )
-      commentItem = $("<span>")
+      commentItem = $("<p>")
       commentItem.text comments[0].comment
       $("#recent-comment-container").append commentItem
       commentCount = comments.length
     else
       commentCount = 0
+      $("#recent-comment-container").hide()
 
     # コメント件数の入れ替え
     commentCountText = createCommentNavigation commentCount
@@ -551,6 +556,8 @@ showImageDetail = () ->
   editStamps = () ->
     # attachedStampsとeditStamp以外は非表示
     $(".navbar-footer").addClass("all-comment-container-opened")
+    $("#attached-stamps-container").hide()
+    $("#stamp-edit-container").hide()
     $("#stamp-edit-container").show()
     # stamp-edit-containerのアイコンのgrayscaleをセット
     setEditStampGrayscale()
@@ -576,6 +583,12 @@ showImageDetail = () ->
     for stampId of stamps
       if stamps[stampId] == true
         container.find("a[stamp-id=" + stampId + "]").find("img").addClass "icon-grayscale"
+
+  setupGroupbyIcon = () ->
+    $("#group_by_stamp").show()
+
+  setupGlobalFooter = () ->
+    $("#global-footer").hide()
 
   # stamp attach用のmodalのsetup
   if ! hasElem(window.stampData)

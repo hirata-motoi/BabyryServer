@@ -11,7 +11,7 @@
     max-width: 320px;
   }
 </style>
-<form action="http://babyryserver5001/profile/delete_child.json" method="post" enctype="multipart/form-data">delete child sample:</br>
+<form action="http://babyryserver5001/profile/delete_child.json" method="post" enctype="multipart/form-data" data-ajax="false">delete child sample:</br>
   child_id <input type="text" name="child_id"/><br/>
   <input type="submit" value="sumbit"/>
 </form>

@@ -11,7 +11,7 @@
     max-width: 320px;
   }
 </style>
-<form action="http://dev5001.babyry.jp/profile/upload_icon.json" method="post" enctype="multipart/form-data">icon upload:
+<form action="http://dev5001.babyry.jp/profile/upload_icon.json" method="post" enctype="multipart/form-data" data-ajax="false">icon upload:
   <input type="file" name="file"/><br/>
   <input type="submit" value="Upload"/>
 </form>
