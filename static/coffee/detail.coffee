@@ -491,6 +491,7 @@ showImageDetail = () ->
       commentItem.text comments[0].comment
       $("#recent-comment-container").append commentItem
       commentCount = comments.length
+      $("#recent-comment-container").show()
     else
       commentCount = 0
       $("#recent-comment-container").hide()
