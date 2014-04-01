@@ -8,7 +8,6 @@
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="format-detection" content="telephone=no">
     <link href="<: uri_for('/static/bootstrap/css/bootstrap.css') :>" rel="stylesheet" type="text/css">
-    <link href="<: uri_for('/static/jquery/plugin/ui/jquery-ui.css') :>" rel="stylesheet" type="text/css">
     <link href="<: static_file('/static/css/main.css') :>" rel="stylesheet" type="text/css" media="screen">
     <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css" />
     <style>

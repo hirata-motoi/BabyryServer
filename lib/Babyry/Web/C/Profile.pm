@@ -80,7 +80,9 @@ sub add_child {
     my $params = {
         user_id => $c->stash->{'user_id'},
         child_name => $c->req->param('child_name'),
-        stamp_id => $c->req->param('stamp_id'),
+        birth_year => $c->req->param('birth_year'),
+        birth_month => $c->req->param('birth_month'),
+        birth_day => $c->req->param('birth_day'),
     };
 
     my $logic = Babyry::Logic::Profile->new;
@@ -97,7 +99,9 @@ sub edit_child {
         user_id => $c->stash->{'user_id'},
         child_id => $c->req->param('child_id'),
         child_name => $c->req->param('child_name'),
-        stamp_id => $c->req->param('stamp_id'),
+        birth_year => $c->req->param('birth_year'),
+        birth_month => $c->req->param('birth_month'),
+        birth_day => $c->req->param('birth_day'),
     };
 
     my $logic = Babyry::Logic::Profile->new;

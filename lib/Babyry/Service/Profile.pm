@@ -7,7 +7,7 @@ use parent qw/Babyry::Service::Base/;
 
 use Babyry::Model::UserChildMap;
 use Log::Minimal;
-use Data::Dump;
+use Data::Dumper;
 
 
 sub get {
@@ -24,7 +24,11 @@ sub get {
 
     # get icon image
     my $image = $self->model('Image')->get_by_image_id($teng_r, $profile->{'icon_image_id'});
-    $profile->{'icon_image_url'} = $image->url;
+    if ($image) {
+        $profile->{'icon_image_url'} = $image->url;
+    } else {
+        $profile->{'icon_image_url'} = "";
+    }
 
     # get child data
     my $child_map_rows = $self->model('UserChildMap')->get_child_by_user_id($teng_r, $params);
@@ -34,7 +38,17 @@ sub get {
         my $child = $self->model('Child')->get_by_child_id($teng_r, $row->child_id);
         $child_hash->{child_id} = $child->[0]->child_id;
         $child_hash->{child_name} = $child->[0]->child_name;
-        $child_hash->{stamp_id} = $child->[0]->stamp_id;
+        if ($child->[0]->birthday =~ /^(\d\d\d\d)-(\d\d)-(\d\d)$/) {
+            $child_hash->{child_birthday_year} = $1;
+            $child_hash->{child_birthday_month} = $2;
+            $child_hash->{child_birthday_day} = $3;
+        }
+        my $child_image = $self->model('Image')->get_by_image_id($teng_r, $child->[0]->icon_image_id);
+        if ($child_image) {
+            $child_hash->{child_icon_url} = $child_image->url;
+        } else {
+            $child_hash->{child_icon_url} = "";
+        }
         push @{$child_array}, $child_hash;
     }
     $profile->{'child'} = $child_array;
@@ -65,7 +79,7 @@ sub add_child {
 
     # insert child data
     $self->model('UserChildMap')->add_child($teng, $params->{user_id}, $child_id, $unixtime);
-    $self->model('Child')->add_child($teng, $child_id, $params->{child_name}, $params->{stamp_id});
+    $self->model('Child')->add_child($teng, $child_id, $params, $unixtime);
 
     $teng->txn_commit;
 

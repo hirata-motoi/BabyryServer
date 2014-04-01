@@ -1,5 +1,5 @@
 (function() {
-  var console, count, page, stamp_ids_hash;
+  var child_ids_hash, console, count, page, stamp_ids_hash;
 
   if (typeof window.console === "undefined") {
     console = {};
@@ -18,20 +18,25 @@
 
   window.stamp_ids = [];
 
+  window.child_ids = [];
+
   stamp_ids_hash = [];
+
+  child_ids_hash = [];
 
   $(function() {
     var grid, load_contents, tmpl, tmpl_child, tmpl_stamp;
     tmpl = _.template($('#template-item').html());
     grid = $('.timeline').get(0);
     $("#group_by_stamp").show();
-    load_contents = function(stamp_ids) {
+    load_contents = function(stamp_ids, child_ids) {
       return $.ajax({
         url: '/entry/search.json',
         dataType: "json",
         traditional: true,
         data: {
           stamp_id: stamp_ids,
+          child_id: child_ids,
           count: count,
           page: page
         },
@@ -69,9 +74,9 @@
         }
       });
     };
-    load_contents(window.stamp_ids);
+    load_contents(window.stamp_ids, window.child_ids);
     $('#load-more').on('click', function() {
-      return load_contents();
+      return load_contents(window.stamp_ids, window.child_ids);
     });
     $('#image_upload').on('click', function() {
       return location.href = '/image/web/upload';
@@ -103,9 +108,11 @@
             $("#modal_group_by_child").append(HTML);
             _results.push($("#" + response.child[i].child_id).on('click', function() {
               if ($(this).attr('class') === "child-name-color-gray") {
-                return $(this).attr('class', 'child-name-color');
+                $(this).attr('class', 'child-name-color');
+                return child_ids_hash[$(this).attr('id')] = 1;
               } else {
-                return $(this).attr('class', 'child-name-color-gray');
+                $(this).attr('class', 'child-name-color-gray');
+                return child_ids_hash[$(this).attr('id')] = 0;
               }
             }));
           }
@@ -119,6 +126,8 @@
         "contentType": false,
         success: function(response) {
           var HTML, i, _i, _ref, _results;
+          stamp_ids_hash = {};
+          child_ids_hash = {};
           $("#modal_group_by_stamp").html('');
           _results = [];
           for (i = _i = 0, _ref = response.data.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
@@ -153,7 +162,13 @@
           window.stamp_ids.push(key);
         }
       }
-      return load_contents(window.stamp_ids);
+      window.child_ids = [];
+      for (key in child_ids_hash) {
+        if (child_ids_hash[key] === 1) {
+          window.child_ids.push(key);
+        }
+      }
+      return load_contents(window.stamp_ids, window.child_ids);
     });
   });
 

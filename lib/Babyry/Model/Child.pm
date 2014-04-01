@@ -20,14 +20,16 @@ SQL
 }
 
 sub add_child {
-    my ($self, $teng, $child_id, $child_name, $stamp_id) = @_;
-
+    my ($self, $teng, $child_id, $params, $unixtime) = @_;
+    my $birthday = $params->{'birth_year'} . '-' . $params->{'birth_month'} . '-' . $params->{'birth_day'};
     $teng->insert(
         'child',
         {  
             child_id  => $child_id,
-            child_name  => $child_name,
-            stamp_id  => $stamp_id,
+            child_name  => $params->{'child_name'},
+            birthday => $birthday,
+            created_at => $unixtime,
+            updated_at => $unixtime,
         }
     );
     return;
@@ -35,11 +37,14 @@ sub add_child {
 
 sub edit_child {
     my ($self, $teng, $params) = @_;
+    my $birthday = $params->{'birth_year'} . '-' . $params->{'birth_month'} . '-' . $params->{'birth_day'};
+    my $unixtime = time();
     $teng->update(
         'child',
         {  
             child_name => $params->{'child_name'},
-            stamp_id => $params->{'stamp_id'},
+            birthday => $birthday,
+            updated_at => $unixtime,
         },
         {  
             child_id => $params->{'child_id'},
@@ -59,6 +64,20 @@ sub delete_child {
     return $row->get_columns;
 }
 
+sub add_icon {
+    my ($self, $teng, $params) = @_;
+    $teng->update(
+        'child',
+        {
+            updated_at => $params->{'updated_at'},
+            icon_image_id => $params->{'icon_image_id'},
+        },
+        {
+            child_id => $params->{'child_id'},
+        }
+    );
+    return;
+}
 
 1;
 

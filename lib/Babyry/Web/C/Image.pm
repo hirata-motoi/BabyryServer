@@ -60,11 +60,17 @@ sub web_submit {
 
     my @image_list = $c->req->param('image_tmp_names[]');
     my @user_list  = $c->req->param('shared_user_ids[]');
+    my @child_list  = $c->req->param('target_child_ids[]');
+    my $child_id = $c->req->param('child_id') || "";
 
+    # わかりづらいが、child_idが入っている場合は、アイコンとして画像が上げられた場合
+    # target_child(配列)は画像にこどもがひもづけられている状態
     my $params = {
         user_id => $c->stash->{'user_id'},
         user    => \@user_list,
         image   => \@image_list,
+        child   => \@child_list,
+        child_id => $child_id,
     };
 
     my $logic = Babyry::Logic::Image->new;
