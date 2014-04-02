@@ -17,7 +17,7 @@ sub get {
     my $profile = {};
 
     # get user data
-    my $user = $self->model('User')->get_by_user_id($teng_r, $params);
+    my $user = $self->model('User')->get_by_user_id($teng_r, {user_id => $params->{target_user_id}});
     $profile->{'user_id'} = $user->user_id;
     $profile->{'user_name'} = $user->user_name;
     $profile->{'icon_image_id'} = $user->icon_image_id;
@@ -30,8 +30,28 @@ sub get {
         $profile->{'icon_image_url'} = "";
     }
 
+    # get relatives
+    my $relatives = $self->model('Relatives')->get_by_user_id($teng_r, $profile->{'user_id'});
+    my $relatives_array = [];
+    for my $relative_id (keys %{$relatives}) {
+        # name
+        my $relative_info = $self->model('User')->get_by_user_id($teng_r, {user_id => $relative_id});
+        $relatives->{$relative_id}->{relative_name} = $relative_info->user_name;
+
+        # image
+        my $relative_image = $self->model('Image')->get_by_image_id($teng_r, $relative_info->icon_image_id);
+        if ($relative_image) {
+            $relatives->{$relative_id}->{relative_icon_url} = $relative_image->url;
+        } else {
+            $relatives->{$relative_id}->{relative_icon_url} = "";
+        }
+        # basic info
+        push @{$relatives_array}, $relatives->{$relative_id};
+    }
+    $profile->{'relatives'} = $relatives_array;
+
     # get child data
-    my $child_map_rows = $self->model('UserChildMap')->get_child_by_user_id($teng_r, $params);
+    my $child_map_rows = $self->model('UserChildMap')->get_child_by_user_id($teng_r, {user_id => $profile->{'user_id'}});
     my $child_array = [];
     for my $row (@{$child_map_rows}) {
         my $child_hash = {};

@@ -9,7 +9,7 @@ use Babyry::Logic::Image;
 
 sub index {
     my ($class, $c) = @_;
-    $c->render('/profile/index.tx');
+    $c->render('/profile/index.tx', { "target_user_id" => $c->req->param('target_user_id') });
 }
 
 sub profile_edit_name_sample_form {
@@ -51,9 +51,11 @@ sub profile_upload_icon_submit_sample_form {
 sub get {
     my ($self, $c) = @_;
 
+    my $target_user_id = $c->req->param('target_user_id') || $c->stash->{'user_id'};
+
     my $logic = Babyry::Logic::Profile->new;
 
-    my $ret = eval{ $logic->get( { user_id => $c->stash->{'user_id'} }) };
+    my $ret = eval{ $logic->get( { user_id => $c->stash->{'user_id'}, target_user_id => $target_user_id }) };
     infof($@) if($@);
 
     $c->render_json($ret);
