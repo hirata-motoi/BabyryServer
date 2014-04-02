@@ -46,7 +46,7 @@
 
 <script id="template-menu">
   <div class="item" style="text-align: center;">
-    <a href="<%= menu_uri %>">
+    <a href="<%= menu_uri %>" data-ajax="false">
       <img src="<%= menu_icon_image %>" class="img-menu-icon" entryIndex="<%= entryIndex %>" /><br>
       <%= menu_title %>
     </a>

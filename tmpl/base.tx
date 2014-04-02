@@ -9,6 +9,7 @@
     <meta name="format-detection" content="telephone=no">
     <link href="<: uri_for('/static/bootstrap/css/bootstrap.css') :>" rel="stylesheet" type="text/css">
     <link href="<: static_file('/static/css/main.css') :>" rel="stylesheet" type="text/css" media="screen">
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css" />
     <style>
       #footer {
         height: 46px;
@@ -98,12 +99,8 @@
     <div class="navbar navbar-default navbar-fixed-top" role="navigation">
       <div class="navbar-inner">
         <div class="container">
-          <a class="navbar-brand" href="/">Babyry</a>
-          <ul class="nav">
-            <li><a href="/image/web/upload"><img src="/static/img/menu/icon_folder_upload.png"></a></li>
-            <li><a id="group_by_stamp"><img src="/static/img/menu/icon_star_alt.png"></a></li>
-            <li><a href="/menu"><img src="/static/img/menu/icon_cog.png"></a></li>
-          </ul>
+          <a class="navbar-brand" href="/" data-ajax="false">Babyry</a>
+          <a id="group_by_stamp" data-ajax="false" style="float: right; display: none; margin-right: 10px;"><img src="/static/img/menu/icon_star_alt.png"></a>
         </div>
       </div>
     </div>
@@ -118,6 +115,20 @@
       <div id="navbar-space"></div>
       : block content -> {}
     </div>
+    
+    : if $no_footer {
+    : }
+    : else {
+    <div id="global-footer" data-role="footer" data-position="fixed" data-theme="a">
+      <div data-role="navbar">
+        <ul>
+          <li><a href="/" data-ajax="false" style="background-color: silver;"><img src="/static/img/menu/icon_home.png" style="width: 32px; height: 32px; -webkit-filter: invert();"></a></li>
+          <li><a href="/image/web/upload" data-ajax="false" style="background-color: silver;"><img src="/static/img/menu/icon_folder_upload.png"></a></li>
+          <li><a href="/menu" data-ajax="false" style="background-color: silver;"><img src="/static/img/menu/icon_cog.png"></a></li>
+        </ul>
+      </div>
+    </div>
+    : }
 
     <div style="display:none" class="relatives-data" data-json="<: encode_json_kolon($wall.relatives) :>" ></div>
     <div id="page-loading"><span style="display: block; margin-top: 80%; color: white;">読み込み中<span></div>
@@ -125,6 +136,8 @@
     <script src="<: static_file('/static/jquery/js/jquery.min.js') :>"></script>
     <script src="<: static_file('/static/bootstrap/js/bootstrap.min.js') :>"></script>
     <script src="<: static_file('/static/underscore/js/underscore-min.js') :>"></script>
+    <script src="<: static_file('/static/jquery/plugin/ui/jquery-ui.min.js') :>"></script>
+    <script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
     <!--script(src!='<: static_file('/static/js/es5-shim.min.js') :>')-->
     <!--script(src!='<: static_file('/static/js/micro_template.js') :>')-->
     <!--script(src!='<: static_file('/static/js/strftime.js') :>')-->

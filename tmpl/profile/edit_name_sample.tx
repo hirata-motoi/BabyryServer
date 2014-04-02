@@ -11,7 +11,7 @@
     max-width: 320px;
   }
 </style>
-<form action="http://babyryserver5001/profile/edit_name.json" method="post" enctype="multipart/form-data">sample submit:</br>
+<form action="http://babyryserver5001/profile/edit_name.json" method="post" enctype="multipart/form-data" data-ajax="false">sample submit:</br>
   user_name <input type="text" name="user_name"/><br/>
   <input type="submit" value="sumbit"/>
 </form>

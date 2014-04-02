@@ -1,6 +1,6 @@
 : cascade base
 : around content -> {
-<form action="<: uri_for('/register/execute') :>" role="form">
+<form action="<: uri_for('/register/execute') :>" role="form" data-ajax="false">
   <div class="form-group">
     <label for="email">Email address</label>
     <input id="email" type="email" name="email" placeholder="Enter email" class="form-control"/>
@@ -17,6 +17,6 @@
     <label for="invite_code">招待コード</label>
     <input id="invite_code" type="text" name="invite_code" class="form-control"/>
   </div>
-  <input type="submit" value="Submit" class="btn btn-default"/>
+  <input data-ajax="false" type="submit" value="Submit" class="btn btn-default"/>
 </form>
 : }

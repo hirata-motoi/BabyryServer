@@ -20,8 +20,15 @@ window.entryIdsInArray = []
 window.loadingFlg = false
 window.displayedElementsFlg = true
 owlObject = undefined
+defaultTextareaHeight = "30px"
 showImageDetail = () ->
   $(".img-thumbnail").on("click", () ->
+    # styleに画面の大きさを設定
+    setUpScreenSize()
+
+    setupGroupbyIcon()
+
+    setupGlobalFooter()
 
     window.util.showPageLoading()
 
@@ -67,6 +74,7 @@ showImageDetail = () ->
         for stampInfo, n in stamps
           stampElem = createStamp(stampInfo.stamp_id, stampInfo.icon_url)
           $elem.find(".stamp-container").append stampElem
+      $elem.find(".stamp-container").hide()
 
     # hide navbar-space
     $("#navbar-space").hide()
@@ -81,7 +89,8 @@ showImageDetail = () ->
       scrollPerPage: true,
       beforeMove: () ->
       afterMove: () ->
-        adjustDisplayedElements()
+        replaceToolBoxContent()
+#adjustDisplayedElements()
         if shouldPreLoad(5)
           return if window.loadingFlg
 
@@ -108,6 +117,9 @@ showImageDetail = () ->
     owlObject.jumpTo(tappedEntryIndex)
 
     window.util.hidePageLoading()
+
+    # footer
+    showNavBarFooter()
   )
 
   $("#comment-submit").on("click", () ->
@@ -127,44 +139,25 @@ showImageDetail = () ->
       },
       "dataType": "json",
       "success" : (data) ->
-        media = $("<div>")
-        media.addClass("media")
-        
-        icon = $("<a>")
-        icon.addClass("pull-left")
-        icon.attr("href", "#")
+        tmpl = _.template $('#template-comment-item').html()
+        item = tmpl
+          commenter_icon_url: data.commented_by_icon_url,
+          commenter_name: data.commented_by_name,
+          comment_text: data.comment
+        $("#all-comment-container").find("ul").append item
 
-        img = $("<img>")
-        img.addClass("media-object")
-        img.attr("alt", "64x64")
-        img.attr("src", "/static/img/160x160.png")
-        img.css("width", "64px")
-        img.css("height", "64px")
-
-        icon.append img
-        media.append icon
-
-        mediaBody = $("<div>")
-        mediaBody.addClass("media-body")
-
-        h4 = $("<h4>")
-        h4.addClass("media-heading")
-        h4.val("Media heading")
-
-        mediaBody.append h4
-        mediaBody.text(comment)
-
-        media.append mediaBody
-
-        $(".comment-container").prepend media
         window.entryData.entries[currentPosition].comments.push {"comment": comment}
 
         # textareaを空にする
         $("#comment-textarea").val("")
+        
+        # textareaの高さを戻す
+        $("#comment-textarea").css "height", defaultTextareaHeight
 
         # コメント件数を変更
         commentCount = window.entryData.entries[currentPosition].comments.length
         $(imageElem).find(".comment-notice").text createCommentNavigation(commentCount)
+
     })
     
   )
@@ -215,12 +208,12 @@ showImageDetail = () ->
     owlElem.find(".img-box").on "click", toggleDisplayedElements
 
     # stamp編集ボタン
-    owlElem.find(".stamp-edit").on "click", () ->
-      $("#stampAttachModal").modal("show")
+#   owlElem.find(".stamp-edit").on "click", () ->
+#      $("#stampAttachModal").modal("show")
 
     # コメントの件数表示
-    commentNoticeString = createCommentNavigation(comment_count)
-    owlElem.find(".comment-notice").text commentNoticeString
+#    commentNoticeString = createCommentNavigation(comment_count)
+#    owlElem.find(".comment-notice").text commentNoticeString
 
     owlElem.find(".comment-notice").on "click", () ->
       $(".comment-container").empty()
@@ -309,13 +302,17 @@ showImageDetail = () ->
     stampIconUrl = stampHash[stampId].icon_url
     targetImgBox = $(".img-box")[currentPosition]
     imageId = $(targetImgBox).attr("image-id")
+    target = $("#attached-stamps-container")
 
     # 既にattach済ならdetachする
     if alreadyAttachedStamp stampId, currentPosition
       # detach
       # stampを非表示にする
-      targetStamp = $(targetImgBox).find('img[stamp-id="' + stampId + '"]').parent()
+      targetStamp = target.find('img[stamp-id="' + stampId + '"]').parent()
       targetStamp.hide()
+
+      # edit-stamp-container内のスタンプのgrayscaleを外す
+      $(this).find("img").removeClass "icon-grayscale"
 
       token = getXSRFToken()
       $.ajax({
@@ -330,16 +327,27 @@ showImageDetail = () ->
         "success": (response) ->
           # successならDOMを消す
           targetStamp.remove()
+
+          # stamp-containerからも消す
+          window.console.log $(targetImgBox).find('img[stamp-id="' + stampId + '"]').parent()
+          stampContainer = $(targetImgBox).find('img[stamp-id="' + stampId + '"]').parent()
+          stampContainer.remove()
+
           # stampsByImagePositionをfalseにする
           window.stampsByImagePosition[currentPosition][stampId] = false
         "error": (xhr, textStatus, errorThrown) ->
           targetStamp.show()
+          $(this).find("img").addClass "icon-grayscale"
       })
     else
       # attach
       # stampのDOMを作ってappend
       stampElem = createStamp(stampId, stampIconUrl)
-      $(targetImgBox).find(".stamp-container").append stampElem
+      $("#attached-stamps-container").find("ul").append stampElem
+      $(targetImgBox).find(".stamp-container").append stampElem.clone(true)
+      
+      # edit-stamp-container内のスタンプのgrayscaleを外す
+      $(this).find("img").addClass "icon-grayscale"
 
       # stampsByImagePositionを更新
       setStampsByImagePosition stampId, currentPosition, true
@@ -365,6 +373,8 @@ showImageDetail = () ->
           else
             # stampsByImagePositionをfalseにする
             window.stampsByImagePosition[currentPosition][stampId] = false
+            stampElem.remove()
+            $(this).find("img").removeClass "icon-grayscale"
       })
 
 
@@ -419,7 +429,8 @@ showImageDetail = () ->
     stampList = getStampData()
     for stamp, i in stampList
       elem = createStampAttachIcon stamp
-      $("#stampAttachModal").find(".modal-body").append elem
+      #$("#stampAttachModal").find(".modal-body").append elem
+      $("#stamp-edit-container").append elem
 
   backToWall = () ->
     $(".container").removeClass "full-size-screen"
@@ -428,8 +439,9 @@ showImageDetail = () ->
   toggleDisplayedElements = () ->
     $(".navbar").toggle()
     window.displayedElementsFlg = if $(".navbar").css("display") == "none" then false else true
-    adjustDisplayedElements()
+#adjustDisplayedElements()
 
+  # TODO 不要になるかも
   adjustDisplayedElements = () ->
     # currentPositionとその前後2つのimg-box上のdisplayedElementsをtoggleする
     currentPosition = parseInt owlObject.currentPosition(), 10
@@ -455,8 +467,130 @@ showImageDetail = () ->
         imageElem.find(".stamp-container").hide()
         imageElem.find(".img-footer").hide()
 
+  replaceToolBoxContent = () ->
+    currentPosition = parseInt owlObject.currentPosition(), 10
+    elems = $(".img-box")
+    # stampの入れ替え
+    stampContainer = $( $(elems)[currentPosition] ).find(".stamp-container").clone(true)
+    $("#attached-stamps-container").find("ul").html stampContainer.html()
+
+    # コメントの入れ替え
+    $("#recent-comment-container").empty()
+    comments = window.entryData.entries[currentPosition].comments
+
+    if comments and comments.length > 0
+      comments.sort( (a, b) ->
+        aCreatedAt = a.created_at
+        bCreatedAt = b.created_at
+        if aCreatedAt < bCreatedAt
+          return -1
+        if aCreatedAt > bCreatedAt
+          return 1
+        return 0
+      )
+      commentItem = $("<p>")
+      commentItem.text comments[0].comment
+      $("#recent-comment-container").append commentItem
+      commentCount = comments.length
+      $("#recent-comment-container").show()
+    else
+      commentCount = 0
+      $("#recent-comment-container").hide()
+
+    # コメント件数の入れ替え
+    commentCountText = createCommentNavigation commentCount
+    $("#comment-count").text commentCountText
+
   createCommentNavigation = (comment_count) ->
     "コメント" + comment_count + "件"
+
+  showNavBarFooter = () ->
+    $("#comment-count").on "click", showComments
+    $("#comment-box").on "click", showComments
+    $("#modal-header").on "click", closeComments
+    $("#stamp-edit").on "click", editStamps
+    $(".navbar-footer").show()
+
+  showComments = () ->
+    container = $("#all-comment-container")
+    currentPosition = parseInt owlObject.currentPosition(), 10
+    comments = window.entryData.entries[currentPosition].comments
+    comments.sort( (a, b) ->
+      aCreatedAt = a.created_at
+      bCreatedAt = b.created_at
+      if aCreatedAt < bCreatedAt
+        return -1
+      if aCreatedAt > bCreatedAt
+        return 1
+      return 0
+    )
+    if comments.length > 0
+      tmpl = _.template $('#template-comment-item').html()
+      list = for comment in comments
+        item = tmpl
+          commenter_icon_url: comment.commented_by_icon_url,
+          commenter_name: comment.commented_by_name,
+          comment_text: comment.comment
+
+    window.console.log comments.length
+    container.find("ul").empty()
+    container.find("ul").append list
+    $(".navbar-footer").addClass("all-comment-container-opened")
+    $("#attached-stamps-container").hide()
+    $("#stamp-edit-container").hide()
+    $("#recent-comment-container").hide()
+    $("#comment-operation-container").hide()
+    $("#comment-input-container").show()
+    $("#comment-input-container").find("textarea").focus() if ! comments.length
+    $("#modal-header").show()
+    container.show()
+
+  closeComments = () ->
+    $(".navbar-footer").removeClass("all-comment-container-opened")
+    $("#attached-stamps-container").show()
+    $("#stamp-edit-container").hide()
+    $("#recent-comment-container").show()
+    $("#comment-operation-container").show()
+    $("#comment-input-container").hide()
+    $("#all-comment-container").hide()
+    $("#modal-header").hide()
+
+  editStamps = () ->
+    # attachedStampsとeditStamp以外は非表示
+    $(".navbar-footer").addClass("all-comment-container-opened")
+    $("#attached-stamps-container").hide()
+    $("#stamp-edit-container").hide()
+    $("#stamp-edit-container").show()
+    # stamp-edit-containerのアイコンのgrayscaleをセット
+    setEditStampGrayscale()
+    $("#recent-comment-container").hide()
+    $("#comment-operation-container").hide()
+    $("#comment-input-container").hide()
+    $("#modal-header").show()
+
+  setUpScreenSize = () ->
+    screenHeight = window.innerHeight - 44
+    rule = ".all-comment-container-opened { height: " + screenHeight + 'px; }'
+    ss = document.styleSheets
+    $(ss).each () ->
+      window.console.log $(this)[0].title
+      if $(this)[0].title == "dynamic"
+        idx = $(this)[0].cssRules.length;
+        $(this)[0].insertRule rule, idx
+
+  setEditStampGrayscale = () ->
+    container = $("#stamp-edit-container")
+    currentPosition = parseInt owlObject.currentPosition(), 10
+    stamps = window.stampsByImagePosition[currentPosition]
+    for stampId of stamps
+      if stamps[stampId] == true
+        container.find("a[stamp-id=" + stampId + "]").find("img").addClass "icon-grayscale"
+
+  setupGroupbyIcon = () ->
+    $("#group_by_stamp").show()
+
+  setupGlobalFooter = () ->
+    $("#global-footer").hide()
 
   # stamp attach用のmodalのsetup
   if ! hasElem(window.stampData)

@@ -11,7 +11,7 @@
     max-width: 320px;
   }
 </style>
-<form action="http://dev5001.babyry.jp/profile/upload_icon_submit.json" method="post" enctype="multipart/form-data">sample icon submit:</br>
+<form action="http://dev5001.babyry.jp/profile/upload_icon_submit.json" method="post" enctype="multipart/form-data" data-ajax="false">sample icon submit:</br>
   image name <input type="text" name="icon_image[]"/><br/>
   <input type="submit" value="sumbit"/>
 </form>

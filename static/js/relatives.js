@@ -257,7 +257,7 @@
             _results1 = [];
             for (_i = 0, _len = _ref.length; _i < _len; _i++) {
               e = _ref[_i];
-              _results1.push($("#" + r).find("ul").append(e));
+              _results1.push($("#" + r + "-list").append(e));
             }
             return _results1;
           })());

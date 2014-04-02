@@ -11,7 +11,7 @@
     max-width: 320px;
   }
 </style>
-<form action="http://babyryserver5001/profile/add_child.json" method="post" enctype="multipart/form-data">add child sample:</br>
+<form action="http://babyryserver5001/profile/add_child.json" method="post" enctype="multipart/form-data" data-ajax="false">add child sample:</br>
   child_name <input type="text" name="child_name"/><br/>
   stamp_id <input type="text" name="stamp_id"/><br/>
   <input type="submit" value="sumbit"/>

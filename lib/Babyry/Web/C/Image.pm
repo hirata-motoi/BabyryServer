@@ -92,8 +92,7 @@ sub comment {
 
     my $logic = Babyry::Logic::Image->new;
     my $ret = eval { $logic->comment($params) } || {};
-    infof($@) if($@);
-    $c->render_json($ret);
+    $self->output_response_json($c, $ret, $@);
 }
 
 1;

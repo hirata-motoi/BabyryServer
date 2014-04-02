@@ -5,7 +5,7 @@
   .list-view {
     list-style-type: none;
     margin-top: 10px;
-    margin-left: -40px;
+    /*margin-left: -40px;*/
   }
   .list-view li {
     line-height: 30px;
@@ -37,21 +37,15 @@
 : }
 
 : around content -> {
-<div id="slidemenu" style="display:none;">
-  : if $user_id {
-  <p>Welcome <: $user_id :><br>
-  <p><a id="backslide">HOME</a></p>
-  <a href="<: uri_for('/logout') :>">Logout</a></p>
-  : }
-  <p><a href="/profile">Profile</a></p>
-  <p><a id="show-relatives">Relatives</a></p>
+<div data-role="header" data-position="fixed" style="margin-top: 44px;">
+  <div data-role="navbar">
+    <ul>
+      <li class="active"><a href="#invite" data-toggle="tab" data-ajax="false">招待</a></li>
+      <li><a href="#search" data-toggle="tab" data-ajax="false">友達を探す</a></li>
+      <li><a href="#list" data-toggle="tab" data-ajax="false">友達リスト</a></li>
+    </ul>
+  </div>
 </div>
-
-<ul class="nav nav-tabs">
-  <li class="active"><a href="#invite" data-toggle="tab">招待</a></li>
-  <li><a href="#search" data-toggle="tab">友達を探す</a></li>
-  <li><a href="#list" data-toggle="tab">友達リスト</a></li>
-</ul>
 
 <div class="tab-content">
   <div class="tab-pane fade in active" id="invite">
@@ -68,23 +62,27 @@
       </form>
       <button id="search-submit">検索</button>
     </div>
-    <ul id="search-result-container" class="list-view">
+    <ul id="search-result-container" class="list-view" data-role="listview">
     </ul>
   </div>
   <div class="tab-pane fade" id="list">
-    <ul class="list-view">
-      <li id="admitting" class="list-view-item-container">承認待ち
-        <ul></ul>
+    <ul class="list-view" data-role="listview">
+      <li id="admitting" class="list-view-item-container" data-role="list-divider">承認待ち
+      <span id="admitting-list"><span>
+      <!--<ul></ul>-->
       </li>
-      <li id="approved" class="list-view-item-container">友達
-        <ul></ul>
+      <li id="approved" class="list-view-item-container" data-role="list-divider">友達
+      <span id="approved-list"></span>
+      <!--<ul></ul>-->
       </li>
-      <li id="applying" class="list-view-item-container">申請中
-        <ul></ul>
+      <li id="applying" class="list-view-item-container" data-role="list-divider">申請中
+      <span id="applying-list"><span>
+      <!--<ul></ul>-->
       </li>
     </ul>
   </div>
 </div>
+
 
 : include detail::include
 

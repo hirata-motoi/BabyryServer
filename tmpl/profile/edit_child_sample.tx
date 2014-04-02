@@ -11,7 +11,7 @@
     max-width: 320px;
   }
 </style>
-<form action="/profile/edit_child.json" method="post" enctype="multipart/form-data">edit child sample:</br>
+<form action="/profile/edit_child.json" method="post" enctype="multipart/form-data" data-ajax="false">edit child sample:</br>
   child_id <input type="text" name="child_id"/><br/>
   child_name <input type="text" name="child_name"/><br/>
   year <input type="text" name="birth_year"/><br/>
