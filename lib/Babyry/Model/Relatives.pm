@@ -57,6 +57,7 @@ sub get_by_user_id {
         }
 
         $relatives{$id}{relative_relation} = _relative_relation( $relative_status{$id} ) or next;
+        $relatives{$id}{relative_id} = $id;
     }
 
     return \%relatives;

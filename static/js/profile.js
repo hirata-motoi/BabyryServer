@@ -11,12 +11,16 @@
 
   window.child_data = [];
 
+  window.user_data = [];
+
   window.is_icon_changed = 0;
 
   window.new_icon;
 
+  window.view_other_profile = 0;
+
   $(function() {
-    var $form, getXSRFToken, grid_child, grid_user, showEditChildModal, showErrorMessage, tmpl_child, tmpl_new_child, tmpl_user, uploadChildIcon;
+    var $child_form, $user_form, getXSRFToken, grid_child, grid_relatives, grid_user, profile_get_url, showEditChildModal, showEditUserModal, showErrorMessage, tmpl_child, tmpl_new_child, tmpl_relatives, tmpl_user, uploadChildIcon, uploadUserIcon;
     getXSRFToken = function() {
       var c, cookies, matched, token, _i, _len;
       cookies = document.cookie.split(/\s*;\s*/);
@@ -30,28 +34,60 @@
       return token;
     };
     tmpl_user = _.template($('#template-user-profile').html());
+    tmpl_relatives = _.template($('#template-relatives-profile').html());
     tmpl_child = _.template($('#template-child-profile').html());
     tmpl_new_child = _.template($('#template-new-child-profile').html());
     grid_user = $('.user-timeline').get(0);
+    grid_relatives = $('.relatives-timeline').get(0);
     grid_child = $('.child-timeline').get(0);
+    profile_get_url = "/profile/get.json";
+    if ($("#profile_js").attr("target_user_id")) {
+      profile_get_url = "/profile/get.json?target_user_id=" + $("#profile_js").attr("target_user_id");
+      window.view_other_profile = 1;
+    }
     $.ajax({
-      url: '/profile/get.json',
+      url: profile_get_url,
       success: function(data) {
-        var child_item, i, user_item, _i, _j, _ref, _ref1;
+        var child_item, i, relatives_item, user_item, _i, _j, _k, _l, _ref, _ref1, _ref2, _ref3;
         user_item = [];
         user_item.push(document.createElement('article'));
         salvattore.append_elements(grid_user, user_item);
+        window.user_data = data;
         user_item[0].outerHTML = tmpl_user({
           url: data.icon_image_url,
-          name: data.user_name
+          name: data.user_name,
+          id: data.user_id
         });
+        $("#user_edit_button_" + data.user_id).on('click', function(e) {
+          return showEditUserModal(e, data);
+        });
+        relatives_item = [];
+        for (i = _i = 0, _ref = data.relatives.length; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+          relatives_item.push(document.createElement('article'));
+        }
+        salvattore.append_elements(grid_relatives, relatives_item);
+        if (data.relatives.length > 0) {
+          for (i = _j = 0, _ref1 = data.relatives.length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
+            if (data.relatives[i].relative_name === "") {
+              data.relatives[i].relative_name = "名無し";
+            }
+            relatives_item[i].outerHTML = tmpl_relatives({
+              url: data.relatives[i].relative_icon_url,
+              name: data.relatives[i].relative_name,
+              id: data.relatives[i].relative_id
+            });
+            $("#relative_panel_" + data.relatives[i].relative_id).on('click', function() {
+              return location.href = "/profile?target_user_id=" + $(this).attr("relative_id");
+            });
+          }
+        }
         child_item = [];
-        for (i = _i = 0, _ref = data.child.length; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+        for (i = _k = 0, _ref2 = data.child.length; 0 <= _ref2 ? _k <= _ref2 : _k >= _ref2; i = 0 <= _ref2 ? ++_k : --_k) {
           child_item.push(document.createElement('article'));
         }
         salvattore.append_elements(grid_child, child_item);
         if (data.child.length > 0) {
-          for (i = _j = 0, _ref1 = data.child.length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
+          for (i = _l = 0, _ref3 = data.child.length - 1; 0 <= _ref3 ? _l <= _ref3 : _l >= _ref3; i = 0 <= _ref3 ? ++_l : --_l) {
             child_item[i].outerHTML = tmpl_child({
               name: data.child[i].child_name,
               id: data.child[i].child_id,
@@ -77,6 +113,15 @@
         return window.console.log("error");
       }
     });
+    showEditUserModal = function(e, data) {
+      e.stopPropagation();
+      $("#editUserModal").modal({
+        "backdrop": true
+      });
+      data = window.user_data;
+      $("#user_modal_user_name").attr("value", data.user_name);
+      return $("#user_modal_user_icon").attr("src", data.icon_image_url);
+    };
     showEditChildModal = function(e) {
       var data, i, time, year, _i, _j, _k;
       e.stopPropagation();
@@ -120,6 +165,28 @@
         return $("#child_birthday_day").val("--");
       }
     };
+    $("#user_edit_submit").on('click', function(e) {
+      var token;
+      token = getXSRFToken();
+      return $.ajax({
+        "type": "post",
+        "url": "/profile/edit_name.json",
+        "data": {
+          "user_id": window.user_data.user_id,
+          "user_name": $("#user_modal_user_name").val(),
+          "XSRF-TOKEN": token
+        },
+        "dataType": "json",
+        "success": function() {
+          if (window.is_icon_changed === 1) {
+            return uploadUserIcon(window.new_icon);
+          } else {
+            return location.reload(true);
+          }
+        },
+        "error": function() {}
+      });
+    });
     $("#child_edit_delete").on('click', function(e) {
       var token;
       token = getXSRFToken();
@@ -188,18 +255,44 @@
         });
       }
     });
-    $("#child_modal_change_icon").on('click', function() {
-      $("#image-post-form").find("[type=file]").trigger("click");
+    $(".user_modal_change_icon").on('click', function() {
+      $("#user-image-post-form").find("[type=file]").trigger("click");
       return false;
     });
-    $form = $("#image-post-form");
-    $form.find("[type=file]").on("change", function() {
+    $user_form = $("#user-image-post-form");
+    $user_form.find("[type=file]").on("change", function() {
+      var fd;
+      window.is_icon_changed = 1;
+      window.console.log("file changed");
+      $("#user_modal_user_icon").attr("src", "/static/img/ajax-loader.gif");
+      fd = new FormData($user_form[0]);
+      $.ajax($user_form.attr("action"), {
+        type: 'post',
+        processData: false,
+        contentType: false,
+        data: fd,
+        dataType: 'json',
+        success: function(data) {
+          window.console.log(data);
+          window.new_icon = data.image_tmp_name;
+          return $("#user_modal_user_icon").attr("src", data.image_tmp_url);
+        },
+        error: showErrorMessage
+      });
+      return false;
+    });
+    $(".child_modal_change_icon").on('click', function() {
+      $("#child-image-post-form").find("[type=file]").trigger("click");
+      return false;
+    });
+    $child_form = $("#child-image-post-form");
+    $child_form.find("[type=file]").on("change", function() {
       var fd;
       window.is_icon_changed = 1;
       window.console.log("file changed");
       $("#child_modal_child_icon").attr("src", "/static/img/ajax-loader.gif");
-      fd = new FormData($form[0]);
-      $.ajax($form.attr("action"), {
+      fd = new FormData($child_form[0]);
+      $.ajax($child_form.attr("action"), {
         type: 'post',
         processData: false,
         contentType: false,
@@ -219,7 +312,7 @@
       window.console.log(xhr.responseText);
       return window.alert(xhr.responseText);
     };
-    return uploadChildIcon = function(icon) {
+    uploadChildIcon = function(icon) {
       var token;
       token = getXSRFToken();
       window.console.log(window.target_child_id);
@@ -229,6 +322,26 @@
           "shared_user_ids": [],
           "image_tmp_names": [icon],
           "child_id": window.target_child_id,
+          "XSRF-TOKEN": token
+        },
+        dataType: 'json',
+        success: function() {
+          window.console.log('icon submitted');
+          return location.reload(true);
+        },
+        error: showErrorMessage
+      });
+    };
+    return uploadUserIcon = function(icon) {
+      var token;
+      token = getXSRFToken();
+      window.console.log(window.user_data.user_id);
+      return $.ajax("/image/web/submit.json", {
+        type: "post",
+        data: {
+          "shared_user_ids": [],
+          "image_tmp_names": [icon],
+          "is_icon": "1",
           "XSRF-TOKEN": token
         },
         dataType: 'json',
