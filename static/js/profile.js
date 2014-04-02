@@ -103,11 +103,13 @@
             });
           }
         }
-        child_item[data.child.length].outerHTML = tmpl_new_child({});
-        return $("#add-new-child-pannel").on('click', function(e) {
-          window.target_child_id = "";
-          return showEditChildModal(e);
-        });
+        if (window.view_other_profile !== 1) {
+          child_item[data.child.length].outerHTML = tmpl_new_child({});
+          return $("#add-new-child-pannel").on('click', function(e) {
+            window.target_child_id = "";
+            return showEditChildModal(e);
+          });
+        }
       },
       error: function() {
         return window.console.log("error");

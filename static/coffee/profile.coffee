@@ -88,11 +88,12 @@ $ ->
             showEditChildModal(e)
 
       # 新規こどもカラム
-      child_item[data.child.length].outerHTML = tmpl_new_child {
-      }
-      $("#add-new-child-pannel").on 'click', (e) ->
-        window.target_child_id = ""
-        showEditChildModal(e)
+      if window.view_other_profile != 1
+        child_item[data.child.length].outerHTML = tmpl_new_child {
+        }
+        $("#add-new-child-pannel").on 'click', (e) ->
+          window.target_child_id = ""
+          showEditChildModal(e)
     error: () ->
       window.console.log "error"
   }
