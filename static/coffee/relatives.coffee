@@ -31,10 +31,9 @@ searchUser = () ->
         searchResult = $("<li>")
         searchResult.attr "user-id", user.user_id
         searchResult.addClass "list-view-item"
-        img = $("<img>")
-        img.attr "src", user.icon_url
-        searchResult.append img
-        searchResult.append $("<h2>").text user.user_name
+
+        searchResult.append createIcon(user.icon_url)
+        searchResult.append createUserName(user.user_name);
 
         if user.relative_relation == "approved" || user.relative_relation == "admitting" || user.relative_relation == "applying"
           # 既にrelativesになっている場合、申請中の場合はここに出さない
@@ -109,11 +108,16 @@ admitRelativeApply = () ->
   })
 
 createRelativesApplyIcon = () ->
-  icon = $("<button>")
-  icon.addClass("relatives-operation-icon")
-  icon.text("申請")
-  icon.on "click", sendRelativeApply
-  return icon
+  applyIconDiv = $("<div>")
+  applyIconDiv.addClass "apply-icon-div"
+
+  applyIcon = $("<button>")
+  applyIcon.addClass("relatives-operation-icon")
+  applyIcon.text("申請")
+  applyIcon.on "click", sendRelativeApply
+
+  applyIconDiv.append applyIcon
+  return applyIconDiv
 
 sendRelativeApply = () ->
   button = $(this)
@@ -221,10 +225,8 @@ refleshRelativesList = () ->
           elem.attr "user-id", relative_id
           elem.addClass("list-view-item")
 
-          img = $("<img>")
-          img.attr "src", data.relatives[relation][relative_id].icon_url
-          elem.append img
-          elem.append $("<h2>").text(data.relatives[relation][relative_id].user_name)
+          elem.append createIcon(data.relatives[relation][relative_id].icon_url)
+          elem.append createUserName(data.relatives[relation][relative_id].user_name)
 
           if relation == "applying"
             # 申請中の場合はキャンセルボタンを作る
@@ -251,6 +253,47 @@ refleshRelativesList = () ->
       # 更新に失敗した旨を表示
   })
 
+createIcon = (icon_url) ->
+  imgDiv = $("<div>")
+  imgDiv.addClass "icon-image-parent-div"
+  img = $("<img>")
+  img.attr "src", icon_url
+  img.addClass "icon-image"
+  img.on "load", trimIcon 
+  imgDiv.append img
+  return imgDiv
+
+createUserName = (user_name) ->
+  userNameDiv = $("<div>")
+  userNameDiv.addClass "user-name-div"
+  userName = $("<span>")
+  userName.addClass "user-name-elem"
+  userName.text user_name
+  userNameDiv.append  userName
+  return userNameDiv
+
+trimIcon = () ->
+  # 表示時のicon縦横サイズ
+  imgDisplaySize = 80
+
+  img = $(this)[0]
+  nw = img.naturalWidth
+  nh = img.naturalHeight
+
+  # size : trim後の縦横サイズ
+  if nw > nh
+    rh = imgDisplaySize
+    rw = imgDisplaySize * nw / nh
+  else
+    rw = imgDisplaySize
+    rh = imgDisplaySize * nh / nw
+
+  iw = (rw - imgDisplaySize) / 2
+  ih = (rh - imgDisplaySize) / 2
+  $(img).css "top", "-"+ih+"px"
+  $(img).css "left", "-"+iw+"px"
+  $(img).css "width", rw+"px"
+  $(img).css "height", rh+"px"
 
 # タブが切り替わった時には検索条件と検索結果をresetしておく
 # listのタブでrelativesとの関係が変更される可能性があり、

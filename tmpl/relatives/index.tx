@@ -12,11 +12,6 @@
   .list-view-item-container {
     display: none;
   }
-  .relatives-operation-icon {
-    float: right;
-    margin-right: 10px;
-    line-height: 20px;
-  }
   .loading-image {
     width: 20px;
     height: 20px;
@@ -24,6 +19,41 @@
   .ui-collapsible-content.ui-body-d {
     border: none;
   }
+  .icon-image-parent-div {
+    max-width : 80px;
+    max-height: 80px;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: top;
+  }
+  .icon-image {
+    float: left;
+    position: relative;
+  }
+  .user-name-div {
+    display: inline-block;
+    width: 120px;
+  }
+  .user-name-elem {
+    line-height: 80px;
+    padding-left: 10px;
+  }
+  .apply-icon-div {
+    display: inline-block;
+    width: 40px;
+    height: 80px;
+    float: right;
+  }
+  .relatives-operation-icon {
+    position: relative;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    float: right;
+    line-height: 20px;
+  }
+
 </style>
 
 : }
@@ -52,8 +82,8 @@
       <li>LINEで招待</li>
     </ul>
 
-
   </div>
+
   <div class="tab-pane fade" id="search">
     <p>友達を探す</p>
     <div>
@@ -65,6 +95,7 @@
     <ul id="search-result-container" class="list-view" data-role="listview">
     </ul>
   </div>
+
   <div class="tab-pane fade" id="list" data-role="collapsible-set" data-content-theme="f">
     <div id="admitting" data-role="collapsible" data-collapsed="false" class="list-view-item-container" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d" data-theme="d" data-content-theme="d">
       <h3>承認待ち</h3>

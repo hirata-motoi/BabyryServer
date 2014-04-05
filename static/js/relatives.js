@@ -1,5 +1,5 @@
 (function() {
-  var admitRelativeApply, cancelRelativeApply, console, createAdmittedText, createAdmittingIcon, createApplyingText, createCancelIcon, createRejectIcon, createRelativesApplyIcon, createloadingIcon, getXSRFToken, refleshRelativesList, rejectRelativeApply, requestRelativeOperate, searchUser, sendRelativeApply;
+  var admitRelativeApply, cancelRelativeApply, console, createAdmittedText, createAdmittingIcon, createApplyingText, createCancelIcon, createIcon, createRejectIcon, createRelativesApplyIcon, createUserName, createloadingIcon, getXSRFToken, refleshRelativesList, rejectRelativeApply, requestRelativeOperate, searchUser, sendRelativeApply, trimIcon;
 
   if (typeof window.console === "undefined") {
     console = {};
@@ -35,7 +35,7 @@
       },
       "dataType": "json",
       "success": function(data) {
-        var applyIcon, img, index, searchResult, user, _i, _len, _ref, _results;
+        var applyIcon, index, searchResult, user, _i, _len, _ref, _results;
         $.mobile.loading("hide");
         if (!data.users) {
           return;
@@ -47,10 +47,8 @@
           searchResult = $("<li>");
           searchResult.attr("user-id", user.user_id);
           searchResult.addClass("list-view-item");
-          img = $("<img>");
-          img.attr("src", user.icon_url);
-          searchResult.append(img);
-          searchResult.append($("<h2>").text(user.user_name));
+          searchResult.append(createIcon(user.icon_url));
+          searchResult.append(createUserName(user.user_name));
           if (user.relative_relation === "approved" || user.relative_relation === "admitting" || user.relative_relation === "applying") {
             continue;
           } else {
@@ -128,12 +126,15 @@
   };
 
   createRelativesApplyIcon = function() {
-    var icon;
-    icon = $("<button>");
-    icon.addClass("relatives-operation-icon");
-    icon.text("申請");
-    icon.on("click", sendRelativeApply);
-    return icon;
+    var applyIcon, applyIconDiv;
+    applyIconDiv = $("<div>");
+    applyIconDiv.addClass("apply-icon-div");
+    applyIcon = $("<button>");
+    applyIcon.addClass("relatives-operation-icon");
+    applyIcon.text("申請");
+    applyIcon.on("click", sendRelativeApply);
+    applyIconDiv.append(applyIcon);
+    return applyIconDiv;
   };
 
   sendRelativeApply = function() {
@@ -232,7 +233,7 @@
       "url": "/relatives/list.json",
       "type": "get",
       "success": function(data) {
-        var e, elem, elems, email, img, list, r, relation, relative_id, _i, _len, _ref, _results;
+        var e, elem, elems, email, list, r, relation, relative_id, _i, _len, _ref, _results;
         if (!data.relatives) {
           return;
         }
@@ -244,10 +245,8 @@
             elem = $("<li>");
             elem.attr("user-id", relative_id);
             elem.addClass("list-view-item");
-            img = $("<img>");
-            img.attr("src", data.relatives[relation][relative_id].icon_url);
-            elem.append(img);
-            elem.append($("<h2>").text(data.relatives[relation][relative_id].user_name));
+            elem.append(createIcon(data.relatives[relation][relative_id].icon_url));
+            elem.append(createUserName(data.relatives[relation][relative_id].user_name));
             if (relation === "applying") {
               elem.append(createCancelIcon());
             } else if (relation === "admitting") {
@@ -275,6 +274,50 @@
       },
       "error": function() {}
     });
+  };
+
+  createIcon = function(icon_url) {
+    var img, imgDiv;
+    imgDiv = $("<div>");
+    imgDiv.addClass("icon-image-parent-div");
+    img = $("<img>");
+    img.attr("src", icon_url);
+    img.addClass("icon-image");
+    img.on("load", trimIcon);
+    imgDiv.append(img);
+    return imgDiv;
+  };
+
+  createUserName = function(user_name) {
+    var userName, userNameDiv;
+    userNameDiv = $("<div>");
+    userNameDiv.addClass("user-name-div");
+    userName = $("<span>");
+    userName.addClass("user-name-elem");
+    userName.text(user_name);
+    userNameDiv.append(userName);
+    return userNameDiv;
+  };
+
+  trimIcon = function() {
+    var ih, img, imgDisplaySize, iw, nh, nw, rh, rw;
+    imgDisplaySize = 80;
+    img = $(this)[0];
+    nw = img.naturalWidth;
+    nh = img.naturalHeight;
+    if (nw > nh) {
+      rh = imgDisplaySize;
+      rw = imgDisplaySize * nw / nh;
+    } else {
+      rw = imgDisplaySize;
+      rh = imgDisplaySize * nh / nw;
+    }
+    iw = (rw - imgDisplaySize) / 2;
+    ih = (rh - imgDisplaySize) / 2;
+    $(img).css("top", "-" + ih + "px");
+    $(img).css("left", "-" + iw + "px");
+    $(img).css("width", rw + "px");
+    return $(img).css("height", rh + "px");
   };
 
   $('a[data-toggle="tab"]').on("shown.bs.tab", function() {
