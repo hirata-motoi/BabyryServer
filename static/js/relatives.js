@@ -1,5 +1,5 @@
 (function() {
-  var admitRelativeApply, cancelRelativeApply, console, createAdmittedText, createAdmittingIcon, createApplyingText, createCancelIcon, createIcon, createRejectIcon, createRelativesApplyIcon, createUserName, createloadingIcon, getXSRFToken, refleshRelativesList, rejectRelativeApply, requestRelativeOperate, searchUser, sendRelativeApply, trimIcon;
+  var admitRelativeApply, cancelRelativeApply, console, createAdmittedText, createAdmittingIcon, createApplyingText, createCancelIcon, createIcon, createRejectIcon, createRelativesApplyIcon, createUserName, createloadingIcon, getXSRFToken, refreshRelativesList, rejectRelativeApply, requestRelativeOperate, searchUser, sendRelativeApply, trimIcon;
 
   if (typeof window.console === "undefined") {
     console = {};
@@ -162,7 +162,7 @@
         button.remove();
         applyingText = createApplyingText();
         searchResult.append(applyingText);
-        return refleshRelativesList();
+        return refreshRelativesList();
       },
       "error": function() {}
     });
@@ -233,7 +233,7 @@
     return requestRelativeOperate(button, url);
   };
 
-  refleshRelativesList = function() {
+  refreshRelativesList = function() {
     return $.ajax({
       "url": "/relatives/list.json",
       "type": "get",
@@ -332,7 +332,7 @@
 
   $("#search-submit").on("click", searchUser);
 
-  refleshRelativesList();
+  refreshRelativesList();
 
 }).call(this);
 

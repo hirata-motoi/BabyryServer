@@ -150,7 +150,7 @@ sendRelativeApply = () ->
       searchResult.append applyingText
 
       # 友達リストに「申請中」枠で表示
-      refleshRelativesList()
+      refreshRelativesList()
     "error": () ->
       # 失敗した旨を表示
   })
@@ -215,7 +215,7 @@ rejectRelativeApply = () ->
   requestRelativeOperate button, url
 
 # relatives listを再表示
-refleshRelativesList = () ->
+refreshRelativesList = () ->
   $.ajax({
     "url": "/relatives/list.json",
     "type": "get",
@@ -310,5 +310,5 @@ $('a[data-toggle="tab"]').on "shown.bs.tab", () ->
   $("#search-result-container").empty()
 
 $("#search-submit").on "click", searchUser
-refleshRelativesList()
+refreshRelativesList()
 
