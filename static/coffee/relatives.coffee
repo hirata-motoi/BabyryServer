@@ -13,6 +13,7 @@ getXSRFToken = ->
 searchUser = () ->
   searchString = $("#search-form").val()
   $("#search-result-container").empty()
+  $.mobile.loading("show", {})
   $.ajax({
     "url": "/relatives/search.json",
     "type": "get",
@@ -22,11 +23,17 @@ searchUser = () ->
     },
     "dataType": "json",
     "success": (data) ->
+      $.mobile.loading("hide")
+
       return if ! data.users
+
       for user, index in data.users
         searchResult = $("<li>")
         searchResult.attr "user-id", user.user_id
         searchResult.addClass "list-view-item"
+
+        searchResult.append createIcon(user.icon_url)
+        searchResult.append createUserName(user.user_name);
 
         if user.relative_relation == "approved" || user.relative_relation == "admitting" || user.relative_relation == "applying"
           # 既にrelativesになっている場合、申請中の場合はここに出さない
@@ -35,32 +42,40 @@ searchUser = () ->
         else
           applyIcon = createRelativesApplyIcon()
 
-        searchResult.text user.user_name
         searchResult.append applyIcon
         $("#search-result-container").append searchResult
+        $("#search-result-container").listview("refresh")
     "error": () ->
       # 失敗した旨のメッセージを出す
+      $.mobile.loading("hide")
   })
 
 createAdmittingIcon = () ->
   icon = $("<button>")
   icon.addClass("relatives-operation-icon")
-  icon.text("承認する")
+  icon.text("承認")
   icon.on "click", admitRelativeApply
+  icon.addClass "admit-button-icon"
   return icon
 
 createCancelIcon = () ->
+  cancelIconDiv = $("<div>")
+  cancelIconDiv.addClass "cancel-icon-div"
+
   icon = $("<button>")
   icon.addClass("relatives-operation-icon")
-  icon.text("取り消す")
+  icon.text("取消")
   icon.on "click", cancelRelativeApply
-  return icon
+
+  cancelIconDiv.append icon
+  return cancelIconDiv
 
 createRejectIcon = () ->
   icon = $("<button>")
   icon.addClass("relatives-operation-icon")
   icon.text("拒否")
   icon.on "click", rejectRelativeApply
+  icon.addClass "reject-button-icon"
   return icon
 
 admitRelativeApply = () ->
@@ -82,6 +97,7 @@ admitRelativeApply = () ->
     },
     "success": () ->
       # 承認待ちlistから消して友達listに追加する
+      container = item.parents(".list-view-item-container")
       clonedItem = item.clone()
       item.remove()
       clonedItem.find("button").remove()
@@ -91,19 +107,24 @@ admitRelativeApply = () ->
 
       # itemがなくなった項目は非表示にする
       # list-view-itemが一つもない状態になったら項目自体を隠す
-      container = item.parents(".list-view-item-container")
       if container.find(".list-view-item").length < 1
         container.hide()
+      $("#approved-list").listview("refresh")
     "error": () ->
       # 失敗した旨を表示
   })
 
 createRelativesApplyIcon = () ->
-  icon = $("<button>")
-  icon.addClass("relatives-operation-icon")
-  icon.text("申請")
-  icon.on "click", sendRelativeApply
-  return icon
+  applyIconDiv = $("<div>")
+  applyIconDiv.addClass "apply-icon-div"
+
+  applyIcon = $("<button>")
+  applyIcon.addClass("relatives-operation-icon")
+  applyIcon.text("申請")
+  applyIcon.on "click", sendRelativeApply
+
+  applyIconDiv.append applyIcon
+  return applyIconDiv
 
 sendRelativeApply = () ->
   button = $(this)
@@ -129,7 +150,7 @@ sendRelativeApply = () ->
       searchResult.append applyingText
 
       # 友達リストに「申請中」枠で表示
-      refleshRelativesList()
+      refreshRelativesList()
     "error": () ->
       # 失敗した旨を表示
   })
@@ -153,7 +174,7 @@ createloadingIcon = () ->
   return img
 
 requestRelativeOperate = (button, url) ->
-  target = button.parent(".list-view-item")
+  target = button.parents(".list-view-item")
   tab = button.parents(".tab-pane").attr "id"
   userId = target.attr("user-id")
   token = getXSRFToken()
@@ -193,7 +214,8 @@ rejectRelativeApply = () ->
   url = "/relatives/reject.json"
   requestRelativeOperate button, url
 
-refleshRelativesList = () ->
+# relatives listを再表示
+refreshRelativesList = () ->
   $.ajax({
     "url": "/relatives/list.json",
     "type": "get",
@@ -208,8 +230,10 @@ refleshRelativesList = () ->
           email = data.relatives[relation][relative_id].email
           elem = $("<li>")
           elem.attr "user-id", relative_id
-          elem.addClass "list-view-item"
-          elem.text relative_id + " : " + email
+          elem.addClass("list-view-item")
+
+          elem.append createIcon(data.relatives[relation][relative_id].icon_url)
+          elem.append createUserName(data.relatives[relation][relative_id].user_name)
 
           if relation == "applying"
             # 申請中の場合はキャンセルボタンを作る
@@ -228,13 +252,55 @@ refleshRelativesList = () ->
       for r of elems 
         $("#" + r).show()
         for e in elems[r]
-          #$("#" + r).find("ul").append e
           $("#" + r + "-list").append e
-
+          $("#" + r + "-list").listview("refresh")
+        # デフォルトでアコーディオンを開いておく
+        $("#" + r).find("a").trigger("click")
     "error": () ->
       # 更新に失敗した旨を表示
   })
 
+createIcon = (icon_url) ->
+  imgDiv = $("<div>")
+  imgDiv.addClass "icon-image-parent-div"
+  img = $("<img>")
+  img.attr "src", icon_url
+  img.addClass "icon-image"
+  img.on "load", trimIcon 
+  imgDiv.append img
+  return imgDiv
+
+createUserName = (user_name) ->
+  userNameDiv = $("<div>")
+  userNameDiv.addClass "user-name-div"
+  userName = $("<span>")
+  userName.addClass "user-name-elem"
+  userName.text user_name
+  userNameDiv.append  userName
+  return userNameDiv
+
+trimIcon = () ->
+  # 表示時のicon縦横サイズ
+  imgDisplaySize = 64
+
+  img = $(this)[0]
+  nw = img.naturalWidth
+  nh = img.naturalHeight
+
+  # size : trim後の縦横サイズ
+  if nw > nh
+    rh = imgDisplaySize
+    rw = imgDisplaySize * nw / nh
+  else
+    rw = imgDisplaySize
+    rh = imgDisplaySize * nh / nw
+
+  iw = (rw - imgDisplaySize) / 2
+  ih = (rh - imgDisplaySize) / 2
+  $(img).css "top", "-"+ih+"px"
+  $(img).css "left", "-"+iw+"px"
+  $(img).css "width", rw+"px"
+  $(img).css "height", rh+"px"
 
 # タブが切り替わった時には検索条件と検索結果をresetしておく
 # listのタブでrelativesとの関係が変更される可能性があり、
@@ -244,5 +310,5 @@ $('a[data-toggle="tab"]').on "shown.bs.tab", () ->
   $("#search-result-container").empty()
 
 $("#search-submit").on "click", searchUser
-refleshRelativesList()
+refreshRelativesList()
 

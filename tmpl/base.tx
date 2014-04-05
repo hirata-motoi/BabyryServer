@@ -119,7 +119,7 @@
     : if $no_footer {
     : }
     : else {
-    <div id="global-footer" data-role="footer" data-position="fixed" data-theme="a">
+    <div id="global-footer" data-role="footer" data-position="fixed" data-theme="a" data-tap-toggle="false">
       <div data-role="navbar">
         <ul>
           <li><a href="/" data-ajax="false" style="background-color: silver;"><img src="/static/img/menu/icon_home.png" style="width: 32px; height: 32px; -webkit-filter: invert();"></a></li>

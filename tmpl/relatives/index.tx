@@ -5,26 +5,69 @@
   .list-view {
     list-style-type: none;
     margin-top: 10px;
-    /*margin-left: -40px;*/
   }
-  .list-view li {
-    line-height: 30px;
-    border-top: solid 1px #C0C0C0;
-    border-bottom: solid 1px #C0C0C0;
-    border-collapse: collapse;
-    margin-top: -1px;
+  .list-view img {
+    height: 100%;
   }
   .list-view-item-container {
     display: none;
   }
-  .relatives-operation-icon {
-    float: right;
-    margin-right: 10px;
-    line-height: 20px;
-  }
   .loading-image {
     width: 20px;
     height: 20px;
+  }
+  .ui-collapsible-content.ui-body-d {
+    border: none;
+  }
+  .icon-image-parent-div {
+    max-width : 64px;
+    max-height: 64px;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: top;
+  }
+  .icon-image {
+    float: left;
+    position: relative;
+  }
+  .user-name-div {
+    display: inline-block;
+    width: 120px;
+  }
+  .user-name-elem {
+    line-height: 64px;
+    padding-left: 10px;
+  }
+  .apply-icon-div {
+    display: inline-block;
+    width: 40px;
+    height: 64px;
+    float: right;
+  }
+  .relatives-operation-icon {
+    position: relative;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    float: right;
+    line-height: 20px;
+  }
+  .reject-button-icon {
+    position: absolute;
+    top: 70px;
+    right: 10px;
+  }
+  .admit-button-icon {
+    position: absolute;
+    top: 70px;
+    right: 60px;
+  }
+  .cancel-icon-div {
+    display: inline-block;
+    width: 40px;
+    height: 64px;
+    float: right;
   }
 </style>
 
@@ -37,7 +80,7 @@
 : }
 
 : around content -> {
-<div data-role="header" data-position="fixed" style="margin-top: 44px;">
+<div data-role="header" data-position="fixed" style="margin-top: 44px;" data-tap-toggle="false">
   <div data-role="navbar">
     <ul>
       <li class="active"><a href="#invite" data-toggle="tab" data-ajax="false">招待</a></li>
@@ -53,7 +96,9 @@
       <li id="invite-submit" style="cursor: pointer">メールで招待</li>
       <li>LINEで招待</li>
     </ul>
+
   </div>
+
   <div class="tab-pane fade" id="search">
     <p>友達を探す</p>
     <div>
@@ -65,21 +110,20 @@
     <ul id="search-result-container" class="list-view" data-role="listview">
     </ul>
   </div>
-  <div class="tab-pane fade" id="list">
-    <ul class="list-view" data-role="listview">
-      <li id="admitting" class="list-view-item-container" data-role="list-divider">承認待ち
-      <span id="admitting-list"><span>
-      <!--<ul></ul>-->
-      </li>
-      <li id="approved" class="list-view-item-container" data-role="list-divider">友達
-      <span id="approved-list"></span>
-      <!--<ul></ul>-->
-      </li>
-      <li id="applying" class="list-view-item-container" data-role="list-divider">申請中
-      <span id="applying-list"><span>
-      <!--<ul></ul>-->
-      </li>
-    </ul>
+
+  <div class="tab-pane fade" id="list" data-role="collapsible-set" data-content-theme="f">
+    <div id="admitting" data-role="collapsible" data-collapsed="false" class="list-view-item-container" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d" data-theme="d" data-content-theme="d">
+      <h3>承認待ち</h3>
+      <ul id="admitting-list" class="list-view" data-role="listview"></ul>
+    </div>
+    <div id="approved" data-role="collapsible" data-collapsed="false" class="list-view-item-container" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d" data-theme="d" data-content-theme="d">
+      <h3>友達</h3>
+      <ul id="approved-list" class="list-view" data-role="listview"></ul>
+    </div>
+    <div id="applying"  data-role="collapsible" data-collapsed="false" class="list-view-item-container" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d" data-theme="d" data-content-theme="d">
+      <h3>申請中</h3>
+      <ul id="applying-list" class="list-view" data-role="listview"></ul>
+    </div>
   </div>
 </div>
 

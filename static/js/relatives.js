@@ -1,5 +1,5 @@
 (function() {
-  var admitRelativeApply, cancelRelativeApply, console, createAdmittedText, createAdmittingIcon, createApplyingText, createCancelIcon, createRejectIcon, createRelativesApplyIcon, createloadingIcon, getXSRFToken, refleshRelativesList, rejectRelativeApply, requestRelativeOperate, searchUser, sendRelativeApply;
+  var admitRelativeApply, cancelRelativeApply, console, createAdmittedText, createAdmittingIcon, createApplyingText, createCancelIcon, createIcon, createRejectIcon, createRelativesApplyIcon, createUserName, createloadingIcon, getXSRFToken, refreshRelativesList, rejectRelativeApply, requestRelativeOperate, searchUser, sendRelativeApply, trimIcon;
 
   if (typeof window.console === "undefined") {
     console = {};
@@ -25,6 +25,7 @@
     var searchString;
     searchString = $("#search-form").val();
     $("#search-result-container").empty();
+    $.mobile.loading("show", {});
     return $.ajax({
       "url": "/relatives/search.json",
       "type": "get",
@@ -35,6 +36,7 @@
       "dataType": "json",
       "success": function(data) {
         var applyIcon, index, searchResult, user, _i, _len, _ref, _results;
+        $.mobile.loading("hide");
         if (!data.users) {
           return;
         }
@@ -45,18 +47,22 @@
           searchResult = $("<li>");
           searchResult.attr("user-id", user.user_id);
           searchResult.addClass("list-view-item");
+          searchResult.append(createIcon(user.icon_url));
+          searchResult.append(createUserName(user.user_name));
           if (user.relative_relation === "approved" || user.relative_relation === "admitting" || user.relative_relation === "applying") {
             continue;
           } else {
             applyIcon = createRelativesApplyIcon();
           }
-          searchResult.text(user.user_name);
           searchResult.append(applyIcon);
-          _results.push($("#search-result-container").append(searchResult));
+          $("#search-result-container").append(searchResult);
+          _results.push($("#search-result-container").listview("refresh"));
         }
         return _results;
       },
-      "error": function() {}
+      "error": function() {
+        return $.mobile.loading("hide");
+      }
     });
   };
 
@@ -64,18 +70,22 @@
     var icon;
     icon = $("<button>");
     icon.addClass("relatives-operation-icon");
-    icon.text("承認する");
+    icon.text("承認");
     icon.on("click", admitRelativeApply);
+    icon.addClass("admit-button-icon");
     return icon;
   };
 
   createCancelIcon = function() {
-    var icon;
+    var cancelIconDiv, icon;
+    cancelIconDiv = $("<div>");
+    cancelIconDiv.addClass("cancel-icon-div");
     icon = $("<button>");
     icon.addClass("relatives-operation-icon");
-    icon.text("取り消す");
+    icon.text("取消");
     icon.on("click", cancelRelativeApply);
-    return icon;
+    cancelIconDiv.append(icon);
+    return cancelIconDiv;
   };
 
   createRejectIcon = function() {
@@ -84,6 +94,7 @@
     icon.addClass("relatives-operation-icon");
     icon.text("拒否");
     icon.on("click", rejectRelativeApply);
+    icon.addClass("reject-button-icon");
     return icon;
   };
 
@@ -104,27 +115,31 @@
       },
       "success": function() {
         var clonedItem, container;
+        container = item.parents(".list-view-item-container");
         clonedItem = item.clone();
         item.remove();
         clonedItem.find("button").remove();
         $("#approved").find("ul").prepend(clonedItem);
         $("#approved").show();
-        container = item.parents(".list-view-item-container");
         if (container.find(".list-view-item").length < 1) {
-          return container.hide();
+          container.hide();
         }
+        return $("#approved-list").listview("refresh");
       },
       "error": function() {}
     });
   };
 
   createRelativesApplyIcon = function() {
-    var icon;
-    icon = $("<button>");
-    icon.addClass("relatives-operation-icon");
-    icon.text("申請");
-    icon.on("click", sendRelativeApply);
-    return icon;
+    var applyIcon, applyIconDiv;
+    applyIconDiv = $("<div>");
+    applyIconDiv.addClass("apply-icon-div");
+    applyIcon = $("<button>");
+    applyIcon.addClass("relatives-operation-icon");
+    applyIcon.text("申請");
+    applyIcon.on("click", sendRelativeApply);
+    applyIconDiv.append(applyIcon);
+    return applyIconDiv;
   };
 
   sendRelativeApply = function() {
@@ -147,7 +162,7 @@
         button.remove();
         applyingText = createApplyingText();
         searchResult.append(applyingText);
-        return refleshRelativesList();
+        return refreshRelativesList();
       },
       "error": function() {}
     });
@@ -179,7 +194,7 @@
 
   requestRelativeOperate = function(button, url) {
     var tab, target, token, userId;
-    target = button.parent(".list-view-item");
+    target = button.parents(".list-view-item");
     tab = button.parents(".tab-pane").attr("id");
     userId = target.attr("user-id");
     token = getXSRFToken();
@@ -218,12 +233,12 @@
     return requestRelativeOperate(button, url);
   };
 
-  refleshRelativesList = function() {
+  refreshRelativesList = function() {
     return $.ajax({
       "url": "/relatives/list.json",
       "type": "get",
       "success": function(data) {
-        var e, elem, elems, email, list, r, relation, relative_id, _results;
+        var e, elem, elems, email, list, r, relation, relative_id, _i, _len, _ref, _results;
         if (!data.relatives) {
           return;
         }
@@ -235,7 +250,8 @@
             elem = $("<li>");
             elem.attr("user-id", relative_id);
             elem.addClass("list-view-item");
-            elem.text(relative_id + " : " + email);
+            elem.append(createIcon(data.relatives[relation][relative_id].icon_url));
+            elem.append(createUserName(data.relatives[relation][relative_id].user_name));
             if (relation === "applying") {
               elem.append(createCancelIcon());
             } else if (relation === "admitting") {
@@ -251,21 +267,62 @@
         _results = [];
         for (r in elems) {
           $("#" + r).show();
-          _results.push((function() {
-            var _i, _len, _ref, _results1;
-            _ref = elems[r];
-            _results1 = [];
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              e = _ref[_i];
-              _results1.push($("#" + r + "-list").append(e));
-            }
-            return _results1;
-          })());
+          _ref = elems[r];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            e = _ref[_i];
+            $("#" + r + "-list").append(e);
+            $("#" + r + "-list").listview("refresh");
+          }
+          _results.push($("#" + r).find("a").trigger("click"));
         }
         return _results;
       },
       "error": function() {}
     });
+  };
+
+  createIcon = function(icon_url) {
+    var img, imgDiv;
+    imgDiv = $("<div>");
+    imgDiv.addClass("icon-image-parent-div");
+    img = $("<img>");
+    img.attr("src", icon_url);
+    img.addClass("icon-image");
+    img.on("load", trimIcon);
+    imgDiv.append(img);
+    return imgDiv;
+  };
+
+  createUserName = function(user_name) {
+    var userName, userNameDiv;
+    userNameDiv = $("<div>");
+    userNameDiv.addClass("user-name-div");
+    userName = $("<span>");
+    userName.addClass("user-name-elem");
+    userName.text(user_name);
+    userNameDiv.append(userName);
+    return userNameDiv;
+  };
+
+  trimIcon = function() {
+    var ih, img, imgDisplaySize, iw, nh, nw, rh, rw;
+    imgDisplaySize = 64;
+    img = $(this)[0];
+    nw = img.naturalWidth;
+    nh = img.naturalHeight;
+    if (nw > nh) {
+      rh = imgDisplaySize;
+      rw = imgDisplaySize * nw / nh;
+    } else {
+      rw = imgDisplaySize;
+      rh = imgDisplaySize * nh / nw;
+    }
+    iw = (rw - imgDisplaySize) / 2;
+    ih = (rh - imgDisplaySize) / 2;
+    $(img).css("top", "-" + ih + "px");
+    $(img).css("left", "-" + iw + "px");
+    $(img).css("width", rw + "px");
+    return $(img).css("height", rh + "px");
   };
 
   $('a[data-toggle="tab"]').on("shown.bs.tab", function() {
@@ -275,7 +332,7 @@
 
   $("#search-submit").on("click", searchUser);
 
-  refleshRelativesList();
+  refreshRelativesList();
 
 }).call(this);
 
