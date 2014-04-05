@@ -112,15 +112,16 @@
       },
       "success": function() {
         var clonedItem, container;
+        container = item.parents(".list-view-item-container");
         clonedItem = item.clone();
         item.remove();
         clonedItem.find("button").remove();
         $("#approved").find("ul").prepend(clonedItem);
         $("#approved").show();
-        container = item.parents(".list-view-item-container");
         if (container.find(".list-view-item").length < 1) {
-          return container.hide();
+          container.hide();
         }
+        return $("#approved-list").listview("refresh");
       },
       "error": function() {}
     });
@@ -231,7 +232,7 @@
       "url": "/relatives/list.json",
       "type": "get",
       "success": function(data) {
-        var e, elem, elems, email, img, list, r, relation, relative_id, _results;
+        var e, elem, elems, email, img, list, r, relation, relative_id, _i, _len, _ref, _results;
         if (!data.relatives) {
           return;
         }
@@ -242,6 +243,7 @@
             email = data.relatives[relation][relative_id].email;
             elem = $("<li>");
             elem.attr("user-id", relative_id);
+            elem.addClass("list-view-item");
             img = $("<img>");
             img.attr("src", data.relatives[relation][relative_id].icon_url);
             elem.append(img);
@@ -261,17 +263,13 @@
         _results = [];
         for (r in elems) {
           $("#" + r).show();
-          _results.push((function() {
-            var _i, _len, _ref, _results1;
-            _ref = elems[r];
-            _results1 = [];
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              e = _ref[_i];
-              $("#" + r + "-list").append(e);
-              _results1.push($("#" + r + "-list").listview("refresh"));
-            }
-            return _results1;
-          })());
+          _ref = elems[r];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            e = _ref[_i];
+            $("#" + r + "-list").append(e);
+            $("#" + r + "-list").listview("refresh");
+          }
+          _results.push($("#" + r).find("a").trigger("click"));
         }
         return _results;
       },

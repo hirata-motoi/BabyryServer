@@ -91,6 +91,7 @@ admitRelativeApply = () ->
     },
     "success": () ->
       # 承認待ちlistから消して友達listに追加する
+      container = item.parents(".list-view-item-container")
       clonedItem = item.clone()
       item.remove()
       clonedItem.find("button").remove()
@@ -100,9 +101,9 @@ admitRelativeApply = () ->
 
       # itemがなくなった項目は非表示にする
       # list-view-itemが一つもない状態になったら項目自体を隠す
-      container = item.parents(".list-view-item-container")
       if container.find(".list-view-item").length < 1
         container.hide()
+      $("#approved-list").listview("refresh")
     "error": () ->
       # 失敗した旨を表示
   })
@@ -218,6 +219,7 @@ refleshRelativesList = () ->
           email = data.relatives[relation][relative_id].email
           elem = $("<li>")
           elem.attr "user-id", relative_id
+          elem.addClass("list-view-item")
 
           img = $("<img>")
           img.attr "src", data.relatives[relation][relative_id].icon_url
@@ -243,6 +245,8 @@ refleshRelativesList = () ->
         for e in elems[r]
           $("#" + r + "-list").append e
           $("#" + r + "-list").listview("refresh")
+        # デフォルトでアコーディオンを開いておく
+        $("#" + r).find("a").trigger("click")
     "error": () ->
       # 更新に失敗した旨を表示
   })

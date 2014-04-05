@@ -21,6 +21,9 @@
     width: 20px;
     height: 20px;
   }
+  .ui-collapsible-content.ui-body-d {
+    border: none;
+  }
 </style>
 
 : }
@@ -62,18 +65,19 @@
     <ul id="search-result-container" class="list-view" data-role="listview">
     </ul>
   </div>
-  <div class="tab-pane fade" id="list">
-    <ul class="list-view relatives-list-container" data-role="listview">
-      <li id="admitting" class="list-view-item-container" data-role="list-divider">承認待ち
-        <ul id="admitting-list" class="list-view" data-role="listview"></ul>
-      </li>
-      <li id="approved" class="list-view-item-container" data-role="list-divider">友達
-        <ul id="approved-list" class="list-view" data-role="listview"></ul>
-      </li>
-      <li id="applying" class="list-view-item-container" data-role="list-divider">申請中
-        <ul id="applying-list" class="list-view" data-role="listview"></ul>
-      </li>
-    </ul>
+  <div class="tab-pane fade" id="list" data-role="collapsible-set" data-content-theme="f">
+    <div id="admitting" data-role="collapsible" data-collapsed="false" class="list-view-item-container" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d" data-theme="d" data-content-theme="d">
+      <h3>承認待ち</h3>
+      <ul id="admitting-list" class="list-view" data-role="listview"></ul>
+    </div>
+    <div id="approved" data-role="collapsible" data-collapsed="false" class="list-view-item-container" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d" data-theme="d" data-content-theme="d">
+      <h3>友達</h3>
+      <ul id="approved-list" class="list-view" data-role="listview"></ul>
+    </div>
+    <div id="applying"  data-role="collapsible" data-collapsed="false" class="list-view-item-container" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d" data-theme="d" data-content-theme="d">
+      <h3>申請中</h3>
+      <ul id="applying-list" class="list-view" data-role="listview"></ul>
+    </div>
   </div>
 </div>
 
