@@ -20,8 +20,8 @@
     border: none;
   }
   .icon-image-parent-div {
-    max-width : 80px;
-    max-height: 80px;
+    max-width : 64px;
+    max-height: 64px;
     overflow: hidden;
     display: inline-block;
     vertical-align: top;
@@ -35,13 +35,13 @@
     width: 120px;
   }
   .user-name-elem {
-    line-height: 80px;
+    line-height: 64px;
     padding-left: 10px;
   }
   .apply-icon-div {
     display: inline-block;
     width: 40px;
-    height: 80px;
+    height: 64px;
     float: right;
   }
   .relatives-operation-icon {
@@ -53,7 +53,22 @@
     float: right;
     line-height: 20px;
   }
-
+  .reject-button-icon {
+    position: absolute;
+    top: 70px;
+    right: 10px;
+  }
+  .admit-button-icon {
+    position: absolute;
+    top: 70px;
+    right: 60px;
+  }
+  .cancel-icon-div {
+    display: inline-block;
+    width: 40px;
+    height: 64px;
+    float: right;
+  }
 </style>
 
 : }

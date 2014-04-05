@@ -53,22 +53,29 @@ searchUser = () ->
 createAdmittingIcon = () ->
   icon = $("<button>")
   icon.addClass("relatives-operation-icon")
-  icon.text("承認する")
+  icon.text("承認")
   icon.on "click", admitRelativeApply
+  icon.addClass "admit-button-icon"
   return icon
 
 createCancelIcon = () ->
+  cancelIconDiv = $("<div>")
+  cancelIconDiv.addClass "cancel-icon-div"
+
   icon = $("<button>")
   icon.addClass("relatives-operation-icon")
-  icon.text("取り消す")
+  icon.text("取消")
   icon.on "click", cancelRelativeApply
-  return icon
+
+  cancelIconDiv.append icon
+  return cancelIconDiv
 
 createRejectIcon = () ->
   icon = $("<button>")
   icon.addClass("relatives-operation-icon")
   icon.text("拒否")
   icon.on "click", rejectRelativeApply
+  icon.addClass "reject-button-icon"
   return icon
 
 admitRelativeApply = () ->
@@ -167,7 +174,7 @@ createloadingIcon = () ->
   return img
 
 requestRelativeOperate = (button, url) ->
-  target = button.parent(".list-view-item")
+  target = button.parents(".list-view-item")
   tab = button.parents(".tab-pane").attr "id"
   userId = target.attr("user-id")
   token = getXSRFToken()
@@ -274,7 +281,7 @@ createUserName = (user_name) ->
 
 trimIcon = () ->
   # 表示時のicon縦横サイズ
-  imgDisplaySize = 80
+  imgDisplaySize = 64
 
   img = $(this)[0]
   nw = img.naturalWidth
