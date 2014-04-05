@@ -32,7 +32,7 @@
 : }
 
 : around content -> {
-<div data-role="header" data-position="fixed" style="margin-top: 44px;">
+<div data-role="header" data-position="fixed" style="margin-top: 44px;" data-tap-toggle="false">
   <div data-role="navbar">
     <ul>
       <li class="active"><a href="#invite" data-toggle="tab" data-ajax="false">招待</a></li>
