@@ -192,7 +192,7 @@ sub comment {
     my $ret = $comment->add($teng, $params);
     $teng->txn_commit;
 
-    # TODO 共通methodを使うように色々直す
+    # TODO Babyry::Service::User::get_icon_urlsを使うように色々直す
     my $users = $self->model('user')->get_by_user_ids($teng, [ $ret->commented_by ]);
     # user_icon_url
     my $images = $self->model('image')->get_by_image_ids(

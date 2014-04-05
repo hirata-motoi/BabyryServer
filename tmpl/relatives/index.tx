@@ -5,14 +5,9 @@
   .list-view {
     list-style-type: none;
     margin-top: 10px;
-    /*margin-left: -40px;*/
   }
-  .list-view li {
-    line-height: 30px;
-    border-top: solid 1px #C0C0C0;
-    border-bottom: solid 1px #C0C0C0;
-    border-collapse: collapse;
-    margin-top: -1px;
+  .list-view img {
+    height: 100%;
   }
   .list-view-item-container {
     display: none;
@@ -53,6 +48,8 @@
       <li id="invite-submit" style="cursor: pointer">メールで招待</li>
       <li>LINEで招待</li>
     </ul>
+
+
   </div>
   <div class="tab-pane fade" id="search">
     <p>友達を探す</p>
@@ -66,18 +63,15 @@
     </ul>
   </div>
   <div class="tab-pane fade" id="list">
-    <ul class="list-view" data-role="listview">
+    <ul class="list-view relatives-list-container" data-role="listview">
       <li id="admitting" class="list-view-item-container" data-role="list-divider">承認待ち
-      <span id="admitting-list"><span>
-      <!--<ul></ul>-->
+        <ul id="admitting-list" class="list-view" data-role="listview"></ul>
       </li>
       <li id="approved" class="list-view-item-container" data-role="list-divider">友達
-      <span id="approved-list"></span>
-      <!--<ul></ul>-->
+        <ul id="approved-list" class="list-view" data-role="listview"></ul>
       </li>
       <li id="applying" class="list-view-item-container" data-role="list-divider">申請中
-      <span id="applying-list"><span>
-      <!--<ul></ul>-->
+        <ul id="applying-list" class="list-view" data-role="listview"></ul>
       </li>
     </ul>
   </div>

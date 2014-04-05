@@ -6,6 +6,7 @@ use utf8;
 
 use parent qw/Babyry::Service::Base/;
 use Log::Minimal;
+use Babyry::Service::User;
 
 use constant {
     RELATIVE_STATUS_UNADMITTED => 0,
@@ -16,8 +17,9 @@ sub get {
     my ($self, $user_id) = @_;
 
     my $teng      = $self->teng('BABYRY_MAIN_R');
-    my $relatives = $self->model('Relatives')->get_by_user_id($teng, $user_id);
-    my $user      = $self->model('UserAuth')->get_by_ids( $teng, [ keys %$relatives ] );
+    my $relatives = $self->model('relatives')->get_by_user_id($teng, $user_id);
+    my $user      = $self->model('user')->get_by_user_ids($teng, [ keys %$relatives ]);
+    my $icon_urls = Babyry::Service::User->new->get_icon_urls({ user_info_list => $user });
 
     my %relatives_info = ();
     for my $relative_id ( keys %$relatives ) {
@@ -27,7 +29,8 @@ sub get {
 
         $relatives_info{$relation}{$relative_id} = {
             %{ $relatives->{$relative_id} },
-            email => $user->{$relative_id}{email},
+            icon_url  => $icon_urls->{$relative_id},
+            user_name => $user->{$relative_id}{user_name},
         }
     }
     return { relatives => \%relatives_info };
@@ -39,21 +42,25 @@ sub search_by_name {
     my $teng = $self->teng('BABYRY_MAIN_R');
 
     my $matched_users = $self->model('user')->search_by_name($teng, $str);
-    my $relatives = $self->model('relatives')->get_by_user_id($teng, $user_id) || {};
+    my $relatives     = $self->model('relatives')->get_by_user_id($teng, $user_id) || {};
+    my $icon_urls     = Babyry::Service::User->new->get_icon_urls({
+        user_info_list => $matched_users
+    });
 
     my @search_result = ();
-    for my $user ( @{ $matched_users->{users} } ) {
+    for my $matched_user_id ( keys %$matched_users ) {
 
         # 自分自身は除外
-        next if $user->{user_id} == $user_id;
+        next if $matched_user_id == $user_id;
 
         # 承認されたrelativesは除外する
-        my $relative = $relatives->{ $user->{user_id} };
+        my $relative = $relatives->{ $matched_user_id };
         next if $relative && $relative->{relative_relation} eq 'approved';
 
         # relative_statusをmerge
         push @search_result, {
-            %$user,
+            %{$matched_users->{$matched_user_id}},
+            icon_url          => $icon_urls->{ $matched_user_id },
             relative_relation => $relative->{relative_relation}
         };
     }

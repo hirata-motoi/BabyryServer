@@ -25,6 +25,7 @@
     var searchString;
     searchString = $("#search-form").val();
     $("#search-result-container").empty();
+    $.mobile.loading("show", {});
     return $.ajax({
       "url": "/relatives/search.json",
       "type": "get",
@@ -34,7 +35,8 @@
       },
       "dataType": "json",
       "success": function(data) {
-        var applyIcon, index, searchResult, user, _i, _len, _ref, _results;
+        var applyIcon, img, index, searchResult, user, _i, _len, _ref, _results;
+        $.mobile.loading("hide");
         if (!data.users) {
           return;
         }
@@ -45,18 +47,24 @@
           searchResult = $("<li>");
           searchResult.attr("user-id", user.user_id);
           searchResult.addClass("list-view-item");
+          img = $("<img>");
+          img.attr("src", user.icon_url);
+          searchResult.append(img);
+          searchResult.append($("<h2>").text(user.user_name));
           if (user.relative_relation === "approved" || user.relative_relation === "admitting" || user.relative_relation === "applying") {
             continue;
           } else {
             applyIcon = createRelativesApplyIcon();
           }
-          searchResult.text(user.user_name);
           searchResult.append(applyIcon);
-          _results.push($("#search-result-container").append(searchResult));
+          $("#search-result-container").append(searchResult);
+          _results.push($("#search-result-container").listview("refresh"));
         }
         return _results;
       },
-      "error": function() {}
+      "error": function() {
+        return $.mobile.loading("hide");
+      }
     });
   };
 
@@ -223,7 +231,7 @@
       "url": "/relatives/list.json",
       "type": "get",
       "success": function(data) {
-        var e, elem, elems, email, list, r, relation, relative_id, _results;
+        var e, elem, elems, email, img, list, r, relation, relative_id, _results;
         if (!data.relatives) {
           return;
         }
@@ -234,8 +242,10 @@
             email = data.relatives[relation][relative_id].email;
             elem = $("<li>");
             elem.attr("user-id", relative_id);
-            elem.addClass("list-view-item");
-            elem.text(relative_id + " : " + email);
+            img = $("<img>");
+            img.attr("src", data.relatives[relation][relative_id].icon_url);
+            elem.append(img);
+            elem.append($("<h2>").text(data.relatives[relation][relative_id].user_name));
             if (relation === "applying") {
               elem.append(createCancelIcon());
             } else if (relation === "admitting") {
@@ -257,7 +267,8 @@
             _results1 = [];
             for (_i = 0, _len = _ref.length; _i < _len; _i++) {
               e = _ref[_i];
-              _results1.push($("#" + r + "-list").append(e));
+              $("#" + r + "-list").append(e);
+              _results1.push($("#" + r + "-list").listview("refresh"));
             }
             return _results1;
           })());

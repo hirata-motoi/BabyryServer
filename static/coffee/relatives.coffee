@@ -13,6 +13,7 @@ getXSRFToken = ->
 searchUser = () ->
   searchString = $("#search-form").val()
   $("#search-result-container").empty()
+  $.mobile.loading("show", {})
   $.ajax({
     "url": "/relatives/search.json",
     "type": "get",
@@ -22,11 +23,18 @@ searchUser = () ->
     },
     "dataType": "json",
     "success": (data) ->
+      $.mobile.loading("hide")
+
       return if ! data.users
+
       for user, index in data.users
         searchResult = $("<li>")
         searchResult.attr "user-id", user.user_id
         searchResult.addClass "list-view-item"
+        img = $("<img>")
+        img.attr "src", user.icon_url
+        searchResult.append img
+        searchResult.append $("<h2>").text user.user_name
 
         if user.relative_relation == "approved" || user.relative_relation == "admitting" || user.relative_relation == "applying"
           # 既にrelativesになっている場合、申請中の場合はここに出さない
@@ -35,11 +43,12 @@ searchUser = () ->
         else
           applyIcon = createRelativesApplyIcon()
 
-        searchResult.text user.user_name
         searchResult.append applyIcon
         $("#search-result-container").append searchResult
+        $("#search-result-container").listview("refresh")
     "error": () ->
       # 失敗した旨のメッセージを出す
+      $.mobile.loading("hide")
   })
 
 createAdmittingIcon = () ->
@@ -193,6 +202,7 @@ rejectRelativeApply = () ->
   url = "/relatives/reject.json"
   requestRelativeOperate button, url
 
+# relatives listを再表示
 refleshRelativesList = () ->
   $.ajax({
     "url": "/relatives/list.json",
@@ -208,8 +218,11 @@ refleshRelativesList = () ->
           email = data.relatives[relation][relative_id].email
           elem = $("<li>")
           elem.attr "user-id", relative_id
-          elem.addClass "list-view-item"
-          elem.text relative_id + " : " + email
+
+          img = $("<img>")
+          img.attr "src", data.relatives[relation][relative_id].icon_url
+          elem.append img
+          elem.append $("<h2>").text(data.relatives[relation][relative_id].user_name)
 
           if relation == "applying"
             # 申請中の場合はキャンセルボタンを作る
@@ -228,9 +241,8 @@ refleshRelativesList = () ->
       for r of elems 
         $("#" + r).show()
         for e in elems[r]
-          #$("#" + r).find("ul").append e
           $("#" + r + "-list").append e
-
+          $("#" + r + "-list").listview("refresh")
     "error": () ->
       # 更新に失敗した旨を表示
   })

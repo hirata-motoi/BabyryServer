@@ -111,14 +111,11 @@ sub search_by_name {
         }
     );
 
-    my @users = ();
+    my %users = ();
     while ( my $u = $itr->next ) {
-        push @users, {
-            user_id   => $u->user_id,
-            user_name => $u->user_name,
-        };
+        $users{$u->user_id} = $u->get_columns;
     }
-    return { users => \@users };
+    return \%users;
 }
 
 sub update_icon_image {
