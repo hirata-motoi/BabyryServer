@@ -9,8 +9,6 @@
 
   window.target_child_id;
 
-  window.child_data = [];
-
   window.user_data = [];
 
   window.is_icon_changed = 0;
@@ -18,6 +16,8 @@
   window.new_icon;
 
   window.view_other_profile = 0;
+
+  window.temp_url = "";
 
   $(function() {
     var $child_form, $user_form, getXSRFToken, grid_child, grid_relatives, grid_user, profile_get_url, showEditChildModal, showEditUserModal, showErrorMessage, tmpl_child, tmpl_new_child, tmpl_relatives, tmpl_user, uploadChildIcon, uploadUserIcon;
@@ -48,47 +48,55 @@
     $.ajax({
       url: profile_get_url,
       success: function(data) {
-        var child_item, i, relatives_item, user_item, _i, _j, _k, _l, _ref, _ref1, _ref2, _ref3;
-        user_item = [];
-        user_item.push(document.createElement('article'));
-        salvattore.append_elements(grid_user, user_item);
+        var HTML, i, visibility, _i, _j, _ref, _ref1, _results;
         window.user_data = data;
-        user_item[0].outerHTML = tmpl_user({
+        visibility = "hidden";
+        if (data.accessed_user_id === data.user_id) {
+          visibility = "visible";
+        }
+        HTML = tmpl_user({
           url: data.icon_image_url,
           name: data.user_name,
-          id: data.user_id
+          id: data.user_id,
+          edit_visibility: visibility
         });
+        $('#profile_user').append(HTML);
         $("#user_edit_button_" + data.user_id).on('click', function(e) {
-          return showEditUserModal(e, data);
+          return showEditUserModal(e);
         });
-        relatives_item = [];
-        for (i = _i = 0, _ref = data.relatives.length; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-          relatives_item.push(document.createElement('article'));
-        }
-        salvattore.append_elements(grid_relatives, relatives_item);
         if (data.relatives.length > 0) {
-          for (i = _j = 0, _ref1 = data.relatives.length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
+          for (i = _i = 0, _ref = data.relatives.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
             if (data.relatives[i].relative_name === "") {
               data.relatives[i].relative_name = "名無し";
             }
-            relatives_item[i].outerHTML = tmpl_relatives({
+            HTML = tmpl_relatives({
               url: data.relatives[i].relative_icon_url,
               name: data.relatives[i].relative_name,
               id: data.relatives[i].relative_id
             });
+            $('#profile_friend').append(HTML);
             $("#relative_panel_" + data.relatives[i].relative_id).on('click', function() {
               return location.href = "/profile?target_user_id=" + $(this).attr("relative_id");
             });
           }
         }
-        child_item = [];
-        for (i = _k = 0, _ref2 = data.child.length; 0 <= _ref2 ? _k <= _ref2 : _k >= _ref2; i = 0 <= _ref2 ? ++_k : --_k) {
-          child_item.push(document.createElement('article'));
+        if (window.view_other_profile !== 1) {
+          HTML = tmpl_new_child({});
+          $('#profile_child').append(HTML);
+          $("#add-new-child-pannel").on('click', function(e) {
+            window.target_child_id = "";
+            return showEditChildModal(e);
+          });
         }
-        salvattore.append_elements(grid_child, child_item);
         if (data.child.length > 0) {
-          for (i = _l = 0, _ref3 = data.child.length - 1; 0 <= _ref3 ? _l <= _ref3 : _l >= _ref3; i = 0 <= _ref3 ? ++_l : --_l) {
-            child_item[i].outerHTML = tmpl_child({
+          _results = [];
+          for (i = _j = 0, _ref1 = data.child.length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
+            visibility = "hidden";
+            if (data.child[i].created_by === data.accessed_user_id) {
+              visibility = "visible";
+            }
+            HTML = tmpl_child({
+              edit_visibility: visibility,
               name: data.child[i].child_name,
               id: data.child[i].child_id,
               url: data.child[i].child_icon_url,
@@ -96,76 +104,91 @@
               birth_month: data.child[i].child_birthday_month,
               birth_day: data.child[i].child_birthday_day
             });
-            window.child_data[data.child[i].child_id] = data.child[i];
-            $("#child_edit_button_" + data.child[i].child_id).on('click', function(e) {
+            $('#profile_child').append(HTML);
+            _results.push($("#child_edit_button_" + data.child[i].child_id).on('click', function(e) {
               window.target_child_id = $(this).attr("child_id");
               return showEditChildModal(e);
-            });
+            }));
           }
-        }
-        if (window.view_other_profile !== 1) {
-          child_item[data.child.length].outerHTML = tmpl_new_child({});
-          return $("#add-new-child-pannel").on('click', function(e) {
-            window.target_child_id = "";
-            return showEditChildModal(e);
-          });
+          return _results;
         }
       },
       error: function() {
         return window.console.log("error");
       }
     });
-    showEditUserModal = function(e, data) {
+    showEditUserModal = function(e) {
       e.stopPropagation();
       $("#editUserModal").modal({
         "backdrop": true
       });
-      data = window.user_data;
-      $("#user_modal_user_name").attr("value", data.user_name);
-      return $("#user_modal_user_icon").attr("src", data.icon_image_url);
+      $("#user_modal_user_name").attr("value", $('#user_profile_user_name').text());
+      return $("#user_modal_user_icon").attr("src", $('#user_profile_user_icon').attr("src"));
     };
     showEditChildModal = function(e) {
-      var data, i, time, year, _i, _j, _k;
+      var elem, elems, i, options, time, year, _i, _j, _k, _l, _len, _len1, _len2, _m, _n, _results;
       e.stopPropagation();
       $("#editChildModal").modal({
         "backdrop": true
       });
-      if (window.target_child_id === "") {
-        $("#child_modal_child_name").attr("value", "");
-        $("#child_modal_child_icon").attr("src", "/static/img/160x160.png");
-      } else {
-        data = window.child_data[window.target_child_id];
-        $("#child_modal_child_name").attr("value", data.child_name);
-        $("#child_modal_child_icon").attr("src", data.child_icon_url);
-      }
-      time = new Date;
-      year = time.getFullYear();
-      for (i = _i = 2005; 2005 <= year ? _i <= year : _i >= year; i = 2005 <= year ? ++_i : --_i) {
-        $('#child_birthday_year').append('<option value="' + i + '">' + i + '</option>');
-      }
-      for (i = _j = 1; _j <= 12; i = ++_j) {
-        if (i < 10) {
-          $('#child_birthday_month').append('<option value="0' + i + '">' + i + '</option>');
-        } else {
-          $('#child_birthday_month').append('<option value="' + i + '">' + i + '</option>');
+      $("#child_modal_child_name").attr("value", $('#user_profile_child_name_' + window.target_child_id).text());
+      $("#child_modal_child_icon").attr("src", $('#user_profile_child_icon_' + window.target_child_id).attr("src"));
+      options = $("#child_birthday_year").find("option");
+      if ($(options).length < 2) {
+        time = new Date;
+        year = time.getFullYear();
+        for (i = _i = 2005; 2005 <= year ? _i <= year : _i >= year; i = 2005 <= year ? ++_i : --_i) {
+          $('#child_birthday_year').append('<option value="' + i + '">' + i + '</option>');
+        }
+        for (i = _j = 1; _j <= 12; i = ++_j) {
+          if (i < 10) {
+            $('#child_birthday_month').append('<option value="0' + i + '">' + i + '</option>');
+          } else {
+            $('#child_birthday_month').append('<option value="' + i + '">' + i + '</option>');
+          }
+        }
+        for (i = _k = 1; _k <= 31; i = ++_k) {
+          if (i < 10) {
+            $('#child_birthday_day').append('<option value="0' + i + '">' + i + '</option>');
+          } else {
+            $('#child_birthday_day').append('<option value="' + i + '">' + i + '</option>');
+          }
         }
       }
-      for (i = _k = 1; _k <= 31; i = ++_k) {
-        if (i < 10) {
-          $('#child_birthday_day').append('<option value="0' + i + '">' + i + '</option>');
-        } else {
-          $('#child_birthday_day').append('<option value="' + i + '">' + i + '</option>');
+      $("#child_birthday_year").val($('#user_profile_birth_year_' + window.target_child_id).text());
+      elems = $("#child_birthday_year").find("option");
+      for (_l = 0, _len = elems.length; _l < _len; _l++) {
+        elem = elems[_l];
+        if ($(elem).attr('value') === $('#user_profile_birth_year_' + window.target_child_id).text()) {
+          $(elem).attr('selected', true);
+          $(elem).trigger("change");
+          break;
         }
       }
-      if (window.target_child_id !== "") {
-        $("#child_birthday_year").val(data.child_birthday_year);
-        $("#child_birthday_month").val(data.child_birthday_month);
-        return $("#child_birthday_day").val(data.child_birthday_day);
-      } else {
-        $("#child_birthday_year").val("----");
-        $("#child_birthday_month").val("--");
-        return $("#child_birthday_day").val("--");
+      $("#child_birthday_month").val($('#user_profile_birth_month_' + window.target_child_id).text());
+      elems = $("#child_birthday_month").find("option");
+      for (_m = 0, _len1 = elems.length; _m < _len1; _m++) {
+        elem = elems[_m];
+        if ($(elem).attr('value') === $('#user_profile_birth_month_' + window.target_child_id).text()) {
+          $(elem).attr('selected', true);
+          $(elem).trigger("change");
+          break;
+        }
       }
+      $("#child_birthday_day").val($('#user_profile_birth_day_' + window.target_child_id).text());
+      elems = $("#child_birthday_day").find("option");
+      _results = [];
+      for (_n = 0, _len2 = elems.length; _n < _len2; _n++) {
+        elem = elems[_n];
+        if ($(elem).attr('value') === $('#user_profile_birth_day_' + window.target_child_id).text()) {
+          $(elem).attr('selected', true);
+          $(elem).trigger("change");
+          break;
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
     };
     $("#user_edit_submit").on('click', function(e) {
       var token;
@@ -181,10 +204,9 @@
         "dataType": "json",
         "success": function() {
           if (window.is_icon_changed === 1) {
-            return uploadUserIcon(window.new_icon);
-          } else {
-            return location.reload(true);
+            uploadUserIcon(window.new_icon);
           }
+          return $('#user_profile_user_name').text($("#user_modal_user_name").val());
         },
         "error": function() {}
       });
@@ -202,7 +224,7 @@
           },
           "dataType": "json",
           "success": function() {
-            return location.reload(true);
+            return $('#item_user_profile_child_icon_' + window.target_child_id).remove();
           },
           "error": function() {}
         });
@@ -212,6 +234,7 @@
       var token;
       token = getXSRFToken();
       if (window.target_child_id === "") {
+        window.temp_url = "";
         return $.ajax({
           "type": "post",
           "url": "/profile/add_child.json",
@@ -224,12 +247,27 @@
           },
           "dataType": "json",
           "success": function(response) {
+            var HTML;
             if (window.is_icon_changed === 1) {
               window.target_child_id = response.id;
-              return uploadChildIcon(window.new_icon);
+              uploadChildIcon(window.new_icon);
             } else {
-              return location.reload(true);
+              window.new_icon = "";
             }
+            HTML = tmpl_child({
+              edit_visibility: "visible",
+              name: $("#child_modal_child_name").val(),
+              id: response.id,
+              url: window.new_icon,
+              birth_year: $("#child_birthday_year").val(),
+              birth_month: $("#child_birthday_month").val(),
+              birth_day: $("#child_birthday_day").val()
+            });
+            $('#profile_child').append(HTML);
+            return $("#child_edit_button_" + response.id).on('click', function(e) {
+              window.target_child_id = $(this).attr("child_id");
+              return showEditChildModal(e);
+            });
           },
           "error": function() {}
         });
@@ -248,10 +286,12 @@
           "dataType": "json",
           "success": function() {
             if (window.is_icon_changed === 1) {
-              return uploadChildIcon(window.new_icon);
-            } else {
-              return location.reload(true);
+              uploadChildIcon(window.new_icon);
             }
+            $('#user_profile_child_name_' + window.target_child_id).text($("#child_modal_child_name").val());
+            $('#user_profile_birth_year_' + window.target_child_id).text($("#child_birthday_year").val());
+            $('#user_profile_birth_month_' + window.target_child_id).text($("#child_birthday_month").val());
+            return $('#user_profile_birth_day_' + window.target_child_id).text($("#child_birthday_day").val());
           },
           "error": function() {}
         });
@@ -277,7 +317,8 @@
         success: function(data) {
           window.console.log(data);
           window.new_icon = data.image_tmp_name;
-          return $("#user_modal_user_icon").attr("src", data.image_tmp_url);
+          $("#user_modal_user_icon").attr("src", data.image_tmp_url);
+          return window.temp_url = data.image_tmp_url;
         },
         error: showErrorMessage
       });
@@ -303,7 +344,8 @@
         success: function(data) {
           window.console.log(data);
           window.new_icon = data.image_tmp_name;
-          return $("#child_modal_child_icon").attr("src", data.image_tmp_url);
+          $("#child_modal_child_icon").attr("src", data.image_tmp_url);
+          return window.temp_url = data.image_tmp_url;
         },
         error: showErrorMessage
       });
@@ -329,7 +371,7 @@
         dataType: 'json',
         success: function() {
           window.console.log('icon submitted');
-          return location.reload(true);
+          return $('#user_profile_child_icon_' + window.target_child_id).attr("src", window.temp_url);
         },
         error: showErrorMessage
       });
@@ -349,7 +391,7 @@
         dataType: 'json',
         success: function() {
           window.console.log('icon submitted');
-          return location.reload(true);
+          return $('#user_profile_user_icon').attr("src", window.temp_url);
         },
         error: showErrorMessage
       });
