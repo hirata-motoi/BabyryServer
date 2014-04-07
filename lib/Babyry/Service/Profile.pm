@@ -5,7 +5,6 @@ use warnings;
 use utf8;
 use parent qw/Babyry::Service::Base/;
 
-use Babyry::Model::UserChildMap;
 use Log::Minimal;
 use Data::Dumper;
 
@@ -19,6 +18,7 @@ sub get {
     # get user data
     my $user = $self->model('User')->get_by_user_id($teng_r, {user_id => $params->{target_user_id}});
     $profile->{'user_id'} = $user->user_id;
+    $profile->{'accessed_user_id'} = $params->{user_id};
     $profile->{'user_name'} = $user->user_name;
     $profile->{'icon_image_id'} = $user->icon_image_id;
 
@@ -32,45 +32,49 @@ sub get {
 
     # get relatives
     my $relatives = $self->model('Relatives')->get_by_user_id($teng_r, $profile->{'user_id'});
+    my $child = $self->model('Child')->new();
     my $relatives_array = [];
-    for my $relative_id (keys %{$relatives}) {
-        # name
-        my $relative_info = $self->model('User')->get_by_user_id($teng_r, {user_id => $relative_id});
-        $relatives->{$relative_id}->{relative_name} = $relative_info->user_name;
+    my $child_array = [];
+    for my $relative_id ( keys %{$relatives}, $profile->{'user_id'} ) {
+        # 自分(user_id)のrelativesの情報をとるときには、user_id(自分)のときはskip
+        if ($relative_id != $profile->{'user_id'}) {
+            # name
+            my $relative_info = $self->model('User')->get_by_user_id($teng_r, {user_id => $relative_id});
+            $relatives->{$relative_id}->{relative_name} = $relative_info->user_name;
 
-        # image
-        my $relative_image = $self->model('Image')->get_by_image_id($teng_r, $relative_info->icon_image_id);
-        if ($relative_image) {
-            $relatives->{$relative_id}->{relative_icon_url} = $relative_image->url;
-        } else {
-            $relatives->{$relative_id}->{relative_icon_url} = "";
+            # image
+            my $relative_image = $self->model('Image')->get_by_image_id($teng_r, $relative_info->icon_image_id);
+            if ($relative_image) {
+                $relatives->{$relative_id}->{relative_icon_url} = $relative_image->url;
+            } else {
+                $relatives->{$relative_id}->{relative_icon_url} = "";
+            }
+            # basic info
+            push @{$relatives_array}, $relatives->{$relative_id};
         }
-        # basic info
-        push @{$relatives_array}, $relatives->{$relative_id};
+
+        # get child of each relatives
+        my $_child_array = $child->get_by_created_by($teng_r, $relative_id);
+        for my $_child (@{$_child_array}) {
+            my $child_hash = {};
+            $child_hash->{child_id} = $_child->child_id;
+            $child_hash->{child_name} = $_child->child_name;
+            $child_hash->{created_by} = $_child->created_by;
+            if ($_child->birthday =~ /^(\d\d\d\d)-(\d\d)-(\d\d)$/) {
+                $child_hash->{child_birthday_year} = $1;
+                $child_hash->{child_birthday_month} = $2;
+                $child_hash->{child_birthday_day} = $3;
+            }
+            my $child_image = $self->model('Image')->get_by_image_id($teng_r, $_child->icon_image_id);
+            if ($child_image) {
+                $child_hash->{child_icon_url} = $child_image->url;
+            } else {
+                $child_hash->{child_icon_url} = "";
+            }
+            push @{$child_array}, $child_hash;
+        }
     }
     $profile->{'relatives'} = $relatives_array;
-
-    # get child data
-    my $child_map_rows = $self->model('UserChildMap')->get_child_by_user_id($teng_r, {user_id => $profile->{'user_id'}});
-    my $child_array = [];
-    for my $row (@{$child_map_rows}) {
-        my $child_hash = {};
-        my $child = $self->model('Child')->get_by_child_id($teng_r, $row->child_id);
-        $child_hash->{child_id} = $child->[0]->child_id;
-        $child_hash->{child_name} = $child->[0]->child_name;
-        if ($child->[0]->birthday =~ /^(\d\d\d\d)-(\d\d)-(\d\d)$/) {
-            $child_hash->{child_birthday_year} = $1;
-            $child_hash->{child_birthday_month} = $2;
-            $child_hash->{child_birthday_day} = $3;
-        }
-        my $child_image = $self->model('Image')->get_by_image_id($teng_r, $child->[0]->icon_image_id);
-        if ($child_image) {
-            $child_hash->{child_icon_url} = $child_image->url;
-        } else {
-            $child_hash->{child_icon_url} = "";
-        }
-        push @{$child_array}, $child_hash;
-    }
     $profile->{'child'} = $child_array;
 
     return $profile;
@@ -98,7 +102,6 @@ sub add_child {
     my $child_id = $self->model('Sequence')->get_id($teng, 'seq_child');
 
     # insert child data
-    $self->model('UserChildMap')->add_child($teng, $params->{user_id}, $child_id, $unixtime);
     $self->model('Child')->add_child($teng, $child_id, $params, $unixtime);
 
     $teng->txn_commit;
@@ -122,7 +125,6 @@ sub delete_child {
 
     my $teng = $self->teng('BABYRY_MAIN_W');
     $teng->txn_begin;
-    my $user_child_map = $self->model('UserChildMap')->delete_child($teng, $params);
     my $child = $self->model('Child')->delete_child($teng, $params);
     $teng->txn_commit;
 

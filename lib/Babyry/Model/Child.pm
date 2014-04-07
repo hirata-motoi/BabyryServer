@@ -19,6 +19,20 @@ SQL
     return \@records; 
 }
 
+sub get_by_created_by {
+    my ($self, $teng, $created_by) = @_;
+
+    my $sql = <<SQL;
+        SELECT * from child where created_by = ?
+SQL
+    my @records = $teng->search_by_sql(
+        $sql,
+        [$created_by]
+    );
+
+    return \@records;
+}
+
 sub add_child {
     my ($self, $teng, $child_id, $params, $unixtime) = @_;
     my $birthday = $params->{'birth_year'} . '-' . $params->{'birth_month'} . '-' . $params->{'birth_day'};
@@ -27,6 +41,7 @@ sub add_child {
         {  
             child_id  => $child_id,
             child_name  => $params->{'child_name'},
+            created_by => $params->{'user_id'},
             birthday => $birthday,
             created_at => $unixtime,
             updated_at => $unixtime,
