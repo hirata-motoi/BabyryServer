@@ -139,7 +139,9 @@
 </script>
 <script type="text/template" id="template-new-child-profile">
   <div class="item item-child" style="text-align: center;" id="add-new-child-pannel">
-  こどもを追加
+    <div id="center-column">
+      こどもを追加
+    </div>
   </div>
 </script>
 <script type="text/javascript" src="<: uri_for('/static/js/profile.js') :>" id="profile_js" target_user_id="<: $target_user_id :>"></script>
