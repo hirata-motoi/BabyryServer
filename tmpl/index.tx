@@ -20,6 +20,12 @@
     margin: 4px;
     background-color: #FFFFFF
   }
+  .item-album {
+    height: 30px;
+    background-color: #FFDEAD;
+  }
+  .item-album-edit-body {
+  }
 
   /* salvattore */
   .timeline[data-columns]::before {
@@ -45,6 +51,16 @@
   .btn-top {
     width: 49.5%;
   }
+  .center-column {
+    width: 80%;
+    float: left;
+    display: inline;
+  }
+  .right-column {
+    width: 20%;
+    float: left;
+    display: inline;
+  }
 </style>
 
 <link href="<: uri_for('/static/jquery/plugin/owl/owl-carousel/owl.carousel.css') :>" rel="stylesheet">
@@ -69,6 +85,28 @@
       <img src="/static/img/comment_icon.png" class="img-icon-small"/><%= comment_num %>
   </div>
 </script>
+<script id="template-album">
+  <div class="item item-album">
+    <span id="album_id_<%= album_id %>" album_id="<%= album_id %>" class="center-column"><%= name %></span>
+    <span id="album_edit_id_<%= album_id %>" album_edit_id="<%= album_id %>" class="right-column" data-role="button" data-inline="true">編集</span>
+  </div>
+  <div class="item item-album-edit-body" id="album_setting_id_<%= album_id %>" album_setting_id="<%= album_id %>" style="display:none">
+  </div>
+</script>
+<script id="template-album-edit">
+  アルバム名<input type='text' name='album_name' value="<%= name %>" id="album_name_edit_form_<%= id %>">
+  <button id="album_name_edit_<%= id %>" album_name_edit_id ="<%= id %>" class="ui-btn ui-btn-icon-notext ui-icon-forward ui-corner-all" style="display:inline">button</button><br>
+  <div id="album-edit-element_<%= id %>"></div>
+  <select id="new_album_key_<%= id %>" album_key_id="<%= id %>"><option value="0"></option></select>
+  <select id="new_album_attr_<%= id %>" album_attr_id="<%= id %>"><option value="0"></option></select>
+  <button class="ui-btn ui-btn-icon-notext ui-icon-plus ui-corner-all" id="add_album_attr_<%= id %>" add_album_attr_id="<%= id %>" style="display:inline">button</button>
+</script>
+<script id="template-album-element">
+  <div>
+  <%= key %> : <%= value %>  
+  <button id="album_attr_delete_<%= id %>_<%= attr_id %>" album_attr_delete_id="<%= id %>" album_attr_delete_key="<%= key %>" album_attr_delete_value="<%= value %>" class="ui-btn ui-btn-icon-notext ui-icon-delete ui-corner-all" style="display:inline">button</button>
+  </div>
+</script>
 <script type="text/javascript" src="<: uri_for('/static/js/wall.js') :>"></script>
 <script type="text/javascript" src="<: uri_for('/static/js/detail.js') :>"></script>
 : }
@@ -79,6 +117,8 @@
   <div class="timeline row" data-columns style="content: '2 .column.size-1of2';"></div>
 
   <div id="load-more" style="text-align:center"><img src="/static/img/arrow_carrot-2down_alt2.png"></div>
+
+  <div id="album-items"></div>
 </div>
 
 : include wall::include

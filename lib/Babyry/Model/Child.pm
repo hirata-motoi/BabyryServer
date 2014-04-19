@@ -5,6 +5,9 @@ use warnings;
 use utf8;
 use parent qw/Babyry::Model::Base/;
 
+use Log::Minimal;
+use Data::Dumper;
+
 sub get_by_child_id {
     my ($self, $teng, $child_id) = @_;
 
@@ -17,6 +20,26 @@ SQL
     );
 
     return \@records; 
+}
+
+sub get_by_child_ids {
+    my ($self, $teng, $child_ids) = @_;
+
+    my $sql = <<SQL;
+        SELECT * from child where child_id in (?)
+SQL
+    return if ! @$child_ids;
+    my $itr = $teng->search(
+        'child',
+        {
+            child_id => $child_ids
+        }
+    );
+    my %child = ();
+    while ( my $r = $itr->next ) {
+        $child{$r->child_id} = $r->get_columns;
+    }
+    return \%child;
 }
 
 sub get_by_created_by {
