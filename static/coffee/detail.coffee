@@ -83,6 +83,7 @@ showImageDetail = () ->
       items: 1,
       pagination: false,
       scrollPerPage: true,
+      lazyLoad: true,
       beforeMove: () ->
       afterMove: () ->
         replaceToolBoxContent()
@@ -200,18 +201,13 @@ showImageDetail = () ->
     tmpl = $("#item-tmpl").clone(true)
     owlElem = $(tmpl)
     owlElem.find(".img-box").attr "image-id", image_id
-    owlElem.find(".img-box").css "background-image", "url(" + image_url + ")"
+    owlElem.find(".img-box").attr "data-src", image_url
     owlElem.css "width", innerWidth
     owlElem.css "height", innerHeight
     owlElem.attr "id", ""
 
     owlElem.addClass("unloaded") if !image_url
     owlElem.find(".img-box").on "click", toggleDisplayedElements
-
-
-    # コメントの件数表示
-#    commentNoticeString = createCommentNavigation(comment_count)
-#    owlElem.find(".comment-notice").text commentNoticeString
 
     owlElem.find(".comment-notice").on "click", () ->
       $(".comment-container").empty()

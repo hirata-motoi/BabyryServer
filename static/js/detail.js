@@ -86,6 +86,7 @@
         items: 1,
         pagination: false,
         scrollPerPage: true,
+        lazyLoad: true,
         beforeMove: function() {},
         afterMove: function() {
           var count, currentPageNo, loadingFlg;
@@ -190,7 +191,7 @@
       tmpl = $("#item-tmpl").clone(true);
       owlElem = $(tmpl);
       owlElem.find(".img-box").attr("image-id", image_id);
-      owlElem.find(".img-box").css("background-image", "url(" + image_url + ")");
+      owlElem.find(".img-box").attr("data-src", image_url);
       owlElem.css("width", innerWidth);
       owlElem.css("height", innerHeight);
       owlElem.attr("id", "");
