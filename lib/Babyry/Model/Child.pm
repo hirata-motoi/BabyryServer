@@ -6,6 +6,7 @@ use utf8;
 use parent qw/Babyry::Model::Base/;
 
 use Log::Minimal;
+use Data::Util qw/:check/;
 
 sub get_by_child_id {
     my ($self, $teng, $child_id) = @_;
@@ -37,12 +38,16 @@ sub get_by_child_ids {
 sub get_by_created_by {
     my ($self, $teng, $user_ids) = @_;
 
-    return unless $user_ids && scalar @$user_ids;
+    my $user_id_list
+        = is_array_ref($user_ids) ? $user_ids   :
+          is_integer($user_ids)   ? [$user_ids] :
+                                    undef       ;
+    return [] if ! $user_id_list;
 
     my @records = $teng->search(
         'child',
         {
-            created_by => $user_ids
+            created_by => $user_id_list
         }
     );
 
