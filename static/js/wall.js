@@ -67,6 +67,7 @@
           }
           window.entryData.entries = window.entryData.entries.concat(data.data.entries);
           window.entryData.metadata = data.metadata;
+          window.entryData.related_children = data.data.related_children;
           return window.util.showImageDetail();
         },
         error: function() {

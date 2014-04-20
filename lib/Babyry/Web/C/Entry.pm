@@ -15,6 +15,7 @@ sub search {
     my $uploaded_by = $c->req->param('uploaded_by') || $c->stash->{user_id};
     my $count       = $c->req->param('count')       || 10;
     my $page        = $c->req->param('page')        || 1;
+    my $user_id     = $c->stash->{user_id};
 
     my $params = {
         stamp_id    => \@stamp_id,
@@ -22,6 +23,7 @@ sub search {
         uploaded_by => $uploaded_by,
         count       => $count,
         page        => $page,
+        user_id     => $user_id,
     };
 
     my $logic = Babyry::Logic::Entry->new;

@@ -19,25 +19,25 @@
   .owl-item {
     width: 320px;
   }
-  .stamp {
+  .child {
     text-shadow: 0 0 2px #000;
     color: #eee;
     text-decoration:none;
     display: inline;
   }
-  .stamp-icon {
+  .child-icon {
     width: 36px;
     height: 36px;
     display: inline;
     margin: 5px;
   }
-  .stamp-container {
+  .child-container {
     position: absolute;
     width: 100%;
     bottom: 44px;
     font-size: 30px;
   }
-  .listed-stamp {
+  .listed-child {
     width: 36px;
     height: 36px;
     margin: 5px;
@@ -67,7 +67,7 @@
     font-size: 14px;
     float: right;
   }
-  .stamp-edit {
+  #child-edit {
     font-size: 14px;
     float: right;
     margin-right: 10px;
@@ -79,23 +79,34 @@
     width: 64px;
     height: 64px;
   }
+  .navbar {
+    height: auto;
+  }
+  .navbar-inner {
+    height: auto;
+  }
   .navbar-footer {
-    height: 50px;
+    min-height: 50px;
     background: rgba(45,45,45, 0.7);
     color: white;
   }
-  #stamp-edit-container {
+  #child-edit-container {
     display: none;
+    margin-top: 10px;
+    overflow: scroll;
   }
-  #stamp-edit-container ul {
+  #child-edit-container ul {
     list-style-type: none;
   }
-  #stamp-edit-container li {
-    display: inline;
-  }
-  #stamp-edit-container img {
+  #child-edit-container img {
     width: 44px;
     height: 44px;
+  }
+  #child-edit-container ul li:nth-child(1) {
+    border-top: none;
+  }
+  #child-edit-container ul li:nth-last-child(1) {
+    border-bottom: none;
   }
   #comment-input-container {
     display: none;
@@ -115,8 +126,8 @@
     overflow: scroll;
     display: none;
   }
-  #attached-stamps-container {
-    height: 50px;
+  #child-tag-container {
+    min-height: 35px;
   }
   .border-bottom {
     border-bottom: solid 1px white;
@@ -134,8 +145,27 @@
     width: 200px;
     white-space: nowrap;
   }
-  #recent-comment-container {
-    margin-left: 20px;
+  .child-tag-li {
+    display: inline;
+  }
+  #comment-count {
+    float: right;
+    margin-right: 10px;
+  }
+  .child-abbreviation p {
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    -webkit-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    width: 200px;
+    white-space: nowrap;
+  }
+  #child-edit-container .child-attach-item {
+    background: rgba(0, 0, 0, 0);
+  }
+  #child-edit-container .child-attach-item p {
+    text-shadow: none;
+    color: white;
   }
 </style>
 <style title="dynamic">
@@ -156,26 +186,23 @@
   <div class="navbar-inner">
     <div class="container">
       <div id="modal-header" class="border-bottom" style="text-align: right; display: none; height: 44px;" onclick="prevent(event)">閉じる</div>
-      <div>
-<!--
-        <div id="attached-stamps-container" class="border-bottom">
-          <ul style="display: inline; padding: 0px;"></ul>
-          <img id="stamp-edit" src="/static/img/160x160.png" style="width: 44px; height: 44px; float: right; margin-right: 10px;">
+      <div style="width: 90%; margin-left: 5%;">
+        <div id="child-tag-container" class="border-bottom">
+          <ul style="display: inline; padding: 0px; list-style-type: none;"></ul>
         </div>
-        <div id="stamp-edit-container" class="border-bottom">
+        <div id="child-edit-container" class="border-bottom">
+          <ul style="padding-left: 0px;" data-role="listview"></ul>
         </div>
--->
       </div>
-      <div>
+      <div style="width: 90%; margin-left: 5%;">
         <div id="recent-comment-container" class="border-bottom abbreviation"></div>
         <div id="all-comment-container" class="border-bottom">
           <ul></ul>
         </div>
         <div id="comment-operation-container">
-          <ul>
-            <li><span id="comment-count"></span></li>
-            <li><span id="comment-box">コメントする</span></li>
-          </ul>
+          <img id="child-edit-icon" src="/static/img/child-tag-icon.png" style="width: 30px; height: 30px;">
+          <img id="comment-edit-icon" src="/static/img/comment-icon.png" style="width: 30px; height: 30px;">
+          <span id="comment-count"></span>
         </div>
         <div id="comment-input-container" class="navbar-fixed-bottom">
           <textarea rows=1 style="width: 80%; display: inline;" id="comment-textarea"></textarea>
@@ -186,33 +213,37 @@
   </div>
 </div>
 
-<div id="item-tmpl" style="display:none">
-  <div class="img-box cover" style="position: relative; background-color: white;">
-    <div class="stamp-container"></div>
-  </div>
-</div>
-
-<div id="stampAttachModal" class="modal fade" style="top: 0px; margin: 0 auto 20px; max-width: 100%; height: 500px;">
-  <div class="modal-dialog" style="height: 0px;">
-    <div class="modal-content" style="top: 200px;">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3>pick stamps</h3>
-      </div>
-      <div class="modal-body">
-      </div>
+<div>
+  <div id="item-tmpl" style="display:none">
+    <div class="img-box cover" style="position: relative; background-color: white;">
+      <div class="child-container"></div>
     </div>
   </div>
-</div>
-
-<script id="template-comment-item">
-  <div class="media">
-    <a class="pull-left" data-ajax="false">
-      <img class="media-object img-64-64" alt="" src="<%= commenter_icon_url %>">
-    </a>
-    <div class="media-body">
-      <div class="media-heading bold"><%= commenter_name %></div>
-      <div><%= comment_text %></div>
-    </div>
+  
+  <div id="child-tag-tmpl" style="display: none;">
+    <li class="child-tag-li"><a href="#" class="btn btn-info btn-mini active" style="font-size: 9px;"></a></li>
   </div>
-</script>
+
+  <script id="template-comment-item">
+    <div class="media">
+      <a class="pull-left" data-ajax="false">
+        <img class="media-object img-64-64" alt="" src="<%= commenter_icon_url %>">
+      </a>
+      <div class="media-body">
+        <div class="media-heading bold"><%= commenter_name %></div>
+        <div><%= comment_text %></div>
+      </div>
+    </div>
+  </script>
+  <script id="template-child-attach-item">
+    <li class="child-attach-item" data-child-id="<%= child_id %>">
+      <div style="display: table-cell; width: 44px;">
+        <img class="child-attach-img" src="<%= child_icon_url %>">
+      </div>
+      <div class="child-name child-abbreviation" style="display: table-cell; width: 150px; padding-left: 10px;"><p><%= child_name %></p></div>
+      <div class="child-attached-mark" style="display: table-cell; width: 30px;">
+        <span style="display: none; color: lightgreen; font-size: 25px;">&#x2713</span>
+      </div>
+    </li>
+  </script>
+</div>

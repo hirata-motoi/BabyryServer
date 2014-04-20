@@ -21,6 +21,20 @@ SQL
     return \@records;
 }
 
+sub get_child_by_user_ids {
+    my ($teng, $user_ids) = @_;
+
+    return unless $user_ids && scalar @$user_ids;
+
+    my @records = $teng->search(
+        'user_child_map',
+        {
+            user_id => $user_ids
+        }
+    );
+    return \@records;
+}
+
 sub add_child {
     my ($self, $teng, $user_id, $child_id, $unixtime) = @_;
 

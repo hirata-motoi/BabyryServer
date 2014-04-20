@@ -12,6 +12,7 @@ use Log::Minimal;
 # icon_urlを取得
 # user_info_list(get_by_user_idsの結果)とuser_idsどちらをparamに入れてもOK
 # 両方あった場合はuser_info_listが優先される
+# TODO というかuser_info_listはarrayではない！！！
 sub get_icon_urls {
     my ($self, $params) = @_;
 
@@ -25,8 +26,6 @@ sub get_icon_urls {
 
     my $teng = $self->teng('BABYRY_MAIN_R');
     my $users = $params->{user_info_list} || $self->model('user')->get_by_user_ids($teng, $params->{user_ids});
-use YAML;
-warnf Dump $users;
 
     my $images = $self->model('image')->get_by_image_ids(
         $teng,

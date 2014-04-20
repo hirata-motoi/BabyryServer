@@ -97,5 +97,33 @@ sub comment {
     $self->output_response_json($c, $ret, $@);
 }
 
+sub child_attach {
+    my ($self, $c) = @_;
+
+    my $params = {
+        user_id  => $c->stash->{user_id},
+        image_id => $c->req->param('image_id'),
+        child_id => $c->req->param('child_id'),
+    };
+
+    my $logic = Babyry::Logic::Image->new;
+    my $ret = eval { $logic->child_attach($params) } || {};
+    $self->output_response_json($c, $ret, $@);
+}
+
+sub child_detach {
+    my ($self, $c) = @_;
+
+    my $params = {
+        user_id  => $c->stash->{user_id},
+        image_id => $c->req->param('image_id'),
+        child_id => $c->req->param('child_id'),
+    };
+
+    my $logic = Babyry::Logic::Image->new;
+    my $ret = eval { $logic->child_detach($params) } || {};
+    $self->output_response_json($c, $ret, $@);
+}
+
 1;
 
