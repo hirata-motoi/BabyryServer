@@ -3,11 +3,11 @@ if typeof (window.console) is "undefined"
   console.log = console.warn = console.error = (a) ->
 
 window.target_child_id
-window.child_data = []
 window.user_data = []
 window.is_icon_changed = 0
 window.new_icon
 window.view_other_profile = 0
+window.temp_url = ""
 
 $ ->
   getXSRFToken = ->
@@ -35,46 +35,52 @@ $ ->
     url : profile_get_url,
     success : (data) ->
       # ユーザーカラム作成
-      user_item = []
-      user_item.push document.createElement('article')
-      salvattore.append_elements grid_user, user_item
       window.user_data = data
-      user_item[0].outerHTML = tmpl_user {
+      visibility = "hidden"
+      if data.accessed_user_id == data.user_id
+        visibility = "visible"
+      HTML = tmpl_user {
         url: data.icon_image_url,
         name: data.user_name,
         id: data.user_id,
+        edit_visibility: visibility,
       }
+      $('#profile_user').append HTML
       $("#user_edit_button_" + data.user_id).on 'click', (e) ->
-        showEditUserModal(e, data)
+        showEditUserModal(e)
 
       # relativesカラム作成
-      relatives_item = []
-      for i in [0 .. data.relatives.length]
-        relatives_item.push document.createElement('article')
-      salvattore.append_elements grid_relatives, relatives_item
-
       if data.relatives.length > 0
         for i in [0 .. data.relatives.length - 1]
           if data.relatives[i].relative_name == ""
             data.relatives[i].relative_name = "名無し"
-          relatives_item[i].outerHTML = tmpl_relatives {
+          HTML = tmpl_relatives {
             url: data.relatives[i].relative_icon_url,
             name: data.relatives[i].relative_name,
             id: data.relatives[i].relative_id,
           }
+          $('#profile_friend').append HTML
           $("#relative_panel_" + data.relatives[i].relative_id).on 'click', () ->
             location.href = "/profile?target_user_id=" + $(this).attr("relative_id")
 
       # こどもカラム作成
-      child_item = []
-      for i in [0 .. data.child.length]
-        child_item.push document.createElement('article')
-      salvattore.append_elements grid_child, child_item
+
+      # 新規こどもカラム
+      if window.view_other_profile != 1
+        HTML = tmpl_new_child {}
+        $('#profile_child').append HTML
+        $("#add-new-child-pannel").on 'click', (e) ->
+          window.target_child_id = ""
+          showEditChildModal(e)
 
       # 既存こどもカラム
       if data.child.length > 0
         for i in [0 .. data.child.length - 1]
-          child_item[i].outerHTML = tmpl_child {
+          visibility = "hidden"
+          if data.child[i].created_by == data.accessed_user_id
+            visibility = "visible"
+          HTML = tmpl_child {
+            edit_visibility: visibility
             name: data.child[i].child_name
             id: data.child[i].child_id
             url: data.child[i].child_icon_url
@@ -82,31 +88,23 @@ $ ->
             birth_month: data.child[i].child_birthday_month
             birth_day: data.child[i].child_birthday_day
           }
-          window.child_data[data.child[i].child_id] = data.child[i]
+          $('#profile_child').append HTML
           $("#child_edit_button_" + data.child[i].child_id).on 'click', (e) ->
             window.target_child_id = $(this).attr("child_id")
             showEditChildModal(e)
 
-      # 新規こどもカラム
-      if window.view_other_profile != 1
-        child_item[data.child.length].outerHTML = tmpl_new_child {
-        }
-        $("#add-new-child-pannel").on 'click', (e) ->
-          window.target_child_id = ""
-          showEditChildModal(e)
     error: () ->
       window.console.log "error"
   }
 
   # ユーザー編集モーダル
-  showEditUserModal = (e, data) ->
+  showEditUserModal = (e) ->
     e.stopPropagation()
     $("#editUserModal").modal {
       "backdrop": true
     }
-    data = window.user_data
-    $("#user_modal_user_name").attr("value", data.user_name)
-    $("#user_modal_user_icon").attr("src", data.icon_image_url)
+    $("#user_modal_user_name").attr("value", $('#user_profile_user_name').text())
+    $("#user_modal_user_icon").attr("src", $('#user_profile_user_icon').attr("src"))
 
   # こども編集モーダル
   showEditChildModal = (e) ->
@@ -114,36 +112,47 @@ $ ->
     $("#editChildModal").modal {
       "backdrop": true
     }
-    if window.target_child_id == ""
-      $("#child_modal_child_name").attr("value", "")
-      $("#child_modal_child_icon").attr("src", "/static/img/160x160.png")
-    else
-      data = window.child_data[window.target_child_id]
-      $("#child_modal_child_name").attr("value", data.child_name)
-      $("#child_modal_child_icon").attr("src", data.child_icon_url)
+    $("#child_modal_child_name").attr("value", $('#user_profile_child_name_' + window.target_child_id).text())
+    $("#child_modal_child_icon").attr("src", $('#user_profile_child_icon_' + window.target_child_id).attr("src"))
 
-    time = new Date
-    year = time.getFullYear()
-    for i in [2005 .. year]
-      $('#child_birthday_year').append '<option value="' + i + '">' + i + '</option>'
-    for i in [1 .. 12]
-      if i < 10
-        $('#child_birthday_month').append '<option value="0' + i + '">' + i + '</option>'
-      else
-        $('#child_birthday_month').append '<option value="' + i + '">' + i + '</option>'
-    for i in [1 .. 31]
-      if i < 10
-        $('#child_birthday_day').append '<option value="0' + i + '">' + i + '</option>'
-      else
-        $('#child_birthday_day').append '<option value="' + i + '">' + i + '</option>'
-    if window.target_child_id != ""
-      $("#child_birthday_year").val(data.child_birthday_year)
-      $("#child_birthday_month").val(data.child_birthday_month)
-      $("#child_birthday_day").val(data.child_birthday_day)
-    else
-      $("#child_birthday_year").val("----")
-      $("#child_birthday_month").val("--")
-      $("#child_birthday_day").val("--")
+    options = $("#child_birthday_year").find("option")
+    if $(options).length < 2
+      time = new Date
+      year = time.getFullYear()
+      for i in [2005 .. year]
+        $('#child_birthday_year').append '<option value="' + i + '">' + i + '</option>'
+      for i in [1 .. 12]
+        if i < 10
+          $('#child_birthday_month').append '<option value="0' + i + '">' + i + '</option>'
+        else
+          $('#child_birthday_month').append '<option value="' + i + '">' + i + '</option>'
+      for i in [1 .. 31]
+        if i < 10
+           $('#child_birthday_day').append '<option value="0' + i + '">' + i + '</option>'
+        else
+          $('#child_birthday_day').append '<option value="' + i + '">' + i + '</option>'
+
+    $("#child_birthday_year").val $('#user_profile_birth_year_' + window.target_child_id).text()
+    elems = $("#child_birthday_year").find("option")
+    for elem in elems
+      if $(elem).attr('value') == $('#user_profile_birth_year_' + window.target_child_id).text()
+        $(elem).attr 'selected', true
+        $(elem).trigger "change"
+        break
+    $("#child_birthday_month").val $('#user_profile_birth_month_' + window.target_child_id).text()
+    elems = $("#child_birthday_month").find("option")
+    for elem in elems
+      if $(elem).attr('value') == $('#user_profile_birth_month_' + window.target_child_id).text()
+        $(elem).attr 'selected', true
+        $(elem).trigger "change"
+        break
+    $("#child_birthday_day").val $('#user_profile_birth_day_' + window.target_child_id).text()
+    elems = $("#child_birthday_day").find("option")
+    for elem in elems
+      if $(elem).attr('value') == $('#user_profile_birth_day_' + window.target_child_id).text()
+        $(elem).attr 'selected', true
+        $(elem).trigger "change"
+        break
 
   # ユーザー編集submit
   $("#user_edit_submit").on 'click', (e) ->
@@ -160,8 +169,7 @@ $ ->
       "success": () ->
         if window.is_icon_changed == 1
           uploadUserIcon window.new_icon
-        else
-          location.reload true
+        $('#user_profile_user_name').text $("#user_modal_user_name").val()
       "error": () ->
     })
 
@@ -178,7 +186,7 @@ $ ->
         },
         "dataType": "json",
         "success": () ->
-          location.reload true
+          $('#item_user_profile_child_icon_' + window.target_child_id).remove()
         "error": () ->
       })
 
@@ -187,6 +195,7 @@ $ ->
     token = getXSRFToken()
     # child_idが空 = 新規child
     if window.target_child_id == ""
+      window.temp_url = ""
       $.ajax({
         "type": "post",
         "url" : "/profile/add_child.json",
@@ -203,9 +212,24 @@ $ ->
             window.target_child_id = response.id
             uploadChildIcon window.new_icon
           else
-            location.reload true
+            window.new_icon = ""
+          # DOM追加
+          HTML = tmpl_child {
+            edit_visibility: "visible"
+            name: $("#child_modal_child_name").val()
+            id: response.id
+            url: window.new_icon
+            birth_year: $("#child_birthday_year").val()
+            birth_month: $("#child_birthday_month").val()
+            birth_day: $("#child_birthday_day").val()
+          }
+          $('#profile_child').append HTML
+          $("#child_edit_button_" + response.id).on 'click', (e) ->
+            window.target_child_id = $(this).attr("child_id")
+            showEditChildModal(e)
         "error": () ->
       })
+    # 既存の子供の更新
     else
       $.ajax({
         "type": "post",
@@ -222,8 +246,11 @@ $ ->
         "success": () ->
           if window.is_icon_changed == 1
             uploadChildIcon window.new_icon
-          else
-            location.reload true
+          # 名前と生年月日更新
+          $('#user_profile_child_name_' + window.target_child_id).text $("#child_modal_child_name").val() 
+          $('#user_profile_birth_year_' + window.target_child_id).text $("#child_birthday_year").val()
+          $('#user_profile_birth_month_' + window.target_child_id).text $("#child_birthday_month").val()
+          $('#user_profile_birth_day_' + window.target_child_id).text $("#child_birthday_day").val()
         "error": () ->
       })
 
@@ -250,6 +277,7 @@ $ ->
         window.console.log data
         window.new_icon = data.image_tmp_name
         $("#user_modal_user_icon").attr "src", data.image_tmp_url
+        window.temp_url = data.image_tmp_url
       error: showErrorMessage
     })
     return false
@@ -277,6 +305,7 @@ $ ->
         window.console.log data
         window.new_icon = data.image_tmp_name
         $("#child_modal_child_icon").attr "src", data.image_tmp_url
+        window.temp_url = data.image_tmp_url
       error: showErrorMessage
     })
     return false
@@ -301,7 +330,7 @@ $ ->
       dataType: 'json',
       success: () ->
         window.console.log 'icon submitted'
-        location.reload true
+        $('#user_profile_child_icon_' + window.target_child_id).attr("src", window.temp_url)
       error: showErrorMessage
     }
 
@@ -319,6 +348,6 @@ $ ->
       dataType: 'json',
       success: () ->
         window.console.log 'icon submitted'
-        location.reload true
+        $('#user_profile_user_icon').attr("src", window.temp_url)
       error: showErrorMessage
     }

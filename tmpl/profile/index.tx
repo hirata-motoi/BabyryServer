@@ -46,6 +46,10 @@
     width: 50px;
     height: 50px;
   }
+  .img-profile-big {
+    width: 100px;
+    height: 100px;
+  }
   #left-column {
     width: 40%;
     float:left;
@@ -61,6 +65,27 @@
     float: left;
     display: inline;
   }
+  .ui-btn {
+    display: inline-block;
+  }
+  .ui-select {
+    display: inline;
+  }
+  button.ui-btn, .ui-controlgroup-controls button.ui-btn-icon-notext {
+    width: 40%;
+  }
+  .item-relative {
+    height: 80px;
+    width: 47%;
+    margin: 1%;
+    display: inline-block;
+  }
+  .item-child {
+    height: 80px;
+    width: 47%;
+    margin: 1%;
+    display: inline-block;
+  }
 </style>
 : }
 
@@ -72,25 +97,23 @@
 -->
 <script type="text/javascript" src="<: uri_for('/static/salvattore/js/salvattore.min.js') :>"></script>
 <script type="text/template" id="template-user-profile">
-  <div class="item" style="text-align: center;">
+  <div class="item" style="text-align: center; height: 150px;">
     <div id="left-column">
-      <img class="img-thumbnail img-profile" src="<%= url %>"><br>
-      <%= name %>
+      <img id="user_profile_user_icon" class="img-thumbnail img-profile-big" src="<%= url %>"><br>
+      <span id="user_profile_user_name"><%= name %></span>
     </div>
     <div id="center-column">
       投稿数 143<br>
       こども 4人<br>
       ぬーん<br>
     </div>
-    : if (!$target_user_id) {
-    <div id="right-column">
+    <div id="right-column" style="visibility:<%= edit_visibility %>">
       <img class="img-thumbnail img-profile" id="user_edit_button_<%= id %>" user_id="<%= id %>" src="/static/img/icon_pencil-edit_alt.png"><br>
     </div>
-    : }
   </div>
 </script>
 <script type="text/template" id="template-relatives-profile">
-  <div class="item" style="text-align: center;" id="relative_panel_<%= id %>" relative_id="<%= id %>">
+  <div class="item item-relative" style="text-align: center;" id="relative_panel_<%= id %>" relative_id="<%= id %>">
     <div>
       <img class="img-thumbnail img-profile" src="<%= url %>"><br>
       <%= name %>
@@ -98,24 +121,27 @@
   </div>
 </script>
 <script type="text/template" id="template-child-profile">
-  <div class="item" style="text-align: center;">
-    <div id="left-column">
-      <img class="img-thumbnail img-profile" src="<%= url %>"><br>
-      <%= name %>
+  <div class="item item-child" style="text-align: center;" id="item_user_profile_child_icon_<%= id %>">
+     <div id="left-column">
+      <img id="user_profile_child_icon_<%= id %>" class="img-thumbnail img-profile" src="<%= url %>"><br>
+      <span id="user_profile_child_name_<%= id %>"><%= name %></span>
     </div>
     <div id="center-column">
-      BD <%= birth_year %>/<%= birth_month %>/<%= birth_day %><br>
+      BD 
+      <span id="user_profile_birth_year_<%= id %>"><%= birth_year %></span>/
+      <span id="user_profile_birth_month_<%= id %>"><%= birth_month %></span>/
+      <span id="user_profile_birth_day_<%= id %>"><%= birth_day %></span><br>
     </div>
-    : if (!$target_user_id) {
-    <div id="right-column">
+    <div id="right-column" style="visibility:<%= edit_visibility %>">
       <img class="img-thumbnail img-profile" id="child_edit_button_<%= id %>" child_id="<%= id %>" src="/static/img/icon_pencil-edit_alt.png"><br>
     </div>
-    : }
   </div>
 </script>
 <script type="text/template" id="template-new-child-profile">
-  <div class="item" style="text-align: center;" id="add-new-child-pannel">
-  こどもを追加
+  <div class="item item-child" style="text-align: center;" id="add-new-child-pannel">
+    <div id="center-column">
+      こどもを追加
+    </div>
   </div>
 </script>
 <script type="text/javascript" src="<: uri_for('/static/js/profile.js') :>" id="profile_js" target_user_id="<: $target_user_id :>"></script>
@@ -124,19 +150,22 @@
 : around content -> {
 
 <div class="dynamic-container">
-  User
-  <div class="user-timeline row" data-columns style="content: '1 .column.size-1of1';"></div>
-</div>
-<div class="dynamic-container">
-  Relatives
-  <div class="relatives-timeline row" data-columns style="content: '4 .column.size-1of4';"></div>
-</div>
-<div class="dynamic-container">
-  Children
-  <div class="child-timeline row" data-columns style="content: '2 .column.size-1of2';"></div>
+  <div id="profile_user"></div>
 </div>
 
-<div id="editChildModal" class="modal fade" style="top: 0px; margin: 0 auto 20px; max-width: 100%; height: 1000px;">
+<div data-role="navbar">
+  <ul>
+    <li><a href="#profile_friend" data-toggle="tab" data-ajax="false">ともだち</a></li>
+    <li><a href="#profile_child" data-toggle="tab" data-ajax="false">こどもたち</a></li>
+  </ul>
+</div>
+
+<div class="tab-content">
+  <div class="tab-pane fade in active" id="profile_friend"></div>
+  <div class="tab-pane fade" id="profile_child"></div>
+</div>
+
+<div id="editChildModal" class="modal fade" style="top: 0px; margin: 0 auto 20px; max-width: 100%; height: 500px;">
   <div class="modal-dialog" style="height: 0px;">
     <div class="modal-content" style="top: 20px;">
       <div class="modal-header">

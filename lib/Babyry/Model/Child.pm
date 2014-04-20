@@ -45,6 +45,7 @@ sub get_by_created_by {
             created_by => $user_ids
         }
     );
+
     return \@records;
 }
 
@@ -56,6 +57,7 @@ sub add_child {
         {  
             child_id  => $child_id,
             child_name  => $params->{'child_name'},
+            created_by => $params->{'user_id'},
             birthday => $birthday,
             created_at => $unixtime,
             updated_at => $unixtime,
