@@ -37,7 +37,7 @@
   defaultTextareaHeight = "30px";
 
   showImageDetail = function() {
-    var addChildToEntryData, adjustDisplayedElements, alreadyAttachedChild, attachChildToImage, backToWall, closeComments, createChild, createCommentNavigation, createImageBox, detachChildFromImage, editChild, getData, getXSRFToken, hasElem, hideAttachedChild, initEditChild, pickData, preserveResponseData, refreshChildAttachedMark, removeAttachedChild, replaceToolBoxContent, setChildrenAttachList, setUpScreenSize, setupGlobalFooter, shouldPreLoad, showAttachedChild, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements;
+    var addChildToEntryData, adjustDisplayedElements, alreadyAttachedChild, attachChildToImage, backToWall, closeComments, createChild, createCommentNavigation, createImageBox, detachChildFromImage, editChild, getData, getXSRFToken, hasElem, hideAttachedChild, initEditChild, pickData, preserveResponseData, refreshChildAttachedMark, removeAttachedChild, replaceToolBoxContent, setChildAttachList, setUpScreenSize, setupGlobalFooter, shouldPreLoad, showAttachedChild, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements;
     $(".img-thumbnail").on("click", function() {
       var $elem, childElem, childInfo, children, comment_count, data, i, imageId, image_id, image_url, initialIndex, innerHeight, innerWidth, n, owlContainer, tappedEntryIndex, _i, _j, _len, _ref;
       setUpScreenSize();
@@ -106,7 +106,7 @@
       owlObject.jumpTo(tappedEntryIndex);
       window.util.hidePageLoading();
       showNavBarFooter();
-      return setChildrenAttachList(data.related_children);
+      return setChildAttachList(data.related_children);
     });
     $("#comment-submit").on("click", function() {
       var comment, currentPosition, imageElem, imageId, token;
@@ -421,6 +421,7 @@
       $("#child-edit-container").hide();
       $("#recent-comment-container").show();
       $("#comment-operation-container").show();
+      $("#child-message-container").hide();
       $("#comment-input-container").hide();
       $("#all-comment-container").hide();
       return $("#modal-header").hide();
@@ -468,12 +469,16 @@
         }
       });
       refreshChildAttachedMark();
-      return $("#child-edit-container").find("ul").listview("refresh");
+      $("#child-edit-container").find("ul").listview("refresh");
+      if ($(".child-attach-item").length < 1) {
+        $("#child-edit-container,#child-tag-container").hide();
+        return $("#child-message-container").show();
+      }
     };
     setupGlobalFooter = function() {
       return $("#global-footer").hide();
     };
-    setChildrenAttachList = function(related_children) {
+    setChildAttachList = function(related_children) {
       var child, child_id, child_name, icon_url, item, itemObj, tmpl, _i, _len, _results;
       if (!related_children || related_children.length < 1) {
         return;

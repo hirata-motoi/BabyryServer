@@ -167,6 +167,9 @@
     text-shadow: none;
     color: white;
   }
+  #operation-container div,span,p,a,li {
+    text-shadow: none;
+  }
 </style>
 <style title="dynamic">
 </style>
@@ -174,19 +177,25 @@
   function prevent(e) {
     e.stopPropagation();
   }
-  function enlarge(e) {
-    $(".navbar-footer").css("height", "200px");
+  function closeFooter(e){
+    $("#operation-container").hide();
+    console.log("aaaaaaaaaaaaa");
+    return false;
   }
 </script>
 
 <div class="detail-container" style="display:none">
   <div class="owl-carousel owl-theme"></div>
 </div>
-<div class="navbar navbar-footer navbar-fixed-bottom" role="navigation" style="display:none;">
+<div id="operation-container" class="navbar navbar-footer navbar-fixed-bottom" role="navigation" style="display:none;">
   <div class="navbar-inner">
     <div class="container">
       <div id="modal-header" class="border-bottom" style="text-align: right; display: none; height: 44px;" onclick="prevent(event)">閉じる</div>
       <div style="width: 90%; margin-left: 5%;">
+        <div id="child-message-container" style="display:none;">
+          関連のあるこどもたちがいないためタグ付けができません。<br>
+          <a href="/profile" onclick="closeFooter()">こちら</a>からこどもたちを追加してください
+        </div>
         <div id="child-tag-container" class="border-bottom">
           <ul style="display: inline; padding: 0px; list-style-type: none;"></ul>
         </div>

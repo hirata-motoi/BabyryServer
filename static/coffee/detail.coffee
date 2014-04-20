@@ -117,8 +117,8 @@ showImageDetail = () ->
     # footer
     showNavBarFooter()
 
-    # children
-    setChildrenAttachList(data.related_children)
+    # child
+    setChildAttachList(data.related_children)
   )
 
   $("#comment-submit").on("click", () ->
@@ -406,6 +406,7 @@ showImageDetail = () ->
     $("#child-edit-container").hide()
     $("#recent-comment-container").show()
     $("#comment-operation-container").show()
+    $("#child-message-container").hide()
     $("#comment-input-container").hide()
     $("#all-comment-container").hide()
     $("#modal-header").hide()
@@ -445,10 +446,17 @@ showImageDetail = () ->
     refreshChildAttachedMark()
     $("#child-edit-container").find("ul").listview("refresh")
 
+    # availableなchildがいない場合はその旨のメッセージを表示
+    if $(".child-attach-item").length < 1
+      $("#child-edit-container,#child-tag-container").hide();
+      $("#child-message-container").show();
+
+      
+
   setupGlobalFooter = () ->
     $("#global-footer").hide()
 
-  setChildrenAttachList = (related_children) ->
+  setChildAttachList = (related_children) ->
     return if ! related_children || related_children.length < 1
 
     for child in related_children
