@@ -1,5 +1,5 @@
 (function() {
-  var console, defaultTextareaHeight, owlObject, showImageDetail, _base, _base1, _base2;
+  var console, defaultTextareaHeight, innerHeight, innerWidth, owlObject, showImageDetail, _base, _base1, _base2;
 
   if (typeof window.console === "undefined") {
     console = {};
@@ -36,10 +36,14 @@
 
   defaultTextareaHeight = "30px";
 
+  innerWidth = 0;
+
+  innerHeight = 0;
+
   showImageDetail = function() {
-    var addChildToEntryData, adjustDisplayedElements, alreadyAttachedChild, attachChildToImage, backToWall, closeComments, createChild, createCommentNavigation, createImageBox, detachChildFromImage, editChild, getData, getXSRFToken, hasElem, hideAttachedChild, initEditChild, lazyLoad, lazyRelease, pickData, preserveResponseData, refreshChildAttachedMark, releaseTargetElems, removeAttachedChild, replaceToolBoxContent, setChildAttachList, setUpScreenSize, setupGlobalFooter, shouldPreLoad, showAttachedChild, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements;
+    var addChildToEntryData, adjustDisplayedElements, alreadyAttachedChild, attachChildToImage, backToWall, closeComments, createChild, createCommentNavigation, createImageBox, createOwlElements, detachChildFromImage, editChild, getData, getXSRFToken, hasElem, hideAttachedChild, initEditChild, lazyLoad, lazyRelease, pickData, preserveResponseData, refreshChildAttachedMark, releaseTargetElems, removeAttachedChild, replaceCarousel, replaceToolBoxContent, setChildAttachList, setUpScreenSize, setupGlobalFooter, shouldPreLoad, showAttachedChild, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements;
     $(".img-thumbnail").on("click", function() {
-      var $elem, childElem, childInfo, children, comment_count, data, i, imageId, image_id, image_url, initialIndex, innerHeight, innerWidth, n, owlContainer, tappedEntryIndex, _i, _j, _len, _ref;
+      var data, imageId, initialIndex, owlContainer, ret, tappedEntryIndex;
       setUpScreenSize();
       setupGlobalFooter();
       window.util.showPageLoading();
@@ -51,34 +55,9 @@
       imageId = $(this).parents(".item").attr("image_id");
       data = pickData();
       tappedEntryIndex = $(this).attr("entryIndex");
-      owlContainer = $(".owl-carousel").clone(true);
-      owlContainer.addClass("displayed");
-      for (i = _i = 0, _ref = data.found_row_count - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-        if (data.list[i]) {
-          image_url = data.list[i].fullsize_image_url;
-          window.entryIdsInArray.push(data.list[i].image_id);
-          children = data.list[i].child;
-          image_id = data.list[i].image_id;
-          comment_count = data.list[i].comments.length;
-        } else {
-          image_url = "";
-          image_id = "";
-          comment_count = 0;
-        }
-        $elem = createImageBox(image_url, image_id, comment_count, innerWidth, innerHeight);
-        owlContainer.append($elem);
-        if (data.list[i] && data.list[i].image_id === imageId) {
-          initialIndex = i;
-        }
-        if (children) {
-          for (n = _j = 0, _len = children.length; _j < _len; n = ++_j) {
-            childInfo = children[n];
-            childElem = createChild(childInfo.child_id, childInfo.child_name);
-            $elem.find(".child-container").append(childElem);
-          }
-        }
-        $elem.find(".child-container").hide();
-      }
+      ret = createOwlElements(tappedEntryIndex);
+      owlContainer = ret.owlContainer;
+      initialIndex = ret.initialIndex;
       $("#navbar-space").hide();
       $(".dynamic-container").html(owlContainer);
       $(window).scrollTop(0);
@@ -87,26 +66,14 @@
         pagination: false,
         scrollPerPage: true,
         afterMove: function() {
-          var count, currentPageNo, currentPosition, imageBoxes, loadingFlg;
+          var currentPosition, imageBoxes;
           currentPosition = owlObject.currentPosition();
           imageBoxes = $(".img-box");
-          lazyLoad(imageBoxes[currentPosition]);
-          lazyRelease(releaseTargetElems(imageBoxes, currentPosition));
-          replaceToolBoxContent();
-          if (shouldPreLoad(5)) {
-            if (window.loadingFlg) {
-              return;
-            }
-            currentPageNo = 1;
-            count = 10;
-            showLoadingImage();
-            loadingFlg = true;
-            return getData(showEntries, showErrorMessage);
-          }
+          return replaceToolBoxContent();
         }
       });
-      owlObject = $(".owl-carousel").data("owlCarousel");
-      owlObject.jumpTo(tappedEntryIndex);
+      owlObject = $(".owl-carousel.displayed").data("owlCarousel");
+      owlObject.jumpTo(initialIndex);
       window.util.hidePageLoading();
       showNavBarFooter();
       return setChildAttachList(data.related_children);
@@ -154,12 +121,7 @@
       }
     };
     preserveResponseData = function(response) {
-      var entry, _i, _len, _ref;
-      _ref = response.data.entries;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        entry = _ref[_i];
-        window.entryData.entries.push(entry);
-      }
+      window.entryData.entries = response.data.entries;
       window.entryData.metadata = response.metadata;
       return window.entryData.related_children = response.related_children;
     };
@@ -170,7 +132,7 @@
         related_children: window.entryData.related_children
       };
     };
-    getData = function(successCallback, errorCallback) {
+    getData = function(offset, initial, successCallback, errorCallback) {
       var countPerPage, nextPage;
       nextPage = window.entryData.metadata.page ? parseInt(window.entryData.metadata.page, 10) + 1 : 1;
       countPerPage = window.entryData.metadata.count || 10;
@@ -181,10 +143,13 @@
         "data": {
           "child_id": window.child_ids,
           "page": nextPage,
-          "count": countPerPage
+          "count": countPerPage,
+          "offset": offset
         },
         "dataType": 'json',
-        "success": successCallback,
+        "success": function(response) {
+          return successCallback(response, initial);
+        },
         "error": errorCallback
       });
     };
@@ -193,7 +158,7 @@
       tmpl = $("#item-tmpl").clone(true);
       owlElem = $(tmpl);
       owlElem.find(".img-box").attr("image-id", image_id);
-      owlElem.find(".img-box").attr("data-image-url", image_url);
+      owlElem.find(".img-box").css("background-image", "url(" + image_url + ")");
       owlElem.css("width", innerWidth);
       owlElem.css("height", innerHeight);
       owlElem.attr("id", "");
@@ -239,27 +204,25 @@
       return $(".unloadedElems").first().find(".img-box img").attr("src", "/static/img/ajax-loader.gif");
     };
     showErrorMessage = function() {};
-    showEntries = function(response) {
-      var elem, i, image_url, unloadedElems, _i, _len;
+    showEntries = function(response, initial) {
+      var initialIndex, owlContainer, ret;
       if (response.data.entries.length < 1) {
         return;
       }
       preserveResponseData(response);
-      unloadedElems = $(".unloaded");
-      for (i = _i = 0, _len = unloadedElems.length; _i < _len; i = ++_i) {
-        elem = unloadedElems[i];
-        if (response.data.entries[i]) {
-          image_url = response.data.entries[i].fullsize_image_url;
-          $(elem).find(".img-box").css("background-image", "url('" + image_url + "')");
-          $(elem).find(".loading").removeClass("loading");
-          $(elem).removeClass("unloaded");
-          window.entryIdsInArray.push(response.data.entries[i].image_id);
-        } else {
-          window.loadingFlg = false;
-          break;
+      initialIndex = initial === "max" ? response.data.entries.length - 1 : 0;
+      ret = createOwlElements(initialIndex);
+      owlContainer = ret.owlContainer;
+      initialIndex = ret.initialIndex;
+      $(".dynamic-container").html(owlContainer);
+      return $(".owl-carousel.displayed").owlCarousel({
+        items: 1,
+        pagination: false,
+        scrollPerPage: true,
+        afterMove: function() {
+          return replaceToolBoxContent();
         }
-      }
-      return window.loadingFlg = false;
+      });
     };
     createChild = function(childId, childName) {
       var childElem, text;
@@ -695,7 +658,7 @@
       }
       return _results;
     };
-    return releaseTargetElems = function(imageBoxes, currentPosition) {
+    releaseTargetElems = function(imageBoxes, currentPosition) {
       var length, maxIndex, minIndex, targetElems, targetOverIndex, targetUnderIndex;
       length = imageBoxes.length;
       maxIndex = length - 1;
@@ -711,6 +674,103 @@
         targetElems.push(imageBoxes[targetUnderIndex]);
       }
       return targetElems;
+    };
+    createOwlElements = function(tappedEntryIndex) {
+      var $elem, buttonAfter, buttonBefore, childElem, childInfo, childList, comment_count, count, data, i, image_id, image_url, initialIndex, maxIndex, minIndex, moreImageAfter, moreImageAfterElem, moreImageBefore, moreImageBeforeElem, n, owlContainer, _i, _j, _len;
+      data = pickData();
+      count = data.found_row_count;
+      if (count <= 10) {
+        minIndex = 0;
+        maxIndex = data.found_row_count - 1;
+        initialIndex = tappedEntryIndex;
+        moreImageBefore = false;
+        moreImageAfter = false;
+      } else if (tappedEntryIndex < 5) {
+        minIndex = 0;
+        maxIndex = minIndex + 9;
+        initialIndex = tappedEntryIndex;
+        moreImageBefore = false;
+        moreImageAfter = true;
+      } else if (count - 6 <= tappedEntryIndex) {
+        maxIndex = count - 1;
+        minIndex = maxIndex - 9;
+        initialIndex = tappedEntryIndex - 5 + 1;
+        moreImageBefore = true;
+        moreImageAfter = false;
+      } else {
+        initialIndex = 4 + 1;
+        minIndex = tappedEntryIndex - 4;
+        maxIndex = minIndex + 9;
+        moreImageBefore = true;
+        moreImageAfter = true;
+      }
+      owlContainer = $(".owl-carousel.template").clone(true);
+      owlContainer.removeClass("template");
+      owlContainer.addClass("displayed");
+      if (moreImageBefore) {
+        moreImageBeforeElem = createImageBox("/static/img/stamp/icon/1.jpeg", 0, 0, innerWidth, innerHeight);
+        buttonBefore = $("<button>").text("more images");
+        buttonBefore.on("click", function() {
+          return replaceCarousel({
+            minIndex: minIndex
+          });
+        });
+        moreImageBeforeElem.find(".img-box").append(buttonBefore);
+        owlContainer.append(moreImageBeforeElem);
+      }
+      for (i = _i = minIndex; minIndex <= maxIndex ? _i <= maxIndex : _i >= maxIndex; i = minIndex <= maxIndex ? ++_i : --_i) {
+        if (data.list[i]) {
+          image_url = data.list[i].fullsize_image_url;
+          window.entryIdsInArray = [];
+          window.entryIdsInArray.push(data.list[i].image_id);
+          childList = data.list[i].child;
+          image_id = data.list[i].image_id;
+          comment_count = data.list[i].comments.length;
+          $elem = createImageBox(image_url, image_id, comment_count, innerWidth, innerHeight);
+          owlContainer.append($elem);
+          if (childList) {
+            for (n = _j = 0, _len = childList.length; _j < _len; n = ++_j) {
+              childInfo = childList[n];
+              childElem = createChild(childInfo.child_id, childInfo.child_name);
+              $elem.find(".child-container").append(childElem);
+            }
+          }
+          $elem.find(".child-container").hide();
+        }
+      }
+      if (moreImageAfter) {
+        moreImageAfterElem = createImageBox("/static/img/stamp/icon/1.jpeg", 0, 0, innerWidth, innerHeight);
+        buttonAfter = $("<button>").text("more images");
+        window.console.log(buttonAfter);
+        buttonAfter.on("click", function() {
+          return replaceCarousel({
+            maxIndex: maxIndex
+          });
+        });
+        moreImageAfterElem.find(".img-box").append(buttonAfter);
+        owlContainer.append(moreImageAfterElem);
+      }
+      return {
+        initialIndex: initialIndex,
+        owlContainer: owlContainer
+      };
+    };
+    return replaceCarousel = function(params) {
+      var initial, offset;
+      if (params.minIndex) {
+        initial = "max";
+        if (params.minIndex <= 10) {
+          offset = 0;
+        } else {
+          offset = params.minIndex - 10;
+        }
+      } else if (params.maxIndex) {
+        initial = "min";
+        offset = params.maxIndex + 1;
+      } else {
+        return;
+      }
+      return getData(offset, initial, showEntries, showErrorMessage);
     };
   };
 

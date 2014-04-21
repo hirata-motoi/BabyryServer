@@ -21,6 +21,8 @@ window.loadingFlg = false
 window.displayedElementsFlg = true
 owlObject = undefined
 defaultTextareaHeight = "30px"
+innerWidth  = 0
+innerHeight = 0
 
 showImageDetail = () ->
   $(".img-thumbnail").on("click", () ->
@@ -45,35 +47,14 @@ showImageDetail = () ->
     data = pickData()
     tappedEntryIndex = $(this).attr "entryIndex"
 
-    owlContainer = $(".owl-carousel").clone(true)
-    owlContainer.addClass("displayed")
-
     # create new contents
-    for i in [0 .. data.found_row_count - 1]
-
-      if data.list[i]
-        image_url = data.list[i].fullsize_image_url
-        window.entryIdsInArray.push data.list[i].image_id
-        children = data.list[i].child
-        image_id = data.list[i].image_id
-        comment_count = data.list[i].comments.length
-      else 
-        image_url = ""
-        image_id  = ""
-        comment_count = 0
-
-      $elem = createImageBox image_url, image_id, comment_count, innerWidth, innerHeight
-      owlContainer.append $elem
-      initialIndex = i if data.list[i] and data.list[i].image_id == imageId
-  
-      if children
-        for childInfo, n in children
-          childElem = createChild(childInfo.child_id, childInfo.child_name)
-          $elem.find(".child-container").append childElem
-      $elem.find(".child-container").hide()
+    ret = createOwlElements tappedEntryIndex
+    owlContainer = ret.owlContainer
+    initialIndex = ret.initialIndex
 
     # hide navbar-space
     $("#navbar-space").hide()
+
     # replace html of container
     $(".dynamic-container").html( owlContainer )
     $(window).scrollTop(0)
@@ -86,33 +67,31 @@ showImageDetail = () ->
       afterMove: () ->
         currentPosition = owlObject.currentPosition()
         imageBoxes = $(".img-box")
-        lazyLoad imageBoxes[currentPosition]
-        lazyRelease releaseTargetElems(imageBoxes, currentPosition)
         replaceToolBoxContent()
-        if shouldPreLoad(5)
-          return if window.loadingFlg
+#        if shouldPreLoad(5)
+#          return if window.loadingFlg
 
           # 前回取得したページno
-          currentPageNo = 1
+#          currentPageNo = 1
 
           # いくつentryを取得するか
-          count = 10
+#          count = 10
 
           # とりあえず1つぐるぐるをだしておく
-          showLoadingImage()
+#          showLoadingImage()
 
           # loading flg
-          loadingFlg = true
+#          loadingFlg = true
 
           # ajax
-          getData showEntries, showErrorMessage
+#getData showEntries, showErrorMessage
     })
 
     # owlObjectをメモリに保持
-    owlObject = $(".owl-carousel").data("owlCarousel")
+    owlObject = $(".owl-carousel.displayed").data("owlCarousel")
 
     # タップされた画像を初期位置へ
-    owlObject.jumpTo(tappedEntryIndex)
+    owlObject.jumpTo(initialIndex)
 
     window.util.hidePageLoading()
 
@@ -168,7 +147,7 @@ showImageDetail = () ->
     return if window.entryIdsInArray.length < owlObject.currentPosition() + num then true else false
 
   preserveResponseData = (response) ->
-    window.entryData.entries.push entry for entry in response.data.entries
+    window.entryData.entries  =  response.data.entries
     window.entryData.metadata = response.metadata
     window.entryData.related_children = response.related_children
 
@@ -179,7 +158,7 @@ showImageDetail = () ->
       related_children: window.entryData.related_children
     }
 
-  getData = (successCallback, errorCallback) ->
+  getData = (offset, initial, successCallback, errorCallback) ->
     nextPage = if window.entryData.metadata.page then parseInt(window.entryData.metadata.page, 10) + 1 else 1
     countPerPage = window.entryData.metadata.count || 10
     # ajax
@@ -189,12 +168,14 @@ showImageDetail = () ->
       "contentType": false,
       "data": {
         "child_id": window.child_ids,
-        "page": nextPage,
-        "count": countPerPage
+        "page"    : nextPage,
+        "count"   : countPerPage,
+        "offset"  : offset
       },
       "dataType": 'json',
-      "success": successCallback
-      "error": errorCallback
+      "success" : (response) ->
+        successCallback response, initial
+      "error"   : errorCallback
     })
 
 
@@ -202,7 +183,7 @@ showImageDetail = () ->
     tmpl = $("#item-tmpl").clone(true)
     owlElem = $(tmpl)
     owlElem.find(".img-box").attr "image-id", image_id
-    owlElem.find(".img-box").attr "data-image-url", image_url
+    owlElem.find(".img-box").css "background-image", "url(" + image_url + ")"
     owlElem.css "width", innerWidth
     owlElem.css "height", innerHeight
     owlElem.attr "id", ""
@@ -245,23 +226,30 @@ showImageDetail = () ->
   showErrorMessage = () ->
     # TODO implement
 
-  showEntries = (response) ->
+  showEntries = (response, initial) ->
     return if response.data.entries.length < 1
 
     preserveResponseData response
 
-    unloadedElems = $(".unloaded");
-    for elem, i in unloadedElems
-      if response.data.entries[i]
-        image_url = response.data.entries[i].fullsize_image_url
-        $(elem).find(".img-box").css "background-image", "url('" + image_url + "')"
-        $(elem).find(".loading").removeClass("loading")
-        $(elem).removeClass("unloaded")
-        window.entryIdsInArray.push response.data.entries[i].image_id
-      else
-        window.loadingFlg = false
-        break
-    window.loadingFlg = false
+    initialIndex = if initial == "max"
+      response.data.entries.length - 1
+    else
+      0
+
+    ret = createOwlElements initialIndex
+    owlContainer = ret.owlContainer
+    initialIndex = ret.initialIndex
+
+    $(".dynamic-container").html( owlContainer )
+
+    # set carousel
+    $(".owl-carousel.displayed").owlCarousel({
+      items: 1,
+      pagination: false,
+      scrollPerPage: true,
+      afterMove: () ->
+        replaceToolBoxContent()
+    })
 
   createChild = (childId, childName) ->
     childElem =  $( $("#child-tag-tmpl").clone(true).html() )
@@ -638,6 +626,88 @@ showImageDetail = () ->
     if targetUnderIndex >= minIndex
       targetElems.push imageBoxes[ targetUnderIndex ]
     return targetElems 
+
+  createOwlElements = (tappedEntryIndex) ->
+    data  = pickData()
+    count = data.found_row_count
+    if count <= 10
+      minIndex = 0
+      maxIndex = data.found_row_count - 1
+      initialIndex = tappedEntryIndex
+      moreImageBefore = false
+      moreImageAfter  = false
+    else if tappedEntryIndex < 5
+      minIndex = 0
+      maxIndex = minIndex + 9
+      initialIndex = tappedEntryIndex
+      moreImageBefore = false
+      moreImageAfter  = true
+    else if count - 6 <= tappedEntryIndex
+      maxIndex = count - 1
+      minIndex = maxIndex - 9
+      initialIndex = tappedEntryIndex - 5 + 1 # 1 : moreImageBeforeの分
+      moreImageBefore = true
+      moreImageAfter  = false
+    else
+      initialIndex = 4 + 1 # 1 : moreImageBeforeの分
+      minIndex = tappedEntryIndex - 4
+      maxIndex = minIndex + 9
+      moreImageBefore = true
+      moreImageAfter  = true
+      
+    owlContainer = $(".owl-carousel.template").clone(true)
+    owlContainer.removeClass("template")
+    owlContainer.addClass("displayed")
+
+    if moreImageBefore
+      moreImageBeforeElem = createImageBox "/static/img/stamp/icon/1.jpeg", 0, 0, innerWidth, innerHeight
+      buttonBefore = $("<button>").text "more images"
+      buttonBefore.on "click", () ->
+        replaceCarousel {minIndex: minIndex}
+      moreImageBeforeElem.find(".img-box").append buttonBefore
+      owlContainer.append moreImageBeforeElem
+    for i in [minIndex..maxIndex]
+      if data.list[i]
+        image_url = data.list[i].fullsize_image_url
+        window.entryIdsInArray = [] # initialize
+        window.entryIdsInArray.push data.list[i].image_id
+        childList = data.list[i].child
+        image_id = data.list[i].image_id
+        comment_count = data.list[i].comments.length
+        $elem = createImageBox image_url, image_id, comment_count, innerWidth, innerHeight
+        owlContainer.append $elem
+
+        if childList
+          for childInfo, n in childList
+            childElem = createChild(childInfo.child_id, childInfo.child_name)
+            $elem.find(".child-container").append childElem
+        $elem.find(".child-container").hide()
+    if moreImageAfter
+      moreImageAfterElem = createImageBox "/static/img/stamp/icon/1.jpeg", 0, 0, innerWidth, innerHeight
+      buttonAfter = $("<button>").text "more images"
+      window.console.log buttonAfter
+      buttonAfter.on "click", () ->
+        replaceCarousel {maxIndex: maxIndex}
+      moreImageAfterElem.find(".img-box").append buttonAfter
+      owlContainer.append moreImageAfterElem
+    return {initialIndex: initialIndex, owlContainer: owlContainer}
+
+  replaceCarousel = (params) ->
+    if params.minIndex
+      initial = "max"
+      if params.minIndex <= 10
+        offset = 0
+      else
+        offset = params.minIndex - 10
+    else if params.maxIndex
+      initial = "min"
+      offset = params.maxIndex + 1
+    else
+      return
+
+    # getDataする
+    getData offset, initial, showEntries, showErrorMessage
+
 
 window.util ||= {}
 window.util.showImageDetail = showImageDetail

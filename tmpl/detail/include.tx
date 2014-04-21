@@ -185,7 +185,7 @@
 </script>
 
 <div class="detail-container" style="display:none">
-  <div class="owl-carousel owl-theme"></div>
+  <div class="owl-carousel owl-theme template"></div>
 </div>
 <div id="operation-container" class="navbar navbar-footer navbar-fixed-bottom" role="navigation" style="display:none;">
   <div class="navbar-inner">
