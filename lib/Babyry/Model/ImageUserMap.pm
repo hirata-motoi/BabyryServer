@@ -46,7 +46,7 @@ sub get_by_user_id_stamp_id_child_id {
     my ($teng, $user_id, $stamp_id, $child_id, $from, $limit) = @_;
     # stamp_id, child_idが無ければuser_idのみで引く
     if (!scalar(@{$stamp_id}) && !scalar(@{$child_id})) {
-        my ($images, $found_row_count) = &get_by_user_id($teng, $user_id, $from, $limit);
+        my ($images, $found_row_count) = get_by_user_id($teng, $user_id, $from, $limit);
         return ($images, $found_row_count);
     }
     # stamp_idあり child_idなし

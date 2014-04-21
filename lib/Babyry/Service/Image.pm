@@ -153,10 +153,9 @@ sub web_submit {
             );
         }
         for my $child_id (@{$params->{'child'}}) {
-            $image_child_map->add($teng, {
+            $image_child_map->attach($teng, {
                 image_id   => $id,
                 child_id    => $child_id,
-                disabled   => 0,
                 created_at => $unixtime,
                 updated_at => $unixtime,
             });
@@ -201,6 +200,36 @@ sub comment {
     ) || {};
 
     return Babyry::Service::Entry::comment_info($ret, $users, $images);
+}
+
+sub child_attach {
+    my ($self, $params) = @_;
+
+    my $teng = $self->teng('BABYRY_MAIN_W');
+
+    $teng->txn_begin;
+    my $rows = $self->model('image_child_map')->attach($teng, {
+        image_id => $params->{image_id},
+        child_id => $params->{child_id},
+    });
+    $teng->txn_commit;
+
+    return { rows => $rows };
+}
+
+sub child_detach {
+    my ($self, $params) = @_;
+
+    my $teng = $self->teng('BABYRY_MAIN_W');
+
+    $teng->txn_begin;
+    my $rows = $self->model('image_child_map')->detach($teng, {
+        image_id => $params->{image_id},
+        child_id => $params->{child_id},
+    });
+    $teng->txn_commit;
+
+    return { rows => $rows };
 }
 
 

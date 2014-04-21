@@ -20,5 +20,11 @@
     '/image/comment.json' => +{
         controller => 'Image', action => 'comment',
     },
+    '/image/child/attach.json' => +{
+        controller => 'Image', action => 'child_attach',
+    },
+    '/image/child/detach.json' => +{
+        controller => 'Image', action => 'child_detach',
+    },
 }
 
