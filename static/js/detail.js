@@ -37,7 +37,7 @@
   defaultTextareaHeight = "30px";
 
   showImageDetail = function() {
-    var addChildToEntryData, adjustDisplayedElements, alreadyAttachedChild, attachChildToImage, backToWall, closeComments, createChild, createCommentNavigation, createImageBox, detachChildFromImage, editChild, getData, getXSRFToken, hasElem, hideAttachedChild, initEditChild, pickData, preserveResponseData, refreshChildAttachedMark, removeAttachedChild, replaceToolBoxContent, setChildAttachList, setUpScreenSize, setupGlobalFooter, shouldPreLoad, showAttachedChild, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements;
+    var addChildToEntryData, adjustDisplayedElements, alreadyAttachedChild, attachChildToImage, backToWall, closeComments, createChild, createCommentNavigation, createImageBox, detachChildFromImage, editChild, getData, getXSRFToken, hasElem, hideAttachedChild, initEditChild, lazyLoad, lazyRelease, pickData, preserveResponseData, refreshChildAttachedMark, releaseTargetElems, removeAttachedChild, replaceToolBoxContent, setChildAttachList, setUpScreenSize, setupGlobalFooter, shouldPreLoad, showAttachedChild, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements;
     $(".img-thumbnail").on("click", function() {
       var $elem, childElem, childInfo, children, comment_count, data, i, imageId, image_id, image_url, initialIndex, innerHeight, innerWidth, n, owlContainer, tappedEntryIndex, _i, _j, _len, _ref;
       setUpScreenSize();
@@ -86,10 +86,12 @@
         items: 1,
         pagination: false,
         scrollPerPage: true,
-        lazyLoad: true,
-        beforeMove: function() {},
         afterMove: function() {
-          var count, currentPageNo, loadingFlg;
+          var count, currentPageNo, currentPosition, imageBoxes, loadingFlg;
+          currentPosition = owlObject.currentPosition();
+          imageBoxes = $(".img-box");
+          lazyLoad(imageBoxes[currentPosition]);
+          lazyRelease(releaseTargetElems(imageBoxes, currentPosition));
           replaceToolBoxContent();
           if (shouldPreLoad(5)) {
             if (window.loadingFlg) {
@@ -191,7 +193,7 @@
       tmpl = $("#item-tmpl").clone(true);
       owlElem = $(tmpl);
       owlElem.find(".img-box").attr("image-id", image_id);
-      owlElem.find(".img-box").attr("data-src", image_url);
+      owlElem.find(".img-box").attr("data-image-url", image_url);
       owlElem.css("width", innerWidth);
       owlElem.css("height", innerHeight);
       owlElem.attr("id", "");
@@ -655,7 +657,7 @@
         }
       });
     };
-    return refreshChildAttachedMark = function() {
+    refreshChildAttachedMark = function() {
       var attachedChildren, child, childId, currentPosition, _base3, _i, _len, _ref;
       currentPosition = owlObject.currentPosition();
       (_base3 = window.entryData.entries[currentPosition]).child || (_base3.child = []);
@@ -676,6 +678,39 @@
           return $(this).on("click", attachChildToImage);
         }
       });
+    };
+    lazyLoad = function(imageElem) {
+      var imageUrl;
+      imageUrl = $(imageElem).attr("data-image-url");
+      window.console.log("imageUrl : " + imageUrl);
+      return $(imageElem).css("background-image", "url(" + imageUrl + ")");
+    };
+    lazyRelease = function(imageElems) {
+      var elem, _i, _len, _results;
+      _results = [];
+      for (_i = 0, _len = imageElems.length; _i < _len; _i++) {
+        elem = imageElems[_i];
+        window.console.log("release imageElem : " + elem);
+        _results.push($(elem).css("background-image", ""));
+      }
+      return _results;
+    };
+    return releaseTargetElems = function(imageBoxes, currentPosition) {
+      var length, maxIndex, minIndex, targetElems, targetOverIndex, targetUnderIndex;
+      length = imageBoxes.length;
+      maxIndex = length - 1;
+      minIndex = 0;
+      targetOverIndex = parseInt(currentPosition, 10) + 3;
+      targetUnderIndex = parseInt(currentPosition, 10) - 3;
+      window.console.log("targetOverIndex : " + targetOverIndex);
+      targetElems = [];
+      if (targetOverIndex <= maxIndex) {
+        targetElems.push(imageBoxes[targetOverIndex]);
+      }
+      if (targetUnderIndex >= minIndex) {
+        targetElems.push(imageBoxes[targetUnderIndex]);
+      }
+      return targetElems;
     };
   };
 

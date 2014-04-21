@@ -224,7 +224,7 @@
 
 <div>
   <div id="item-tmpl" style="display:none">
-    <div class="img-box cover lazyOwl" style="position: relative; background-color: white;">
+    <div class="img-box cover" style="position: relative; background-color: white;">
       <div class="child-container"></div>
     </div>
   </div>

@@ -83,11 +83,12 @@ showImageDetail = () ->
       items: 1,
       pagination: false,
       scrollPerPage: true,
-      lazyLoad: true,
-      beforeMove: () ->
       afterMove: () ->
+        currentPosition = owlObject.currentPosition()
+        imageBoxes = $(".img-box")
+        lazyLoad imageBoxes[currentPosition]
+        lazyRelease releaseTargetElems(imageBoxes, currentPosition)
         replaceToolBoxContent()
-#adjustDisplayedElements()
         if shouldPreLoad(5)
           return if window.loadingFlg
 
@@ -201,7 +202,7 @@ showImageDetail = () ->
     tmpl = $("#item-tmpl").clone(true)
     owlElem = $(tmpl)
     owlElem.find(".img-box").attr "image-id", image_id
-    owlElem.find(".img-box").attr "data-src", image_url
+    owlElem.find(".img-box").attr "data-image-url", image_url
     owlElem.css "width", innerWidth
     owlElem.css "height", innerHeight
     owlElem.attr "id", ""
@@ -611,6 +612,32 @@ showImageDetail = () ->
       else
         $(this).on "click", attachChildToImage
 
+  lazyLoad = (imageElem) ->
+    imageUrl = $(imageElem).attr("data-image-url")
+    window.console.log "imageUrl : " + imageUrl
+    $(imageElem).css "background-image",  "url(" + imageUrl + ")"
+  
+  lazyRelease = (imageElems) ->
+    for elem in imageElems
+      window.console.log "release imageElem : " + elem
+      $(elem).css "background-image",  ""
+
+  releaseTargetElems = (imageBoxes, currentPosition) ->
+    length = imageBoxes.length
+
+    maxIndex = length - 1
+    minIndex = 0
+    targetOverIndex  = parseInt(currentPosition, 10) + 3
+    targetUnderIndex = parseInt(currentPosition, 10) - 3
+
+    window.console.log "targetOverIndex : " + targetOverIndex
+
+    targetElems = []
+    if targetOverIndex <= maxIndex
+      targetElems.push imageBoxes[ targetOverIndex ]
+    if targetUnderIndex >= minIndex
+      targetElems.push imageBoxes[ targetUnderIndex ]
+    return targetElems 
 
 window.util ||= {}
 window.util.showImageDetail = showImageDetail
