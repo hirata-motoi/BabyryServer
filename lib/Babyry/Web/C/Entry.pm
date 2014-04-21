@@ -15,7 +15,7 @@ sub search {
     my $uploaded_by = $c->req->param('uploaded_by') || $c->stash->{user_id};
     my $count       = $c->req->param('count')       || 10;
     my $page        = $c->req->param('page')        || 1;
-    my $offset      = $c->req->param('offset')      || undef;
+    my $offset      = $c->req->param('offset');
     my $user_id     = $c->stash->{user_id};
 
     my $params = {

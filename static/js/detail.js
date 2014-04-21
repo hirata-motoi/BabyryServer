@@ -22,15 +22,7 @@
 
   (_base2 = window.entryData).related_children || (_base2.related_children = {});
 
-  window.childrenData || (window.childrenData = {});
-
   window.child_ids || (window.child_ids = []);
-
-  window.entryIdsInArray = [];
-
-  window.loadingFlg = false;
-
-  window.displayedElementsFlg = true;
 
   owlObject = void 0;
 
@@ -41,48 +33,33 @@
   innerHeight = 0;
 
   showImageDetail = function() {
-    var addChildToEntryData, adjustDisplayedElements, alreadyAttachedChild, attachChildToImage, backToWall, closeComments, createChild, createCommentNavigation, createImageBox, createOwlElements, detachChildFromImage, editChild, getData, getXSRFToken, hasElem, hideAttachedChild, initEditChild, lazyLoad, lazyRelease, pickData, preserveResponseData, refreshChildAttachedMark, releaseTargetElems, removeAttachedChild, replaceCarousel, replaceToolBoxContent, setChildAttachList, setUpScreenSize, setupGlobalFooter, shouldPreLoad, showAttachedChild, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements;
+    var addChildToEntryData, alreadyAttachedChild, attachChildToImage, closeComments, createChild, createCommentNavigation, createImageBox, createOwlElementsWithResponse, detachChildFromImage, editChild, getCurrentPosition, getData, getXSRFToken, hasElem, hideAttachedChild, initEditChild, pickData, preserveResponseData, refreshChildAttachedMark, removeAttachedChild, replaceToolBoxContent, setChildAttachList, setUpScreenSize, setupGlobalFooter, showAttachedChild, showCarousel, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements;
     $(".img-thumbnail").on("click", function() {
-      var data, imageId, initialIndex, owlContainer, ret, tappedEntryIndex;
+      var imageId, tappedEntryIndex;
       setUpScreenSize();
       setupGlobalFooter();
       window.util.showPageLoading();
-      $(".container").addClass("full-size-screen");
       innerWidth = window.innerWidth;
       innerHeight = window.innerHeight;
       $(".container.content-body").css("width", innerWidth);
       $(".container.content-body").css("height", innerHeight);
       imageId = $(this).parents(".item").attr("image_id");
-      data = pickData();
       tappedEntryIndex = $(this).attr("entryIndex");
-      ret = createOwlElements(tappedEntryIndex);
-      owlContainer = ret.owlContainer;
-      initialIndex = ret.initialIndex;
-      $("#navbar-space").hide();
-      $(".dynamic-container").html(owlContainer);
-      $(window).scrollTop(0);
-      $(".owl-carousel.displayed").owlCarousel({
-        items: 1,
-        pagination: false,
-        scrollPerPage: true,
-        afterMove: function() {
-          var currentPosition, imageBoxes;
-          currentPosition = owlObject.currentPosition();
-          imageBoxes = $(".img-box");
-          return replaceToolBoxContent();
-        }
+      return showCarousel({
+        offset: tappedEntryIndex
+      }, function() {
+        var data;
+        window.util.hidePageLoading();
+        showNavBarFooter();
+        data = pickData();
+        return setChildAttachList(data.related_children);
       });
-      owlObject = $(".owl-carousel.displayed").data("owlCarousel");
-      owlObject.jumpTo(initialIndex);
-      window.util.hidePageLoading();
-      showNavBarFooter();
-      return setChildAttachList(data.related_children);
     });
     $("#comment-submit").on("click", function() {
       var comment, currentPosition, imageElem, imageId, token;
       token = getXSRFToken();
       comment = $("#comment-textarea").val();
-      currentPosition = owlObject.currentPosition();
+      currentPosition = getCurrentPosition();
       imageElem = $(".img-box")[currentPosition];
       imageId = $(imageElem).attr("image-id");
       return $.ajax({
@@ -113,13 +90,6 @@
         }
       });
     });
-    shouldPreLoad = function(num) {
-      if (window.entryIdsInArray.length < owlObject.currentPosition() + num) {
-        return true;
-      } else {
-        return false;
-      }
-    };
     preserveResponseData = function(response) {
       window.entryData.entries = response.data.entries;
       window.entryData.metadata = response.metadata;
@@ -129,13 +99,15 @@
       return {
         list: window.entryData.entries,
         found_row_count: window.entryData.metadata.found_row_count,
-        related_children: window.entryData.related_children
+        related_children: window.entryData.related_children,
+        metadata: window.entryData.metadata
       };
     };
-    getData = function(offset, initial, successCallback, errorCallback) {
+    getData = function(offset, initial, addOnCallback) {
       var countPerPage, nextPage;
       nextPage = window.entryData.metadata.page ? parseInt(window.entryData.metadata.page, 10) + 1 : 1;
       countPerPage = window.entryData.metadata.count || 10;
+      $.mobile.loading("show");
       return $.ajax({
         "url": "/entry/search.json",
         "processData": true,
@@ -148,9 +120,15 @@
         },
         "dataType": 'json',
         "success": function(response) {
-          return successCallback(response, initial);
+          showEntries(response, initial);
+          if (typeof addOnCallback === "function") {
+            return addOnCallback();
+          }
         },
-        "error": errorCallback
+        "error": showErrorMessage,
+        "complete": function() {
+          return $.mobile.loading("hide");
+        }
       });
     };
     createImageBox = function(image_url, image_id, comment_count, innerWidth, innerHeight) {
@@ -169,7 +147,7 @@
       owlElem.find(".comment-notice").on("click", function() {
         var comment, comments, currentPosition, item, _i, _len;
         $(".comment-container").empty();
-        currentPosition = owlObject.currentPosition();
+        currentPosition = getCurrentPosition();
         comments = window.entryData.entries[currentPosition].comments;
         comments.sort(function(a, b) {
           var aCreatedAt, bCreatedAt;
@@ -210,12 +188,12 @@
         return;
       }
       preserveResponseData(response);
-      initialIndex = initial === "max" ? response.data.entries.length - 1 : 0;
-      ret = createOwlElements(initialIndex);
+      ret = createOwlElementsWithResponse(initial);
       owlContainer = ret.owlContainer;
       initialIndex = ret.initialIndex;
+      $(".container").addClass("full-size-screen");
       $(".dynamic-container").html(owlContainer);
-      return $(".owl-carousel.displayed").owlCarousel({
+      $(".owl-carousel.displayed").owlCarousel({
         items: 1,
         pagination: false,
         scrollPerPage: true,
@@ -223,6 +201,72 @@
           return replaceToolBoxContent();
         }
       });
+      owlObject = $(".owl-carousel.displayed").data("owlCarousel");
+      return owlObject.jumpTo(initialIndex);
+    };
+    createOwlElementsWithResponse = function(initial) {
+      var buttonAfter, buttonBefore, childElem, childInfo, childList, comment_count, count, data, div, elem, entry, image_id, image_url, initialIndex, length, moreImageAfterElem, moreImageBeforeElem, n, offset, owlContainer, _i, _j, _len, _len1, _ref;
+      data = pickData();
+      count = parseInt(data.found_row_count, 10);
+      offset = parseInt(data.metadata.offset, 10);
+      length = data.list.length;
+      initialIndex = initial === "max" ? data.list.length - 1 : 0;
+      owlContainer = $(".owl-carousel.template").clone(true);
+      owlContainer.removeClass("template");
+      owlContainer.addClass("displayed");
+      if (0 < offset) {
+        moreImageBeforeElem = createImageBox("/static/img/stamp/icon/1.jpeg", 0, 0, innerWidth, innerHeight);
+        buttonBefore = $("<a href=\"#\" class=\"btn btn-info btn-large\">YES</a>");
+        buttonBefore.on("click", function() {
+          showCarousel({
+            minIndex: offset
+          });
+          return false;
+        });
+        div = $("<div style=\"position: relative; margin-top: 100px\">もっとみるかニャ？</div>");
+        div.append(buttonBefore);
+        moreImageBeforeElem.find(".img-box").append(div);
+        moreImageBeforeElem.find(".img-box").addClass("moreImage");
+        owlContainer.append(moreImageBeforeElem);
+        initialIndex = initialIndex + 1;
+      }
+      _ref = data.list;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        entry = _ref[_i];
+        image_url = entry.fullsize_image_url;
+        childList = entry.child;
+        image_id = entry.image_id;
+        comment_count = entry.comments.length;
+        elem = createImageBox(image_url, image_id, comment_count, innerWidth, innerHeight);
+        owlContainer.append(elem);
+        if (childList) {
+          for (n = _j = 0, _len1 = childList.length; _j < _len1; n = ++_j) {
+            childInfo = childList[n];
+            childElem = createChild(childInfo.child_id, childInfo.child_name);
+            elem.find(".child-container").append(childElem);
+          }
+        }
+        elem.find(".child-container").hide();
+      }
+      if (count > offset + length) {
+        moreImageAfterElem = createImageBox("/static/img/stamp/icon/1.jpeg", 0, 0, innerWidth, innerHeight);
+        buttonAfter = $("<a href=\"#\" class=\"btn btn-info btn-large\">YES</a>");
+        buttonAfter.on("click", function() {
+          showCarousel({
+            maxIndex: offset + length - 1
+          });
+          return false;
+        });
+        div = $("<div style=\"position: relative; margin-top: 100px\">もっとみるかニャ？</div>");
+        div.append(buttonAfter);
+        moreImageAfterElem.find(".img-box").append(div);
+        moreImageAfterElem.find(".img-box").addClass("moreImage");
+        owlContainer.append(moreImageAfterElem);
+      }
+      return {
+        owlContainer: owlContainer,
+        initialIndex: initialIndex
+      };
     };
     createChild = function(childId, childName) {
       var childElem, text;
@@ -252,48 +296,12 @@
       }
       return false;
     };
-    backToWall = function() {
-      $(".container").removeClass("full-size-screen");
-      return location.href = "/";
-    };
     toggleDisplayedElements = function() {
-      $(".navbar").toggle();
-      return window.displayedElementsFlg = $(".navbar").css("display") === "none" ? false : true;
-    };
-    adjustDisplayedElements = function() {
-      var currentPosition, elems, i, imageElem, indexes, _i, _j, _len, _ref, _results, _results1;
-      currentPosition = parseInt(owlObject.currentPosition(), 10);
-      elems = $(".img-box");
-      if (window.entryData.entries.length < 4) {
-        indexes = (function() {
-          _results = [];
-          for (var _i = 0, _ref = window.entryData.entries.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; 0 <= _ref ? _i++ : _i--){ _results.push(_i); }
-          return _results;
-        }).apply(this);
-      } else if (currentPosition === 0) {
-        indexes = [0, 1];
-      } else if (currentPosition === window.entryData.entries.length - 1) {
-        indexes = [currentPosition + 0 - 1, currentPosition];
-      } else {
-        indexes = [currentPosition, currentPosition - 1, currentPosition + 0 + 1];
-      }
-      _results1 = [];
-      for (_j = 0, _len = indexes.length; _j < _len; _j++) {
-        i = indexes[_j];
-        imageElem = $(elems[i]);
-        if (window.displayedElementsFlg) {
-          imageElem.find(".stamp-container").show();
-          _results1.push(imageElem.find(".img-footer").show());
-        } else {
-          imageElem.find(".stamp-container").hide();
-          _results1.push(imageElem.find(".img-footer").hide());
-        }
-      }
-      return _results1;
+      return $(".navbar").toggle();
     };
     replaceToolBoxContent = function() {
       var childContainer, commentCount, commentCountText, commentItem, comments, currentPosition, elems;
-      currentPosition = parseInt(owlObject.currentPosition(), 10);
+      currentPosition = getCurrentPosition();
       elems = $(".img-box");
       childContainer = $($(elems)[currentPosition]).find(".child-container").clone(true);
       $("#child-tag-container").find("ul").html(childContainer.html());
@@ -337,7 +345,7 @@
     showComments = function() {
       var comment, comments, container, currentPosition, item, list, tmpl;
       container = $("#all-comment-container");
-      currentPosition = parseInt(owlObject.currentPosition(), 10);
+      currentPosition = getCurrentPosition();
       comments = window.entryData.entries[currentPosition].comments;
       comments.sort(function(a, b) {
         var aCreatedAt, bCreatedAt;
@@ -417,7 +425,7 @@
     };
     initEditChild = function() {
       var child, childHash, currentPosition, _base3, _i, _len, _ref;
-      currentPosition = parseInt(owlObject.currentPosition(), 10);
+      currentPosition = getCurrentPosition();
       (_base3 = window.entryData.entries[currentPosition]).child || (_base3.child = []);
       childHash = {};
       _ref = window.entryData.entries[currentPosition].child;
@@ -470,7 +478,7 @@
       var childElem, childId, childName, currentPosition, imageElem, imageId, token;
       childId = $(this).attr("data-child-id");
       childName = $(this).find(".child-name").text();
-      currentPosition = owlObject.currentPosition();
+      currentPosition = getCurrentPosition();
       imageElem = $(".img-box")[currentPosition];
       imageId = $(imageElem).attr("image-id");
       token = getXSRFToken();
@@ -542,7 +550,7 @@
           $(tag).remove();
         }
       }
-      currentPosition = owlObject.currentPosition();
+      currentPosition = getCurrentPosition();
       $($(".img-box")[currentPosition]).find(".child-tag-li").each(function() {
         if (childId === $(this).attr("data-child-id")) {
           return $(this).remove();
@@ -563,7 +571,7 @@
     };
     alreadyAttachedChild = function(childId) {
       var child, children, currentPosition, index, _base3, _i, _len;
-      currentPosition = owlObject.currentPosition();
+      currentPosition = getCurrentPosition();
       (_base3 = window.entryData.entries[currentPosition]).child || (_base3.child = []);
       children = window.entryData.entries[currentPosition].child;
       for (index = _i = 0, _len = children.length; _i < _len; index = ++_i) {
@@ -575,7 +583,7 @@
     };
     addChildToEntryData = function(childId, childName) {
       var currentPosition, _base3;
-      currentPosition = owlObject.currentPosition();
+      currentPosition = getCurrentPosition();
       (_base3 = window.entryData.entries[currentPosition]).child || (_base3.child = []);
       if (alreadyAttachedChild(childId)) {
         return false;
@@ -590,7 +598,7 @@
       var childId, childName, currentPosition, imageElem, imageId, token;
       childId = $(this).attr("data-child-id");
       childName = $(this).find(".child-name").text();
-      currentPosition = owlObject.currentPosition();
+      currentPosition = getCurrentPosition();
       imageElem = $(".img-box")[currentPosition];
       imageId = $(imageElem).attr("image-id");
       token = getXSRFToken();
@@ -608,10 +616,9 @@
         success: function(response) {
           if (!response.rows || response.rows < 1) {
             showAttachedChild(childId);
-            refreshChildAttachedMark();
-            return;
+          } else {
+            removeAttachedChild(childId);
           }
-          removeAttachedChild(childId);
           return refreshChildAttachedMark();
         },
         error: function() {
@@ -622,7 +629,7 @@
     };
     refreshChildAttachedMark = function() {
       var attachedChildren, child, childId, currentPosition, _base3, _i, _len, _ref;
-      currentPosition = owlObject.currentPosition();
+      currentPosition = getCurrentPosition();
       (_base3 = window.entryData.entries[currentPosition]).child || (_base3.child = []);
       attachedChildren = {};
       _ref = window.entryData.entries[currentPosition].child;
@@ -642,127 +649,18 @@
         }
       });
     };
-    lazyLoad = function(imageElem) {
-      var imageUrl;
-      imageUrl = $(imageElem).attr("data-image-url");
-      window.console.log("imageUrl : " + imageUrl);
-      return $(imageElem).css("background-image", "url(" + imageUrl + ")");
-    };
-    lazyRelease = function(imageElems) {
-      var elem, _i, _len, _results;
-      _results = [];
-      for (_i = 0, _len = imageElems.length; _i < _len; _i++) {
-        elem = imageElems[_i];
-        window.console.log("release imageElem : " + elem);
-        _results.push($(elem).css("background-image", ""));
-      }
-      return _results;
-    };
-    releaseTargetElems = function(imageBoxes, currentPosition) {
-      var length, maxIndex, minIndex, targetElems, targetOverIndex, targetUnderIndex;
-      length = imageBoxes.length;
-      maxIndex = length - 1;
-      minIndex = 0;
-      targetOverIndex = parseInt(currentPosition, 10) + 3;
-      targetUnderIndex = parseInt(currentPosition, 10) - 3;
-      window.console.log("targetOverIndex : " + targetOverIndex);
-      targetElems = [];
-      if (targetOverIndex <= maxIndex) {
-        targetElems.push(imageBoxes[targetOverIndex]);
-      }
-      if (targetUnderIndex >= minIndex) {
-        targetElems.push(imageBoxes[targetUnderIndex]);
-      }
-      return targetElems;
-    };
-    createOwlElements = function(tappedEntryIndex) {
-      var $elem, buttonAfter, buttonBefore, childElem, childInfo, childList, comment_count, count, data, i, image_id, image_url, initialIndex, maxIndex, minIndex, moreImageAfter, moreImageAfterElem, moreImageBefore, moreImageBeforeElem, n, owlContainer, _i, _j, _len;
-      data = pickData();
-      count = data.found_row_count;
-      if (count <= 10) {
-        minIndex = 0;
-        maxIndex = data.found_row_count - 1;
-        initialIndex = tappedEntryIndex;
-        moreImageBefore = false;
-        moreImageAfter = false;
-      } else if (tappedEntryIndex < 5) {
-        minIndex = 0;
-        maxIndex = minIndex + 9;
-        initialIndex = tappedEntryIndex;
-        moreImageBefore = false;
-        moreImageAfter = true;
-      } else if (count - 6 <= tappedEntryIndex) {
-        maxIndex = count - 1;
-        minIndex = maxIndex - 9;
-        initialIndex = tappedEntryIndex - 5 + 1;
-        moreImageBefore = true;
-        moreImageAfter = false;
-      } else {
-        initialIndex = 4 + 1;
-        minIndex = tappedEntryIndex - 4;
-        maxIndex = minIndex + 9;
-        moreImageBefore = true;
-        moreImageAfter = true;
-      }
-      owlContainer = $(".owl-carousel.template").clone(true);
-      owlContainer.removeClass("template");
-      owlContainer.addClass("displayed");
-      if (moreImageBefore) {
-        moreImageBeforeElem = createImageBox("/static/img/stamp/icon/1.jpeg", 0, 0, innerWidth, innerHeight);
-        buttonBefore = $("<button>").text("more images");
-        buttonBefore.on("click", function() {
-          return replaceCarousel({
-            minIndex: minIndex
-          });
-        });
-        moreImageBeforeElem.find(".img-box").append(buttonBefore);
-        owlContainer.append(moreImageBeforeElem);
-      }
-      for (i = _i = minIndex; minIndex <= maxIndex ? _i <= maxIndex : _i >= maxIndex; i = minIndex <= maxIndex ? ++_i : --_i) {
-        if (data.list[i]) {
-          image_url = data.list[i].fullsize_image_url;
-          window.entryIdsInArray = [];
-          window.entryIdsInArray.push(data.list[i].image_id);
-          childList = data.list[i].child;
-          image_id = data.list[i].image_id;
-          comment_count = data.list[i].comments.length;
-          $elem = createImageBox(image_url, image_id, comment_count, innerWidth, innerHeight);
-          owlContainer.append($elem);
-          if (childList) {
-            for (n = _j = 0, _len = childList.length; _j < _len; n = ++_j) {
-              childInfo = childList[n];
-              childElem = createChild(childInfo.child_id, childInfo.child_name);
-              $elem.find(".child-container").append(childElem);
-            }
-          }
-          $elem.find(".child-container").hide();
-        }
-      }
-      if (moreImageAfter) {
-        moreImageAfterElem = createImageBox("/static/img/stamp/icon/1.jpeg", 0, 0, innerWidth, innerHeight);
-        buttonAfter = $("<button>").text("more images");
-        window.console.log(buttonAfter);
-        buttonAfter.on("click", function() {
-          return replaceCarousel({
-            maxIndex: maxIndex
-          });
-        });
-        moreImageAfterElem.find(".img-box").append(buttonAfter);
-        owlContainer.append(moreImageAfterElem);
-      }
-      return {
-        initialIndex: initialIndex,
-        owlContainer: owlContainer
-      };
-    };
-    return replaceCarousel = function(params) {
+    showCarousel = function(params, addOnCallback) {
       var initial, offset;
-      if (params.minIndex) {
-        initial = "max";
+      if (params.offset) {
+        offset = params.offset;
+        initial = "min";
+      } else if (params.minIndex) {
         if (params.minIndex <= 10) {
           offset = 0;
+          initial = "min";
         } else {
           offset = params.minIndex - 10;
+          initial = "max";
         }
       } else if (params.maxIndex) {
         initial = "min";
@@ -770,7 +668,15 @@
       } else {
         return;
       }
-      return getData(offset, initial, showEntries, showErrorMessage);
+      return getData(offset, initial, addOnCallback);
+    };
+    return getCurrentPosition = function() {
+      var position;
+      position = parseInt(owlObject.currentPosition(), 10);
+      if ($($(".img-box")[0]).hasClass("moreImage")) {
+        position = position - 1;
+      }
+      return position;
     };
   };
 
