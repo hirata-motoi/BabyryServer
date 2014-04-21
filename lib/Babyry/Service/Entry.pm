@@ -23,11 +23,11 @@ use Babyry::Service::Child;
 # searchの条件は今後増えるかもしれないので、search自体は、dispatchするだけにする。
 sub search {
     my ($self, $params) = @_;
-    my ($stamp_id, $child_id, $uploaded_by, $count, $page, $user_id)
-        = @$params{qw/stamp_id child_id uploaded_by count page user_id/};
+    my ($stamp_id, $child_id, $uploaded_by, $count, $page, $offset, $user_id)
+        = @$params{qw/stamp_id child_id uploaded_by count page offset user_id/};
 
     my $teng = $self->teng('BABYRY_MAIN_R');
-    my $from = ($page - 1) * $count || 0;
+    my $from = defined $offset ? $offset : ($page - 1) * $count || 0;
 
     my ($images, $found_row_count)  = Babyry::Model::ImageUserMap::get_by_user_id_stamp_id_child_id($teng, $uploaded_by, $stamp_id, $child_id, $from, $count);
 
