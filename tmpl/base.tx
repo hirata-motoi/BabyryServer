@@ -60,12 +60,9 @@
         padding: 15px 15px;
       }
       .navbar-default {
-        background-image: -moz-linear-gradient(top, #ffe4b2, #ffa500);
-        background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffe4b2), to(#ffa500));
-        background-image: -webkit-linear-gradient(top, #ffe4b2, #ffa500);
-        background-image: -o-linear-gradient(top, #ffe4b2, #ffa500);
-        background-image: linear-gradient(to bottom, #ffe4b2, #ffa500);
-        border-color: #ffa500;
+        border-color: rgba(246, 172, 23, 1.0);
+        background: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 42, 1.0)), to(rgba(246, 172, 23, 1.0)));
+        background: -moz-linear-gradient(top, rgba(255, 255, 41, 1.0), rgba(246, 172, 23, 1.0));
       }
       .navbar-default .navbar-brand {
         color: #FFFFFF;
@@ -99,7 +96,7 @@
     <div class="navbar navbar-default navbar-fixed-top" role="navigation">
       <div class="navbar-inner">
         <div class="container">
-          <a class="navbar-brand" href="/" data-ajax="false">Babyry</a>
+          <a class="navbar-brand" href="/" data-ajax="false" style="color: white;">Babyry</a>
           <a id="group_by_stamp" data-ajax="false" style="float: right; display: none; margin-right: 10px;"><img src="/static/img/menu/icon_star_alt.png"></a>
         </div>
       </div>
