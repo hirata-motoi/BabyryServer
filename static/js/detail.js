@@ -1,5 +1,5 @@
 (function() {
-  var console, defaultTextareaHeight, owlObject, showImageDetail, _base, _base1;
+  var console, defaultTextareaHeight, innerHeight, innerWidth, owlObject, showImageDetail, _base, _base1, _base2;
 
   if (typeof window.console === "undefined") {
     console = {};
@@ -20,101 +20,46 @@
 
   (_base1 = window.entryData).metadata || (_base1.metadata = {});
 
-  window.stampData || (window.stampData = {});
+  (_base2 = window.entryData).related_children || (_base2.related_children = {});
 
-  window.stampsByImagePosition || (window.stampsByImagePosition = {});
-
-  window.stamp_ids || (window.stamp_ids = []);
-
-  window.entryIdsInArray = [];
-
-  window.loadingFlg = false;
-
-  window.displayedElementsFlg = true;
+  window.child_ids || (window.child_ids = []);
 
   owlObject = void 0;
 
   defaultTextareaHeight = "30px";
 
+  innerWidth = 0;
+
+  innerHeight = 0;
+
   showImageDetail = function() {
-    var adjustDisplayedElements, alreadyAttachedStamp, backToWall, closeComments, createCommentNavigation, createImageBox, createStamp, createStampAttachIcon, editStamps, getCurrentEntryId, getData, getNextIds, getStampData, getStampHash, getXSRFToken, hasElem, pickData, preserveResponseData, replaceToolBoxContent, setEditStampGrayscale, setStampAttachList, setStampsByImagePosition, setUpScreenSize, setupGlobalFooter, setupGroupbyIcon, shouldPreLoad, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements, toggleStamp, upsertStampsByImagePosition;
+    var addChildToEntryData, alreadyAttachedChild, attachChildToImage, closeComments, createChild, createCommentNavigation, createImageBox, createOwlElementsWithResponse, detachChildFromImage, editChild, getCurrentPosition, getData, getXSRFToken, hasElem, hideAttachedChild, initEditChild, pickData, preserveResponseData, refreshChildAttachedMark, removeAttachedChild, replaceToolBoxContent, setChildAttachList, setUpScreenSize, setupGlobalFooter, showAttachedChild, showCarousel, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements;
     $(".img-thumbnail").on("click", function() {
-      var $elem, comment_count, data, i, imageId, image_id, image_url, initialIndex, innerHeight, innerWidth, n, owlContainer, stampElem, stampInfo, stampList, stamps, tappedEntryIndex, _i, _j, _len, _ref;
+      var imageId, tappedEntryIndex;
       setUpScreenSize();
-      setupGroupbyIcon();
       setupGlobalFooter();
       window.util.showPageLoading();
-      $(".container").addClass("full-size-screen");
       innerWidth = window.innerWidth;
       innerHeight = window.innerHeight;
       $(".container.content-body").css("width", innerWidth);
       $(".container.content-body").css("height", innerHeight);
       imageId = $(this).parents(".item").attr("image_id");
-      data = pickData();
       tappedEntryIndex = $(this).attr("entryIndex");
-      upsertStampsByImagePosition(data.list);
-      owlContainer = $(".owl-carousel").clone(true);
-      owlContainer.addClass("displayed");
-      for (i = _i = 0, _ref = data.found_row_count - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-        if (data.list[i]) {
-          image_url = data.list[i].fullsize_image_url;
-          window.entryIdsInArray.push(data.list[i].image_id);
-          stamps = data.list[i].stamps;
-          image_id = data.list[i].image_id;
-          comment_count = data.list[i].comments.length;
-        } else {
-          image_url = "";
-          image_id = "";
-          comment_count = 0;
-        }
-        $elem = createImageBox(image_url, image_id, comment_count, innerWidth, innerHeight);
-        owlContainer.append($elem);
-        if (data.list[i] && data.list[i].image_id === imageId) {
-          initialIndex = i;
-        }
-        if (stamps) {
-          stampList = [];
-          for (n = _j = 0, _len = stamps.length; _j < _len; n = ++_j) {
-            stampInfo = stamps[n];
-            stampElem = createStamp(stampInfo.stamp_id, stampInfo.icon_url);
-            $elem.find(".stamp-container").append(stampElem);
-          }
-        }
-        $elem.find(".stamp-container").hide();
-      }
-      $("#navbar-space").hide();
-      $(".dynamic-container").html(owlContainer);
-      $(window).scrollTop(0);
-      $(".owl-carousel.displayed").owlCarousel({
-        items: 1,
-        pagination: false,
-        scrollPerPage: true,
-        beforeMove: function() {},
-        afterMove: function() {
-          var count, currentPageNo, loadingFlg;
-          replaceToolBoxContent();
-          if (shouldPreLoad(5)) {
-            if (window.loadingFlg) {
-              return;
-            }
-            currentPageNo = 1;
-            count = 10;
-            showLoadingImage();
-            loadingFlg = true;
-            return getData(showEntries, showErrorMessage);
-          }
-        }
+      return showCarousel({
+        offset: tappedEntryIndex
+      }, function() {
+        var data;
+        window.util.hidePageLoading();
+        showNavBarFooter();
+        data = pickData();
+        return setChildAttachList(data.related_children);
       });
-      owlObject = $(".owl-carousel").data("owlCarousel");
-      owlObject.jumpTo(tappedEntryIndex);
-      window.util.hidePageLoading();
-      return showNavBarFooter();
     });
     $("#comment-submit").on("click", function() {
       var comment, currentPosition, imageElem, imageId, token;
       token = getXSRFToken();
       comment = $("#comment-textarea").val();
-      currentPosition = owlObject.currentPosition();
+      currentPosition = getCurrentPosition();
       imageElem = $(".img-box")[currentPosition];
       imageId = $(imageElem).attr("image-id");
       return $.ajax({
@@ -145,44 +90,45 @@
         }
       });
     });
-    shouldPreLoad = function(num) {
-      if (window.entryIdsInArray.length < owlObject.currentPosition() + num) {
-        return true;
-      } else {
-        return false;
-      }
-    };
     preserveResponseData = function(response) {
-      var entry, _i, _len, _ref;
-      _ref = response.data.entries;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        entry = _ref[_i];
-        window.entryData.entries.push(entry);
-      }
-      return window.entryData.metadata = response.metadata;
+      window.entryData.entries = response.data.entries;
+      window.entryData.metadata = response.metadata;
+      return window.entryData.related_children = response.related_children;
     };
     pickData = function() {
       return {
         list: window.entryData.entries,
-        found_row_count: window.entryData.metadata.found_row_count
+        found_row_count: window.entryData.metadata.found_row_count,
+        related_children: window.entryData.related_children,
+        metadata: window.entryData.metadata
       };
     };
-    getData = function(successCallback, errorCallback) {
+    getData = function(offset, initial, addOnCallback) {
       var countPerPage, nextPage;
       nextPage = window.entryData.metadata.page ? parseInt(window.entryData.metadata.page, 10) + 1 : 1;
       countPerPage = window.entryData.metadata.count || 10;
+      $.mobile.loading("show");
       return $.ajax({
         "url": "/entry/search.json",
         "processData": true,
         "contentType": false,
         "data": {
-          stamp_id: window.stamp_ids,
+          "child_id": window.child_ids,
           "page": nextPage,
-          "count": countPerPage
+          "count": countPerPage,
+          "offset": offset
         },
         "dataType": 'json',
-        "success": successCallback,
-        "error": errorCallback
+        "success": function(response) {
+          showEntries(response, initial);
+          if (typeof addOnCallback === "function") {
+            return addOnCallback();
+          }
+        },
+        "error": showErrorMessage,
+        "complete": function() {
+          return $.mobile.loading("hide");
+        }
       });
     };
     createImageBox = function(image_url, image_id, comment_count, innerWidth, innerHeight) {
@@ -201,7 +147,7 @@
       owlElem.find(".comment-notice").on("click", function() {
         var comment, comments, currentPosition, item, _i, _len;
         $(".comment-container").empty();
-        currentPosition = owlObject.currentPosition();
+        currentPosition = getCurrentPosition();
         comments = window.entryData.entries[currentPosition].comments;
         comments.sort(function(a, b) {
           var aCreatedAt, bCreatedAt;
@@ -236,153 +182,99 @@
       return $(".unloadedElems").first().find(".img-box img").attr("src", "/static/img/ajax-loader.gif");
     };
     showErrorMessage = function() {};
-    showEntries = function(response) {
-      var elem, i, image_url, unloadedElems, _i, _len;
+    showEntries = function(response, initial) {
+      var initialIndex, owlContainer, ret;
       if (response.data.entries.length < 1) {
         return;
       }
       preserveResponseData(response);
-      unloadedElems = $(".unloaded");
-      for (i = _i = 0, _len = unloadedElems.length; _i < _len; i = ++_i) {
-        elem = unloadedElems[i];
-        if (response.data.entries[i]) {
-          image_url = response.data.entries[i].fullsize_image_url;
-          $(elem).find(".img-box").css("background-image", "url('" + image_url + "')");
-          $(elem).find(".loading").removeClass("loading");
-          $(elem).removeClass("unloaded");
-          window.entryIdsInArray.push(response.data.entries[i].image_id);
-        } else {
-          window.loadingFlg = false;
-          break;
+      ret = createOwlElementsWithResponse(initial);
+      owlContainer = ret.owlContainer;
+      initialIndex = ret.initialIndex;
+      $(".container").addClass("full-size-screen");
+      $(".dynamic-container").html(owlContainer);
+      $(".owl-carousel.displayed").owlCarousel({
+        items: 1,
+        pagination: false,
+        scrollPerPage: true,
+        afterMove: function() {
+          return replaceToolBoxContent();
         }
-      }
-      return window.loadingFlg = false;
+      });
+      owlObject = $(".owl-carousel.displayed").data("owlCarousel");
+      return owlObject.jumpTo(initialIndex);
     };
-    getNextIds = function() {
-      var currentEntryId;
-      return currentEntryId = getCurrentEntryId;
-    };
-    getCurrentEntryId = function() {};
-    alreadyAttachedStamp = function(stampId, currentPosition) {
-      var _base2;
-      (_base2 = window.stampsByImagePosition)[currentPosition] || (_base2[currentPosition] = {});
-      if (window.stampsByImagePosition[currentPosition][stampId] === true) {
-        return true;
-      } else {
-        return false;
-      }
-    };
-    setStampsByImagePosition = function(stampId, currentPosition, value) {
-      var _base2;
-      (_base2 = window.stampsByImagePosition)[currentPosition] || (_base2[currentPosition] = {});
-      return window.stampsByImagePosition[currentPosition][stampId] = value;
-    };
-    upsertStampsByImagePosition = function(entries) {
-      var entry, i, n, stamp, _base2, _i, _len, _results;
-      _results = [];
-      for (i = _i = 0, _len = entries.length; _i < _len; i = ++_i) {
-        entry = entries[i];
-        (_base2 = window.stampsByImagePosition)[i] || (_base2[i] = {});
-        _results.push((function() {
-          var _j, _len1, _ref, _results1;
-          _ref = entry.stamps;
-          _results1 = [];
-          for (n = _j = 0, _len1 = _ref.length; _j < _len1; n = ++_j) {
-            stamp = _ref[n];
-            _results1.push(window.stampsByImagePosition[i][stamp.stamp_id] = true);
-          }
-          return _results1;
-        })());
-      }
-      return _results;
-    };
-    toggleStamp = function() {
-      var currentPosition, imageId, stampElem, stampHash, stampIconUrl, stampId, target, targetImgBox, targetStamp, token;
-      stampId = $(this).attr("stamp-id");
-      currentPosition = owlObject.currentPosition();
-      stampHash = getStampHash();
-      stampIconUrl = stampHash[stampId].icon_url;
-      targetImgBox = $(".img-box")[currentPosition];
-      imageId = $(targetImgBox).attr("image-id");
-      target = $("#attached-stamps-container");
-      if (alreadyAttachedStamp(stampId, currentPosition)) {
-        targetStamp = target.find('img[stamp-id="' + stampId + '"]').parent();
-        targetStamp.hide();
-        $(this).find("img").removeClass("icon-grayscale");
-        token = getXSRFToken();
-        return $.ajax({
-          "url": "/stamp/detach.json",
-          "type": "post",
-          "data": {
-            "image_id": imageId,
-            "stamp_id": stampId,
-            "XSRF-TOKEN": token
-          },
-          "dataType": "json",
-          "success": function(response) {
-            var stampContainer;
-            targetStamp.remove();
-            window.console.log($(targetImgBox).find('img[stamp-id="' + stampId + '"]').parent());
-            stampContainer = $(targetImgBox).find('img[stamp-id="' + stampId + '"]').parent();
-            stampContainer.remove();
-            return window.stampsByImagePosition[currentPosition][stampId] = false;
-          },
-          "error": function(xhr, textStatus, errorThrown) {
-            targetStamp.show();
-            return $(this).find("img").addClass("icon-grayscale");
-          }
+    createOwlElementsWithResponse = function(initial) {
+      var buttonAfter, buttonBefore, childElem, childInfo, childList, comment_count, count, data, div, elem, entry, image_id, image_url, initialIndex, length, moreImageAfterElem, moreImageBeforeElem, n, offset, owlContainer, _i, _j, _len, _len1, _ref;
+      data = pickData();
+      count = parseInt(data.found_row_count, 10);
+      offset = parseInt(data.metadata.offset, 10);
+      length = data.list.length;
+      initialIndex = initial === "max" ? data.list.length - 1 : 0;
+      owlContainer = $(".owl-carousel.template").clone(true);
+      owlContainer.removeClass("template");
+      owlContainer.addClass("displayed");
+      if (0 < offset) {
+        moreImageBeforeElem = createImageBox("/static/img/stamp/icon/1.jpeg", 0, 0, innerWidth, innerHeight);
+        buttonBefore = $("<a href=\"#\" class=\"btn btn-info btn-large\">YES</a>");
+        buttonBefore.on("click", function() {
+          showCarousel({
+            minIndex: offset
+          });
+          return false;
         });
-      } else {
-        stampElem = createStamp(stampId, stampIconUrl);
-        $("#attached-stamps-container").find("ul").append(stampElem);
-        $(targetImgBox).find(".stamp-container").append(stampElem.clone(true));
-        $(this).find("img").addClass("icon-grayscale");
-        setStampsByImagePosition(stampId, currentPosition, true);
-        token = getXSRFToken();
-        return $.ajax({
-          "url": "/stamp/attach.json",
-          "type": "post",
-          "data": {
-            "image_id": imageId,
-            "stamp_id": stampId,
-            "XSRF-TOKEN": token
-          },
-          "dataType": "json",
-          "error": function(xhr, textStatus, errorThrown) {
-            var regexp, res;
-            res = $.parseJSON(xhr.responseText);
-            regexp = new RegExp("stamp", "i");
-            if (res.error_messages.stamp_id && res.error_messages.stamp_id[0].match(regexp)) {
-
-            } else {
-              window.stampsByImagePosition[currentPosition][stampId] = false;
-              stampElem.remove();
-              return $(this).find("img").removeClass("icon-grayscale");
-            }
-          }
-        });
+        div = $("<div style=\"position: relative; margin-top: 100px\">もっとみるかニャ？</div>");
+        div.append(buttonBefore);
+        moreImageBeforeElem.find(".img-box").append(div);
+        moreImageBeforeElem.find(".img-box").addClass("moreImage");
+        owlContainer.append(moreImageBeforeElem);
+        initialIndex = initialIndex + 1;
       }
-    };
-    createStamp = function(stampId, stampIconUrl) {
-      var stampElem, stampImage;
-      stampElem = $("<li>");
-      stampElem.addClass("stamp");
-      stampImage = $("<img>");
-      stampImage.addClass("stamp-icon");
-      stampImage.attr("src", stampIconUrl);
-      stampImage.attr("stamp-id", stampId);
-      stampElem.append(stampImage);
-      return stampElem;
-    };
-    getStampHash = function() {
-      var stamp, stampHash, _i, _len, _ref;
-      stampHash = {};
-      _ref = window.stampData;
+      _ref = data.list;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        stamp = _ref[_i];
-        stampHash[stamp.stamp_id] = stamp;
+        entry = _ref[_i];
+        image_url = entry.fullsize_image_url;
+        childList = entry.child;
+        image_id = entry.image_id;
+        comment_count = entry.comments.length;
+        elem = createImageBox(image_url, image_id, comment_count, innerWidth, innerHeight);
+        owlContainer.append(elem);
+        if (childList) {
+          for (n = _j = 0, _len1 = childList.length; _j < _len1; n = ++_j) {
+            childInfo = childList[n];
+            childElem = createChild(childInfo.child_id, childInfo.child_name);
+            elem.find(".child-container").append(childElem);
+          }
+        }
+        elem.find(".child-container").hide();
       }
-      return stampHash;
+      if (count > offset + length) {
+        moreImageAfterElem = createImageBox("/static/img/stamp/icon/1.jpeg", 0, 0, innerWidth, innerHeight);
+        buttonAfter = $("<a href=\"#\" class=\"btn btn-info btn-large\">YES</a>");
+        buttonAfter.on("click", function() {
+          showCarousel({
+            maxIndex: offset + length - 1
+          });
+          return false;
+        });
+        div = $("<div style=\"position: relative; margin-top: 100px\">もっとみるかニャ？</div>");
+        div.append(buttonAfter);
+        moreImageAfterElem.find(".img-box").append(div);
+        moreImageAfterElem.find(".img-box").addClass("moreImage");
+        owlContainer.append(moreImageAfterElem);
+      }
+      return {
+        owlContainer: owlContainer,
+        initialIndex: initialIndex
+      };
+    };
+    createChild = function(childId, childName) {
+      var childElem, text;
+      childElem = $($("#child-tag-tmpl").clone(true).html());
+      childElem.attr("data-child-id", childId);
+      text = childName.length > 10 ? childName.substr(0, 10) + "..." : childName;
+      childElem.find("a").text(text);
+      return childElem;
     };
     getXSRFToken = function() {
       var c, cookies, matched, token, _i, _len;
@@ -396,18 +288,6 @@
       }
       return token;
     };
-    createStampAttachIcon = function(stamp) {
-      var elem, img;
-      elem = $("<a>");
-      elem.addClass("stamp-attach-icon");
-      elem.attr("stamp-id", stamp.stamp_id);
-      img = $("<img>");
-      img.attr("src", stamp.icon_url);
-      img.addClass("listed-stamp");
-      elem.append(img);
-      elem.on("click", toggleStamp);
-      return elem;
-    };
     hasElem = function(data) {
       var i, _i, _len;
       for (_i = 0, _len = data.length; _i < _len; _i++) {
@@ -416,66 +296,15 @@
       }
       return false;
     };
-    getStampData = function() {
-      return window.stampData;
-    };
-    setStampAttachList = function() {
-      var elem, i, stamp, stampList, _i, _len, _results;
-      $("#stampAttachModal").find(".modal-body").empty();
-      stampList = getStampData();
-      _results = [];
-      for (i = _i = 0, _len = stampList.length; _i < _len; i = ++_i) {
-        stamp = stampList[i];
-        elem = createStampAttachIcon(stamp);
-        _results.push($("#stamp-edit-container").append(elem));
-      }
-      return _results;
-    };
-    backToWall = function() {
-      $(".container").removeClass("full-size-screen");
-      return location.href = "/";
-    };
     toggleDisplayedElements = function() {
-      $(".navbar").toggle();
-      return window.displayedElementsFlg = $(".navbar").css("display") === "none" ? false : true;
-    };
-    adjustDisplayedElements = function() {
-      var currentPosition, elems, i, imageElem, indexes, _i, _j, _len, _ref, _results, _results1;
-      currentPosition = parseInt(owlObject.currentPosition(), 10);
-      elems = $(".img-box");
-      if (window.entryData.entries.length < 4) {
-        indexes = (function() {
-          _results = [];
-          for (var _i = 0, _ref = window.entryData.entries.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; 0 <= _ref ? _i++ : _i--){ _results.push(_i); }
-          return _results;
-        }).apply(this);
-      } else if (currentPosition === 0) {
-        indexes = [0, 1];
-      } else if (currentPosition === window.entryData.entries.length - 1) {
-        indexes = [currentPosition + 0 - 1, currentPosition];
-      } else {
-        indexes = [currentPosition, currentPosition - 1, currentPosition + 0 + 1];
-      }
-      _results1 = [];
-      for (_j = 0, _len = indexes.length; _j < _len; _j++) {
-        i = indexes[_j];
-        imageElem = $(elems[i]);
-        if (window.displayedElementsFlg) {
-          imageElem.find(".stamp-container").show();
-          _results1.push(imageElem.find(".img-footer").show());
-        } else {
-          imageElem.find(".stamp-container").hide();
-          _results1.push(imageElem.find(".img-footer").hide());
-        }
-      }
-      return _results1;
+      return $(".navbar").toggle();
     };
     replaceToolBoxContent = function() {
-      var commentCount, commentCountText, commentItem, comments, currentPosition, elems, stampContainer;
-      currentPosition = parseInt(owlObject.currentPosition(), 10);
+      var childContainer, commentCount, commentCountText, commentItem, comments, currentPosition, elems;
+      currentPosition = getCurrentPosition();
       elems = $(".img-box");
-      stampContainer = $($(elems)[currentPosition]).find(".stamp-container").clone(true);
-      $("#attached-stamps-container").find("ul").html(stampContainer.html());
+      childContainer = $($(elems)[currentPosition]).find(".child-container").clone(true);
+      $("#child-tag-container").find("ul").html(childContainer.html());
       $("#recent-comment-container").empty();
       comments = window.entryData.entries[currentPosition].comments;
       if (comments && comments.length > 0) {
@@ -484,10 +313,10 @@
           aCreatedAt = a.created_at;
           bCreatedAt = b.created_at;
           if (aCreatedAt < bCreatedAt) {
-            return -1;
+            return 1;
           }
           if (aCreatedAt > bCreatedAt) {
-            return 1;
+            return -1;
           }
           return 0;
         });
@@ -508,15 +337,15 @@
     };
     showNavBarFooter = function() {
       $("#comment-count").on("click", showComments);
-      $("#comment-box").on("click", showComments);
+      $("#comment-edit-icon").on("click", showComments);
+      $("#child-edit-icon").on("click", editChild);
       $("#modal-header").on("click", closeComments);
-      $("#stamp-edit").on("click", editStamps);
       return $(".navbar-footer").show();
     };
     showComments = function() {
       var comment, comments, container, currentPosition, item, list, tmpl;
       container = $("#all-comment-container");
-      currentPosition = parseInt(owlObject.currentPosition(), 10);
+      currentPosition = getCurrentPosition();
       comments = window.entryData.entries[currentPosition].comments;
       comments.sort(function(a, b) {
         var aCreatedAt, bCreatedAt;
@@ -546,12 +375,11 @@
           return _results;
         })();
       }
-      window.console.log(comments.length);
       container.find("ul").empty();
       container.find("ul").append(list);
       $(".navbar-footer").addClass("all-comment-container-opened");
-      $("#attached-stamps-container").hide();
-      $("#stamp-edit-container").hide();
+      $("#attached-child-tag-container").hide();
+      $("#child-edit-container").hide();
       $("#recent-comment-container").hide();
       $("#comment-operation-container").hide();
       $("#comment-input-container").show();
@@ -563,20 +391,20 @@
     };
     closeComments = function() {
       $(".navbar-footer").removeClass("all-comment-container-opened");
-      $("#attached-stamps-container").show();
-      $("#stamp-edit-container").hide();
+      $("#attached-child-tag-container").show();
+      $("#child-edit-container").hide();
       $("#recent-comment-container").show();
       $("#comment-operation-container").show();
+      $("#child-message-container").hide();
       $("#comment-input-container").hide();
       $("#all-comment-container").hide();
       return $("#modal-header").hide();
     };
-    editStamps = function() {
+    editChild = function() {
       $(".navbar-footer").addClass("all-comment-container-opened");
-      $("#attached-stamps-container").hide();
-      $("#stamp-edit-container").hide();
-      $("#stamp-edit-container").show();
-      setEditStampGrayscale();
+      $("#attached-child-tag-container").hide();
+      $("#child-edit-container").show();
+      initEditChild();
       $("#recent-comment-container").hide();
       $("#comment-operation-container").hide();
       $("#comment-input-container").hide();
@@ -589,48 +417,267 @@
       ss = document.styleSheets;
       return $(ss).each(function() {
         var idx;
-        window.console.log($(this)[0].title);
         if ($(this)[0].title === "dynamic") {
           idx = $(this)[0].cssRules.length;
           return $(this)[0].insertRule(rule, idx);
         }
       });
     };
-    setEditStampGrayscale = function() {
-      var container, currentPosition, stampId, stamps, _results;
-      container = $("#stamp-edit-container");
-      currentPosition = parseInt(owlObject.currentPosition(), 10);
-      stamps = window.stampsByImagePosition[currentPosition];
+    initEditChild = function() {
+      var child, childHash, currentPosition, _base3, _i, _len, _ref;
+      currentPosition = getCurrentPosition();
+      (_base3 = window.entryData.entries[currentPosition]).child || (_base3.child = []);
+      childHash = {};
+      _ref = window.entryData.entries[currentPosition].child;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        child = _ref[_i];
+        childHash[child.child_id] = true;
+      }
+      $(".child-attach-item").each(function() {
+        var childId;
+        childId = $(this).attr("data-child-id");
+        if (childHash[childId]) {
+          return $(this).find(".child-attached-mark span").show();
+        } else {
+          return $(this).find(".child-attached-mark span").hide();
+        }
+      });
+      refreshChildAttachedMark();
+      $("#child-edit-container").find("ul").listview("refresh");
+      if ($(".child-attach-item").length < 1) {
+        $("#child-edit-container,#child-tag-container").hide();
+        return $("#child-message-container").show();
+      }
+    };
+    setupGlobalFooter = function() {
+      return $("#global-footer").hide();
+    };
+    setChildAttachList = function(related_children) {
+      var child, child_id, child_name, icon_url, item, itemObj, tmpl, _i, _len, _results;
+      if (!related_children || related_children.length < 1) {
+        return;
+      }
       _results = [];
-      for (stampId in stamps) {
-        if (stamps[stampId] === true) {
-          _results.push(container.find("a[stamp-id=" + stampId + "]").find("img").addClass("icon-grayscale"));
+      for (_i = 0, _len = related_children.length; _i < _len; _i++) {
+        child = related_children[_i];
+        icon_url = child.icon_url;
+        child_id = child.child_id;
+        child_name = child.child_name;
+        tmpl = _.template($('#template-child-attach-item').html());
+        item = tmpl({
+          child_icon_url: icon_url,
+          child_name: child_name,
+          child_id: child_id
+        });
+        itemObj = $(item);
+        _results.push($("#child-edit-container").find("ul").append(itemObj));
+      }
+      return _results;
+    };
+    attachChildToImage = function() {
+      var childElem, childId, childName, currentPosition, imageElem, imageId, token;
+      childId = $(this).attr("data-child-id");
+      childName = $(this).find(".child-name").text();
+      currentPosition = getCurrentPosition();
+      imageElem = $(".img-box")[currentPosition];
+      imageId = $(imageElem).attr("image-id");
+      token = getXSRFToken();
+      childElem = createChild(childId, childName);
+      if (!alreadyAttachedChild(childId)) {
+        $("#child-tag-container").find("ul").append(childElem);
+      }
+      $(this).find(".child-attached-mark span").show();
+      return $.ajax({
+        url: "/image/child/attach.json",
+        type: "POST",
+        data: {
+          "image_id": imageId,
+          "child_id": childId,
+          "XSRF-TOKEN": token
+        },
+        dataType: "json",
+        success: function(response) {
+          if (!response.rows || response.rows < 1) {
+            removeAttachedChild(childId);
+            refreshChildAttachedMark();
+            return;
+          }
+          if (addChildToEntryData(childId, childName)) {
+            $(imageElem).find(".child-container").append(childElem.clone(true));
+            return refreshChildAttachedMark();
+          }
+        },
+        error: function() {
+          removeAttachedChild(childId);
+          return refreshChildAttachedMark();
+        }
+      });
+    };
+    hideAttachedChild = function(childId) {
+      var childTags, tag, _i, _len, _results;
+      childTags = $("#child-tag-container").find(".child-tag-li");
+      _results = [];
+      for (_i = 0, _len = childTags.length; _i < _len; _i++) {
+        tag = childTags[_i];
+        if (childId === $(tag).attr("data-child-id")) {
+          _results.push($(tag).hide());
         } else {
           _results.push(void 0);
         }
       }
       return _results;
     };
-    setupGroupbyIcon = function() {
-      return $("#group_by_stamp").show();
+    showAttachedChild = function(childId) {
+      var childTags, tag, _i, _len, _results;
+      childTags = $("#child-tag-container").find(".child-tag-li");
+      _results = [];
+      for (_i = 0, _len = childTags.length; _i < _len; _i++) {
+        tag = childTags[_i];
+        if (childId === $(tag).attr("data-child-id")) {
+          _results.push($(tag).show());
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
     };
-    setupGlobalFooter = function() {
-      return $("#global-footer").hide();
-    };
-    if (!hasElem(window.stampData)) {
-      return $.ajax({
-        "url": "/stamp/list.json",
-        "type": "get",
-        "processData": true,
-        "contentType": false,
-        success: function(response) {
-          window.stampData = response.data;
-          return setStampAttachList();
+    removeAttachedChild = function(childId) {
+      var child, childTags, children, currentPosition, index, length, tag, _i, _j, _len, _ref, _results;
+      childTags = $("#child-tag-container").find(".child-tag-li");
+      for (_i = 0, _len = childTags.length; _i < _len; _i++) {
+        tag = childTags[_i];
+        if (childId === $(tag).attr("data-child-id")) {
+          $(tag).remove();
+        }
+      }
+      currentPosition = getCurrentPosition();
+      $($(".img-box")[currentPosition]).find(".child-tag-li").each(function() {
+        if (childId === $(this).attr("data-child-id")) {
+          return $(this).remove();
         }
       });
-    } else {
-      return setStampAttachList();
-    }
+      children = window.entryData.entries[currentPosition].child;
+      length = children.length;
+      _results = [];
+      for (index = _j = _ref = length - 1; _ref <= 0 ? _j <= 0 : _j >= 0; index = _ref <= 0 ? ++_j : --_j) {
+        child = children[index];
+        if (child.child_id === childId) {
+          _results.push(children.splice(index, 1));
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
+    };
+    alreadyAttachedChild = function(childId) {
+      var child, children, currentPosition, index, _base3, _i, _len;
+      currentPosition = getCurrentPosition();
+      (_base3 = window.entryData.entries[currentPosition]).child || (_base3.child = []);
+      children = window.entryData.entries[currentPosition].child;
+      for (index = _i = 0, _len = children.length; _i < _len; index = ++_i) {
+        child = children[index];
+        if (child.child_id === childId) {
+          return true;
+        }
+      }
+    };
+    addChildToEntryData = function(childId, childName) {
+      var currentPosition, _base3;
+      currentPosition = getCurrentPosition();
+      (_base3 = window.entryData.entries[currentPosition]).child || (_base3.child = []);
+      if (alreadyAttachedChild(childId)) {
+        return false;
+      }
+      window.entryData.entries[currentPosition].child.push({
+        "child_id": childId,
+        "child_name": childName
+      });
+      return true;
+    };
+    detachChildFromImage = function() {
+      var childId, childName, currentPosition, imageElem, imageId, token;
+      childId = $(this).attr("data-child-id");
+      childName = $(this).find(".child-name").text();
+      currentPosition = getCurrentPosition();
+      imageElem = $(".img-box")[currentPosition];
+      imageId = $(imageElem).attr("image-id");
+      token = getXSRFToken();
+      hideAttachedChild(childId);
+      $(this).find(".child-attached-mark span").hide();
+      return $.ajax({
+        url: "/image/child/detach.json",
+        type: "POST",
+        data: {
+          "image_id": imageId,
+          "child_id": childId,
+          "XSRF-TOKEN": token
+        },
+        dataType: "json",
+        success: function(response) {
+          if (!response.rows || response.rows < 1) {
+            showAttachedChild(childId);
+          } else {
+            removeAttachedChild(childId);
+          }
+          return refreshChildAttachedMark();
+        },
+        error: function() {
+          showAttachedChild(childId);
+          return refreshChildAttachedMark();
+        }
+      });
+    };
+    refreshChildAttachedMark = function() {
+      var attachedChildren, child, childId, currentPosition, _base3, _i, _len, _ref;
+      currentPosition = getCurrentPosition();
+      (_base3 = window.entryData.entries[currentPosition]).child || (_base3.child = []);
+      attachedChildren = {};
+      _ref = window.entryData.entries[currentPosition].child;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        child = _ref[_i];
+        childId = child.child_id;
+        attachedChildren[childId] = true;
+      }
+      return $(".child-attach-item").each(function() {
+        childId = $(this).attr("data-child-id");
+        $(this).off("click");
+        if (attachedChildren[childId]) {
+          $(this).find(".child-attached-mark span").show();
+          return $(this).on("click", detachChildFromImage);
+        } else {
+          return $(this).on("click", attachChildToImage);
+        }
+      });
+    };
+    showCarousel = function(params, addOnCallback) {
+      var initial, offset;
+      if (params.offset) {
+        offset = params.offset;
+        initial = "min";
+      } else if (params.minIndex) {
+        if (params.minIndex <= 10) {
+          offset = 0;
+          initial = "min";
+        } else {
+          offset = params.minIndex - 10;
+          initial = "max";
+        }
+      } else if (params.maxIndex) {
+        initial = "min";
+        offset = params.maxIndex + 1;
+      } else {
+        return;
+      }
+      return getData(offset, initial, addOnCallback);
+    };
+    return getCurrentPosition = function() {
+      var position;
+      position = parseInt(owlObject.currentPosition(), 10);
+      if ($($(".img-box")[0]).hasClass("moreImage")) {
+        position = position - 1;
+      }
+      return position;
+    };
   };
 
   window.util || (window.util = {});

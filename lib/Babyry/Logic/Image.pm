@@ -39,6 +39,20 @@ sub comment {
     return $service->comment($params);
 }
 
+sub child_attach {
+    my ($self, $params) = @_;
+
+    my $service = Babyry::Service::Image->new;
+    return $service->child_attach($params);
+}
+
+sub child_detach {
+    my ($self, $params) = @_;
+
+    my $service = Babyry::Service::Image->new;
+    return $service->child_detach($params);
+}
+
 
 1;
 
