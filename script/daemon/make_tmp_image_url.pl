@@ -6,8 +6,6 @@ use warnings;
 use File::Spec;
 use File::Basename;
 use lib File::Spec->catdir(dirname(__FILE__), '../../lib');
-# temp
-$ENV{APP_ENV} = "development";
 
 use Log::Minimal;
 use AWS::CLIWrapper;

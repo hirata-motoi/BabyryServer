@@ -2,10 +2,11 @@
 exec 2>&1
 
 PERL=/home/babyry/perl5/perlbrew/perls/perl-5.16.3/bin/perl
-DAEMON=/home/babyry/BabyryServer5001/script/daemon/make_tmp_image_url.pl
+DAEMON=/home/babyry/BabyryServer/script/daemon/make_tmp_image_url.pl
 
 . /home/babyry/aws/credential
 
 exec \
   envdir ./env \
+  setuidgid babyry \
   $PERL $DAEMON

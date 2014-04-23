@@ -48,7 +48,7 @@ sub make_thumbnail {
     $thumb->write( file => $thumb_path ) or return { error3 => $thumb->errstr };
 
     my $s3 = Babyry::Model::UploadS3->new()->tmp_upload($tmpdir, [$image_name, $thumb_name]);
-    my $tmp_url = 'https://babyry-image-tmp-upload-dev.s3.amazonaws.com/'.$thumb_name;
+    my $tmp_url = 'https://' . Babyry::Common->config->{tmp_bucket} . '.s3.amazonaws.com/'.$thumb_name;
 
     return {
         image_tmp_name => $thumb_name,

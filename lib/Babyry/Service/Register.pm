@@ -95,15 +95,19 @@ sub execute {
 
     # TODO subject/body + sendを1つのmethodに任せる
     # TODO evalの中に移動
+    my $domain = $c->stash->{domain};
     $mail->set_subject("Babyryにようこそ");
     $mail->set_body(<<"TEXT");
-        Please click this url to verify your account.
+        Babyryにご登録ありがとうございます。
+        以下のURLをクリックするとアカウントが有効になります。
 
-        http://babyryserver5000/register/verify?token=$token
-        http://babyryserver5001/register/verify?token=$token
-        http://babyryserver5002/register/verify?token=$token
+        https://$domain/register/verify?token=$token
 TEXT
-    $mail->set_address('meaning.sys@gmail.com');
+    if ($ENV{APP_ENV} eq 'production') {
+        $mail->set_address($params->{email});
+    } else {
+        $mail->set_address('meaning.sys@gmail.com');
+    }
     $mail->send_mail();
 }
 

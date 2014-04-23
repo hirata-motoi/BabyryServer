@@ -8,6 +8,8 @@ use Log::Minimal;
 use Carp;
 use Babyry::Web::Root;
 
+use Data::Dumper;
+
 # load plugins
 __PACKAGE__->load_plugins(
     'Web::FillInFormLite',
@@ -56,6 +58,13 @@ sub render_json_validation_error {
 __PACKAGE__->add_trigger(
     BEFORE_DISPATCH => sub {
         my ($c, $res) = @_;
+
+        # set domain
+        $c->stash->{domain} = $c->req->env->{'HTTP_HOST'};
+
+        # to https
+        $c->req->env->{"psgi.url_scheme"} = "https";
+
         my $session_id = $c->session->get('session_id');
 
         # TODO move to config
