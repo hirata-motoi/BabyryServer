@@ -19,6 +19,8 @@ owlObject = undefined
 defaultTextareaHeight = "30px"
 innerWidth  = 0
 innerHeight = 0
+navbarShow  = true
+navbarFooterHIdeLocked  = false
 
 showImageDetail = () ->
   $(".img-thumbnail").on("click", () ->
@@ -50,8 +52,7 @@ showImageDetail = () ->
   $("#comment-submit").on("click", () ->
     token = getXSRFToken()
     comment = $("#comment-textarea").val()
-    currentPosition = getCurrentPosition()
-    imageElem = $(".img-box")[currentPosition]
+    imageElem = $(".img-box")[ getCurrentPosition() ]
     imageId = $(imageElem).attr("image-id")
 
     $.ajax({
@@ -71,7 +72,7 @@ showImageDetail = () ->
           comment_text: data.comment
         $("#all-comment-container").find("ul").append item
 
-        window.entryData.entries[currentPosition].comments.push {"comment": comment}
+        window.entryData.entries[ getCurrentEntryIndex() ].comments.push {"comment": comment}
 
         # textareaを空にする
         $("#comment-textarea").val("")
@@ -80,7 +81,7 @@ showImageDetail = () ->
         $("#comment-textarea").css "height", defaultTextareaHeight
 
         # コメント件数を変更
-        commentCount = window.entryData.entries[currentPosition].comments.length
+        commentCount = window.entryData.entries[ getCurrentEntryIndex() ].comments.length
         $(imageElem).find(".comment-notice").text createCommentNavigation(commentCount)
 
     })
@@ -140,8 +141,7 @@ showImageDetail = () ->
     owlElem.find(".comment-notice").on "click", () ->
       $(".comment-container").empty()
 
-      currentPosition = getCurrentPosition()
-      comments = window.entryData.entries[currentPosition].comments
+      comments = window.entryData.entries[ getCurrentEntryIndex() ].comments
 
       comments.sort( (a, b) ->
         aCreatedAt = a.created_at
@@ -285,18 +285,41 @@ showImageDetail = () ->
     return false
 
   toggleDisplayedElements = () ->
-    $(".navbar").toggle()
+    if navbarShow
+      $(".navbar").hide()
+      navbarShow = false
+    else
+      if navbarFooterHIdeLocked
+        $(".navbar:not(\".navbar-footer\")").show()
+      else
+        $(".navbar").show()
+      navbarShow = true
+
+  initializeDisplayedElements = () ->
+    navbarFooterHIdeLocked = false
+    if navbarShow
+      $(".navbar").show()
+    else
+      $(".navbar").hide()
 
   replaceToolBoxContent = () ->
-    currentPosition = getCurrentPosition()
+    currentEntryIndex = getCurrentEntryIndex()
     elems = $(".img-box")
+    window.console.log  $(elems)[currentEntryIndex]
+    if $( $(elems)[ getCurrentPosition() ] ).hasClass "moreImage"
+      $(".navbar-footer").hide()
+      navbarFooterHIdeLocked = true
+      return
+    else 
+      navbarFooterHIdeLocked = false
+
     # childの入れ替え
-    childContainer = $( $(elems)[currentPosition] ).find(".child-container").clone(true)
+    childContainer = $( $(elems)[currentEntryIndex] ).find(".child-container").clone(true)
     $("#child-tag-container").find("ul").html childContainer.html()
 
     # コメントの入れ替え
     $("#recent-comment-container").empty()
-    comments = window.entryData.entries[currentPosition].comments
+    comments = window.entryData.entries[currentEntryIndex].comments
 
     if comments and comments.length > 0
       comments.sort( (a, b) ->
@@ -321,6 +344,8 @@ showImageDetail = () ->
     commentCountText = createCommentNavigation commentCount
     $("#comment-count").text commentCountText
 
+    initializeDisplayedElements()
+
   createCommentNavigation = (comment_count) ->
     "コメント" + comment_count + "件"
 
@@ -333,8 +358,7 @@ showImageDetail = () ->
 
   showComments = () ->
     container = $("#all-comment-container")
-    currentPosition = getCurrentPosition()
-    comments = window.entryData.entries[currentPosition].comments
+    comments = window.entryData.entries[ getCurrentEntryIndex() ].comments
     comments.sort( (a, b) ->
       aCreatedAt = a.created_at
       bCreatedAt = b.created_at
@@ -395,10 +419,10 @@ showImageDetail = () ->
         $(this)[0].insertRule rule, idx
 
   initEditChild = () ->
-    currentPosition = getCurrentPosition()
-    window.entryData.entries[currentPosition].child or= []
+    currentEntryIndex = getCurrentEntryIndex()
+    window.entryData.entries[currentEntryIndex].child or= []
     childHash = {}
-    for child in window.entryData.entries[currentPosition].child
+    for child in window.entryData.entries[currentEntryIndex].child
       childHash[child.child_id] = true
 
     $(".child-attach-item").each () ->
@@ -437,8 +461,7 @@ showImageDetail = () ->
   attachChildToImage = () ->
     childId   = $(this).attr "data-child-id"
     childName = $(this).find(".child-name").text()
-    currentPosition = getCurrentPosition()
-    imageElem = $(".img-box")[currentPosition]
+    imageElem = $(".img-box")[ getCurrentEntryIndex() ]
     imageId = $(imageElem).attr("image-id")
     token = getXSRFToken()
 
@@ -494,13 +517,13 @@ showImageDetail = () ->
         $(tag).remove()
 
     # 裏で保持してるDOMから削除
-    currentPosition = getCurrentPosition()
-    $( $(".img-box")[currentPosition] ).find(".child-tag-li").each () ->
+    currentEntryIndex = getCurrentEntryIndex()
+    $( $(".img-box")[currentEntryIndex] ).find(".child-tag-li").each () ->
       if childId == $(this).attr("data-child-id")
         $(this).remove()
 
     # entryDataから削除
-    children = window.entryData.entries[currentPosition].child
+    children = window.entryData.entries[currentEntryIndex].child
     length   = children.length
     for index in [length - 1 .. 0]
       child = children[index]
@@ -508,24 +531,23 @@ showImageDetail = () ->
         children.splice index, 1
 
   alreadyAttachedChild = (childId) ->
-    currentPosition = getCurrentPosition()
-    window.entryData.entries[currentPosition].child or= []
-    children = window.entryData.entries[currentPosition].child
+    currentEntryIndex = getCurrentEntryIndex()
+    window.entryData.entries[currentEntryIndex].child or= []
+    children = window.entryData.entries[currentEntryIndex].child
     for child, index in children
       return true if child.child_id == childId
 
   addChildToEntryData = (childId, childName) ->
-    currentPosition = getCurrentPosition()
-    window.entryData.entries[currentPosition].child or= []
+    currentEntryIndex = getCurrentEntryIndex()
+    window.entryData.entries[currentEntryIndex].child or= []
     return false if alreadyAttachedChild childId
-    window.entryData.entries[currentPosition].child.push {"child_id": childId, "child_name": childName}
+    window.entryData.entries[currentEntryIndex].child.push {"child_id": childId, "child_name": childName}
     return true
 
   detachChildFromImage = () ->
     childId   = $(this).attr "data-child-id"
     childName = $(this).find(".child-name").text()
-    currentPosition = getCurrentPosition()
-    imageElem = $(".img-box")[currentPosition]
+    imageElem = $(".img-box")[ getCurrentEntryIndex() ]
     imageId = $(imageElem).attr("image-id")
     token = getXSRFToken()
 
@@ -559,11 +581,11 @@ showImageDetail = () ->
     })
 
   refreshChildAttachedMark = () ->
-    currentPosition = getCurrentPosition()
-    window.entryData.entries[currentPosition].child or= []
+    currentEntryIndex = getCurrentEntryIndex()
+    window.entryData.entries[currentEntryIndex].child or= []
 
     attachedChildren = {}
-    for child in window.entryData.entries[currentPosition].child
+    for child in window.entryData.entries[currentEntryIndex].child
       childId = child.child_id
       attachedChildren[childId] = true
 
@@ -595,11 +617,14 @@ showImageDetail = () ->
 
     getData offset, initial, addOnCallback
 
-  getCurrentPosition = () ->
+  getCurrentEntryIndex = () ->
     position = parseInt owlObject.currentPosition(), 10
     if $( $(".img-box")[0] ).hasClass "moreImage"
       position = position - 1
     return position
+
+  getCurrentPosition = () ->
+    return parseInt owlObject.currentPosition(), 10
 
 window.util ||= {}
 window.util.showImageDetail = showImageDetail
