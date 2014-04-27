@@ -12,7 +12,7 @@ this part will be replaced by methods in entries.coffee
 window.entryData or= {}
 window.entryData.entries or= []
 window.entryData.metadata or= {}
-window.entryData.related_children or= {}
+window.entryData.related_child or= {}
 window.child_ids or = []
 
 owlObject = undefined
@@ -46,7 +46,7 @@ showImageDetail = () ->
       showNavBarFooter()
       # child
       data = pickData()
-      setChildAttachList(data.related_children)
+      setChildAttachList(data.related_child)
   )
 
   $("#comment-submit").on("click", () ->
@@ -91,13 +91,13 @@ showImageDetail = () ->
   preserveResponseData = (response) ->
     window.entryData.entries  =  response.data.entries
     window.entryData.metadata = response.metadata
-    window.entryData.related_children = response.related_children
+    window.entryData.related_child = response.data.related_child
 
   pickData = () ->
     return {
       list             : window.entryData.entries,
       found_row_count  : window.entryData.metadata.found_row_count,
-      related_children : window.entryData.related_children,
+      related_child    : window.entryData.related_child,
       metadata         : window.entryData.metadata
     }
 
@@ -305,7 +305,6 @@ showImageDetail = () ->
   replaceToolBoxContent = () ->
     currentEntryIndex = getCurrentEntryIndex()
     elems = $(".img-box")
-    window.console.log  $(elems)[currentEntryIndex]
     if $( $(elems)[ getCurrentPosition() ] ).hasClass "moreImage"
       $(".navbar-footer").hide()
       navbarFooterHIdeLocked = true
@@ -437,15 +436,27 @@ showImageDetail = () ->
     # availableなchildがいない場合はその旨のメッセージを表示
     if $(".child-attach-item").length < 1
       $("#child-edit-container,#child-tag-container").hide();
-      $("#child-message-container").show();
+      $("#child-message-container").show()
+
+    adjustHeightOfChildEditContainer()
+
+  adjustHeightOfChildEditContainer = () ->
+    # child-tag-containerとchild-edit-containerを合わせて画面いっぱいになるように
+    # child-edit-containerの高さを調整
+    # innerHeight - modal-header - child-tag-container - 20px(余白)
+    navbarHeight       = parseInt $(".navbar.navbar-default").css("height").replace(/px/, ""), 10
+    modalHeight        = parseInt $("#modal-header").css("height").replace(/px/, ""), 10
+    tagContainerHeight = parseInt $("#child-tag-container").css("height").replace(/px/, ""), 10
+    height = innerHeight - navbarHeight - modalHeight - tagContainerHeight - 20
+    $("#child-edit-container").css "height", height+"px"
 
   setupGlobalFooter = () ->
     $("#global-footer").hide()
 
-  setChildAttachList = (related_children) ->
-    return if ! related_children || related_children.length < 1
+  setChildAttachList = (related_child) ->
+    return if ! related_child || related_child.length < 1
 
-    for child in related_children
+    for child in related_child
       icon_url   = child.icon_url
       child_id   = child.child_id
       child_name = child.child_name
@@ -523,18 +534,18 @@ showImageDetail = () ->
         $(this).remove()
 
     # entryDataから削除
-    children = window.entryData.entries[currentEntryIndex].child
-    length   = children.length
+    childList = window.entryData.entries[currentEntryIndex].child
+    length   = childList.length
     for index in [length - 1 .. 0]
-      child = children[index]
+      child = childList[index]
       if child.child_id == childId
-        children.splice index, 1
+        childList.splice index, 1
 
   alreadyAttachedChild = (childId) ->
     currentEntryIndex = getCurrentEntryIndex()
     window.entryData.entries[currentEntryIndex].child or= []
-    children = window.entryData.entries[currentEntryIndex].child
-    for child, index in children
+    childList = window.entryData.entries[currentEntryIndex].child
+    for child, index in childList
       return true if child.child_id == childId
 
   addChildToEntryData = (childId, childName) ->

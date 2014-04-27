@@ -36,7 +36,7 @@ sub get_child_info_by_image_ids {
     return \%ret;
 }
 
-sub get_related_children {
+sub get_related_child_list {
     my ($self, $user_id) = @_;
 
     my $teng = $self->teng('BABYRY_MAIN_R');

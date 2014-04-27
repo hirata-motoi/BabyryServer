@@ -20,7 +20,7 @@
 
   (_base1 = window.entryData).metadata || (_base1.metadata = {});
 
-  (_base2 = window.entryData).related_children || (_base2.related_children = {});
+  (_base2 = window.entryData).related_child || (_base2.related_child = {});
 
   window.child_ids || (window.child_ids = []);
 
@@ -37,7 +37,7 @@
   navbarFooterHIdeLocked = false;
 
   showImageDetail = function() {
-    var addChildToEntryData, alreadyAttachedChild, attachChildToImage, closeComments, createChild, createCommentNavigation, createImageBox, createOwlElementsWithResponse, detachChildFromImage, editChild, getCurrentEntryIndex, getCurrentPosition, getData, getXSRFToken, hasElem, hideAttachedChild, initEditChild, initializeDisplayedElements, pickData, preserveResponseData, refreshChildAttachedMark, removeAttachedChild, replaceToolBoxContent, setChildAttachList, setUpScreenSize, setupGlobalFooter, showAttachedChild, showCarousel, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements;
+    var addChildToEntryData, adjustHeightOfChildEditContainer, alreadyAttachedChild, attachChildToImage, closeComments, createChild, createCommentNavigation, createImageBox, createOwlElementsWithResponse, detachChildFromImage, editChild, getCurrentEntryIndex, getCurrentPosition, getData, getXSRFToken, hasElem, hideAttachedChild, initEditChild, initializeDisplayedElements, pickData, preserveResponseData, refreshChildAttachedMark, removeAttachedChild, replaceToolBoxContent, setChildAttachList, setUpScreenSize, setupGlobalFooter, showAttachedChild, showCarousel, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements;
     $(".img-thumbnail").on("click", function() {
       var imageId, tappedEntryIndex;
       setUpScreenSize();
@@ -56,7 +56,7 @@
         window.util.hidePageLoading();
         showNavBarFooter();
         data = pickData();
-        return setChildAttachList(data.related_children);
+        return setChildAttachList(data.related_child);
       });
     });
     $("#comment-submit").on("click", function() {
@@ -96,13 +96,13 @@
     preserveResponseData = function(response) {
       window.entryData.entries = response.data.entries;
       window.entryData.metadata = response.metadata;
-      return window.entryData.related_children = response.related_children;
+      return window.entryData.related_child = response.data.related_child;
     };
     pickData = function() {
       return {
         list: window.entryData.entries,
         found_row_count: window.entryData.metadata.found_row_count,
-        related_children: window.entryData.related_children,
+        related_child: window.entryData.related_child,
         metadata: window.entryData.metadata
       };
     };
@@ -323,7 +323,6 @@
       var childContainer, commentCount, commentCountText, commentItem, comments, currentEntryIndex, elems;
       currentEntryIndex = getCurrentEntryIndex();
       elems = $(".img-box");
-      window.console.log($(elems)[currentEntryIndex]);
       if ($($(elems)[getCurrentPosition()]).hasClass("moreImage")) {
         $(".navbar-footer").hide();
         navbarFooterHIdeLocked = true;
@@ -474,20 +473,29 @@
       $("#child-edit-container").find("ul").listview("refresh");
       if ($(".child-attach-item").length < 1) {
         $("#child-edit-container,#child-tag-container").hide();
-        return $("#child-message-container").show();
+        $("#child-message-container").show();
       }
+      return adjustHeightOfChildEditContainer();
+    };
+    adjustHeightOfChildEditContainer = function() {
+      var height, modalHeight, navbarHeight, tagContainerHeight;
+      navbarHeight = parseInt($(".navbar.navbar-default").css("height").replace(/px/, ""), 10);
+      modalHeight = parseInt($("#modal-header").css("height").replace(/px/, ""), 10);
+      tagContainerHeight = parseInt($("#child-tag-container").css("height").replace(/px/, ""), 10);
+      height = innerHeight - navbarHeight - modalHeight - tagContainerHeight - 20;
+      return $("#child-edit-container").css("height", height + "px");
     };
     setupGlobalFooter = function() {
       return $("#global-footer").hide();
     };
-    setChildAttachList = function(related_children) {
+    setChildAttachList = function(related_child) {
       var child, child_id, child_name, icon_url, item, itemObj, tmpl, _i, _len, _results;
-      if (!related_children || related_children.length < 1) {
+      if (!related_child || related_child.length < 1) {
         return;
       }
       _results = [];
-      for (_i = 0, _len = related_children.length; _i < _len; _i++) {
-        child = related_children[_i];
+      for (_i = 0, _len = related_child.length; _i < _len; _i++) {
+        child = related_child[_i];
         icon_url = child.icon_url;
         child_id = child.child_id;
         child_name = child.child_name;
@@ -569,7 +577,7 @@
       return _results;
     };
     removeAttachedChild = function(childId) {
-      var child, childTags, children, currentEntryIndex, index, length, tag, _i, _j, _len, _ref, _results;
+      var child, childList, childTags, currentEntryIndex, index, length, tag, _i, _j, _len, _ref, _results;
       childTags = $("#child-tag-container").find(".child-tag-li");
       for (_i = 0, _len = childTags.length; _i < _len; _i++) {
         tag = childTags[_i];
@@ -583,13 +591,13 @@
           return $(this).remove();
         }
       });
-      children = window.entryData.entries[currentEntryIndex].child;
-      length = children.length;
+      childList = window.entryData.entries[currentEntryIndex].child;
+      length = childList.length;
       _results = [];
       for (index = _j = _ref = length - 1; _ref <= 0 ? _j <= 0 : _j >= 0; index = _ref <= 0 ? ++_j : --_j) {
-        child = children[index];
+        child = childList[index];
         if (child.child_id === childId) {
-          _results.push(children.splice(index, 1));
+          _results.push(childList.splice(index, 1));
         } else {
           _results.push(void 0);
         }
@@ -597,12 +605,12 @@
       return _results;
     };
     alreadyAttachedChild = function(childId) {
-      var child, children, currentEntryIndex, index, _base3, _i, _len;
+      var child, childList, currentEntryIndex, index, _base3, _i, _len;
       currentEntryIndex = getCurrentEntryIndex();
       (_base3 = window.entryData.entries[currentEntryIndex]).child || (_base3.child = []);
-      children = window.entryData.entries[currentEntryIndex].child;
-      for (index = _i = 0, _len = children.length; _i < _len; index = ++_i) {
-        child = children[index];
+      childList = window.entryData.entries[currentEntryIndex].child;
+      for (index = _i = 0, _len = childList.length; _i < _len; index = ++_i) {
+        child = childList[index];
         if (child.child_id === childId) {
           return true;
         }
