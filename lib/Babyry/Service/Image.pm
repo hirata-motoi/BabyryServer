@@ -20,6 +20,7 @@ use Babyry::Model::ImageQueue;
 use Babyry::Model::Child;
 use Babyry::Model::ImageChildMap;
 use Babyry::Service::Entry;
+use Babyry::Model::ImageFile;
 
 sub is_valid_image_id {
    my ($self, $image_id) = @_;
@@ -48,8 +49,8 @@ sub web_upload_execute {
     my ($self, $params) = @_;
 
     # make thumbnail
-    my $model = Babyry::Model::TempImageUpload->new;
-    my $ret = $model->make_thumbnail($params);
+    my $img_file   = Babyry::Model::ImageFile->factory($params);
+    my $ret = $self->model('temp_image_upload')->make_thumbnail($img_file, $params);
 
     return $ret;
 }

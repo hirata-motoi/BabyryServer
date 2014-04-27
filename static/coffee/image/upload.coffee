@@ -10,7 +10,8 @@ $("#add-image-icon").on("click", () ->
 
 $form = $("#image-post-form")
 $form.find("[type=file]").on("change", () ->
-  window.console.log "file changed"
+
+  $(".error").hide()
 
   box = showLoadingImage()
 
@@ -28,7 +29,8 @@ $form.find("[type=file]").on("change", () ->
       # TODO trim 
       box.find("img").css "width", "80"
       box.find("img").css "height", "80"
-    error: showErrorMessage
+    error: (xhr) ->
+      showErrorMessage xhr, box
   })
   return false
 )
@@ -89,17 +91,17 @@ submit = () ->
       },
       dataType: 'json',
       success: redirectToWall,
-      error: showErrorMessage,
+      error: (xhr) ->
+        showErrorMessage xhr,
     }
   )
 
 redirectToWall = (data) ->
   location.href = "/"
 
-showErrorMessage = (xhr, textStatus, errorThrown) ->
-  window.console.log xhr.responseText
-  # TODO show error message
-  window.alert xhr.responseText
+showErrorMessage = (xhr, box) ->
+  box.remove() if box
+  $(".error").show()
 
 getXSRFToken = ->
   cookies = document.cookie.split(/\s*;\s*/)

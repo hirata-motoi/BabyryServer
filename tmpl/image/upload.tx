@@ -51,6 +51,11 @@
     -webkit-box-shadow: 3px 3px 3px gray;
     -moz-box-shadow: 3px 3px 3px gray;
   }
+  .error {
+    color: red;
+    display: none;
+    text-align: center;
+  }
 </style>
 : }
 
@@ -73,6 +78,7 @@
   </span>
 </div>
 
+<div class="error">アップロードにに失敗しました</div>
 <a href="#relativesModal" class="btn btn-default btn-lg btn-block" id="post-button" data-toggle="modal" role="button" data-backdrop="true" data-ajax="false">
   投稿
 </a>

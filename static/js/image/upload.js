@@ -17,7 +17,7 @@
 
   $form.find("[type=file]").on("change", function() {
     var box, fd;
-    window.console.log("file changed");
+    $(".error").hide();
     box = showLoadingImage();
     fd = new FormData($form[0]);
     $.ajax($form.attr("action"), {
@@ -33,7 +33,9 @@
         box.find("img").css("width", "80");
         return box.find("img").css("height", "80");
       },
-      error: showErrorMessage
+      error: function(xhr) {
+        return showErrorMessage(xhr, box);
+      }
     });
     return false;
   });
@@ -87,7 +89,9 @@
       },
       dataType: 'json',
       success: redirectToWall,
-      error: showErrorMessage
+      error: function(xhr) {
+        return showErrorMessage(xhr);
+      }
     });
   };
 
@@ -95,9 +99,11 @@
     return location.href = "/";
   };
 
-  showErrorMessage = function(xhr, textStatus, errorThrown) {
-    window.console.log(xhr.responseText);
-    return window.alert(xhr.responseText);
+  showErrorMessage = function(xhr, box) {
+    if (box) {
+      box.remove();
+    }
+    return $(".error").show();
   };
 
   getXSRFToken = function() {
