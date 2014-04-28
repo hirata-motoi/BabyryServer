@@ -10,10 +10,17 @@ use lib File::Spec->catdir(dirname(__FILE__), '../../lib');
 use Log::Minimal;
 use AWS::CLIWrapper;
 use Data::Dumper;
+use Getopt::Long;
 
 use Babyry::Common;
 use Babyry::Model::ImageQueue;
 use Babyry::Model::Image;
+
+GetOptions(
+    'env|e=s' => \my $env,
+);
+$ENV{APP_ENV} ||= ($env || 'developmemt');
+
 
 my $aws = AWS::CLIWrapper->new();
 
