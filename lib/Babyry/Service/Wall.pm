@@ -5,6 +5,7 @@ use utf8;
 
 use parent qw/Babyry::Service::Base/;
 use Babyry::Service::User;
+use Babyry::Service::Child;
 
 use Log::Minimal;
 use SQL::Abstract;
