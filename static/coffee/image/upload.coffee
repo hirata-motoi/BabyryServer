@@ -10,7 +10,8 @@ $("#add-image-icon").on("click", () ->
 
 $form = $("#image-post-form")
 $form.find("[type=file]").on("change", () ->
-  window.console.log "file changed"
+
+  $(".error").hide()
 
   box = showLoadingImage()
 
@@ -28,7 +29,8 @@ $form.find("[type=file]").on("change", () ->
       # TODO trim 
       box.find("img").css "width", "80"
       box.find("img").css "height", "80"
-    error: showErrorMessage
+    error: (xhr) ->
+      showErrorMessage xhr, box
   })
   return false
 )
@@ -77,29 +79,29 @@ submit = () ->
   token = getXSRFToken() 
 
   relatives = pickedSharedRelatives()
-  target_child = pickedTargetChild()
+  targetChild = pickedTargetChild()
 
   $.ajax( "/image/web/submit.json", {
       type: "post",
       data: {
         "shared_user_ids": relatives,
-        "target_child_ids": target_child,
+        "target_child_ids": targetChild,
         "image_tmp_names": filenames,
         "XSRF-TOKEN": token
       },
       dataType: 'json',
       success: redirectToWall,
-      error: showErrorMessage,
+      error: (xhr) ->
+        showErrorMessage xhr,
     }
   )
 
 redirectToWall = (data) ->
   location.href = "/"
 
-showErrorMessage = (xhr, textStatus, errorThrown) ->
-  window.console.log xhr.responseText
-  # TODO show error message
-  window.alert xhr.responseText
+showErrorMessage = (xhr, box) ->
+  box.remove() if box
+  $(".error").show()
 
 getXSRFToken = ->
   cookies = document.cookie.split(/\s*;\s*/)
@@ -109,14 +111,20 @@ getXSRFToken = ->
   return token
 
 pickedSharedRelatives = () ->
-  for elem in $(".js-shared-relatives")
-    continue if $(elem).prop("checked") isnt true
-    $(elem).val()
+  relativeIds = for elem in $(".relative-checked-mark.checked")
+    $(elem).parent(".relative-list").attr "data-relative-id"
 
 pickedTargetChild = () ->
-  for elem in $(".js-target-child")
-    continue if $(elem).prop("checked") isnt true
-    $(elem).val()
+  childIds = for elem in $(".child-checked-mark.checked")
+    $(elem).parent(".child-list").attr "data-child-id"
+
+toggleCheckMark = () ->
+  checkedMark = $(this).find(".checked-mark");
+  if $(checkedMark).hasClass "checked"
+    $(checkedMark).removeClass "checked"
+  else
+    $(checkedMark).addClass "checked"
+
 
 $("#submit-button").on("click", submit)
-
+$(".relative-list,.child-list").on "click", toggleCheckMark

@@ -36,7 +36,7 @@ sub search {
     return {
         entries          => $entries,
         found_row_count  => $found_row_count,
-        related_children => Babyry::Service::Child->new->get_related_children($user_id),
+        related_child    => Babyry::Service::Child->new->get_related_child_list($user_id),
     };
 }
 
@@ -44,8 +44,8 @@ sub get_entries_by_images {
     my ($self, $images) = @_;
     my $teng = $self->teng('BABYRY_MAIN_R');
 
-    my $image_ids = Babyry::Model::Image::get_image_ids_by_rows($images);
-    my $children  = $self->get_child_info($images) || {};
+    my $image_ids   = Babyry::Model::Image::get_image_ids_by_rows($images);
+    my $child_info  = $self->get_child_info($images) || {};
     
     my @entries;
 
@@ -73,7 +73,7 @@ sub get_entries_by_images {
         push @entries, {
             %$columns,
             stamps             => [],
-            child              => $children->{ $image->image_id },
+            child              => $child_info->{ $image->image_id },
             comments           => \@cmt_array,
             fullsize_image_url => $url,
         };

@@ -1,5 +1,5 @@
 (function() {
-  var console, defaultTextareaHeight, innerHeight, innerWidth, owlObject, showImageDetail, _base, _base1, _base2;
+  var console, defaultTextareaHeight, innerHeight, innerWidth, navbarFooterHIdeLocked, navbarShow, owlObject, showImageDetail, _base, _base1, _base2;
 
   if (typeof window.console === "undefined") {
     console = {};
@@ -20,7 +20,7 @@
 
   (_base1 = window.entryData).metadata || (_base1.metadata = {});
 
-  (_base2 = window.entryData).related_children || (_base2.related_children = {});
+  (_base2 = window.entryData).related_child || (_base2.related_child = {});
 
   window.child_ids || (window.child_ids = []);
 
@@ -32,8 +32,12 @@
 
   innerHeight = 0;
 
+  navbarShow = true;
+
+  navbarFooterHIdeLocked = false;
+
   showImageDetail = function() {
-    var addChildToEntryData, alreadyAttachedChild, attachChildToImage, closeComments, createChild, createCommentNavigation, createImageBox, createOwlElementsWithResponse, detachChildFromImage, editChild, getCurrentPosition, getData, getXSRFToken, hasElem, hideAttachedChild, initEditChild, pickData, preserveResponseData, refreshChildAttachedMark, removeAttachedChild, replaceToolBoxContent, setChildAttachList, setUpScreenSize, setupGlobalFooter, showAttachedChild, showCarousel, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements;
+    var addChildToEntryData, adjustHeightOfChildEditContainer, alreadyAttachedChild, attachChildToImage, closeComments, createChild, createCommentNavigation, createImageBox, createOwlElementsWithResponse, detachChildFromImage, editChild, getCurrentEntryIndex, getCurrentPosition, getData, getXSRFToken, hasElem, hideAttachedChild, initEditChild, initializeDisplayedElements, pickData, preserveResponseData, refreshChildAttachedMark, removeAttachedChild, replaceToolBoxContent, setChildAttachList, setUpScreenSize, setupGlobalFooter, showAttachedChild, showCarousel, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements;
     $(".img-thumbnail").on("click", function() {
       var imageId, tappedEntryIndex;
       setUpScreenSize();
@@ -52,15 +56,14 @@
         window.util.hidePageLoading();
         showNavBarFooter();
         data = pickData();
-        return setChildAttachList(data.related_children);
+        return setChildAttachList(data.related_child);
       });
     });
     $("#comment-submit").on("click", function() {
-      var comment, currentPosition, imageElem, imageId, token;
+      var comment, imageElem, imageId, token;
       token = getXSRFToken();
       comment = $("#comment-textarea").val();
-      currentPosition = getCurrentPosition();
-      imageElem = $(".img-box")[currentPosition];
+      imageElem = $(".img-box")[getCurrentPosition()];
       imageId = $(imageElem).attr("image-id");
       return $.ajax({
         "type": "post",
@@ -80,12 +83,12 @@
             comment_text: data.comment
           });
           $("#all-comment-container").find("ul").append(item);
-          window.entryData.entries[currentPosition].comments.push({
+          window.entryData.entries[getCurrentEntryIndex()].comments.push({
             "comment": comment
           });
           $("#comment-textarea").val("");
           $("#comment-textarea").css("height", defaultTextareaHeight);
-          commentCount = window.entryData.entries[currentPosition].comments.length;
+          commentCount = window.entryData.entries[getCurrentEntryIndex()].comments.length;
           return $(imageElem).find(".comment-notice").text(createCommentNavigation(commentCount));
         }
       });
@@ -93,13 +96,13 @@
     preserveResponseData = function(response) {
       window.entryData.entries = response.data.entries;
       window.entryData.metadata = response.metadata;
-      return window.entryData.related_children = response.related_children;
+      return window.entryData.related_child = response.data.related_child;
     };
     pickData = function() {
       return {
         list: window.entryData.entries,
         found_row_count: window.entryData.metadata.found_row_count,
-        related_children: window.entryData.related_children,
+        related_child: window.entryData.related_child,
         metadata: window.entryData.metadata
       };
     };
@@ -145,10 +148,9 @@
       }
       owlElem.find(".img-box").on("click", toggleDisplayedElements);
       owlElem.find(".comment-notice").on("click", function() {
-        var comment, comments, currentPosition, item, _i, _len;
+        var comment, comments, item, _i, _len;
         $(".comment-container").empty();
-        currentPosition = getCurrentPosition();
-        comments = window.entryData.entries[currentPosition].comments;
+        comments = window.entryData.entries[getCurrentEntryIndex()].comments;
         comments.sort(function(a, b) {
           var aCreatedAt, bCreatedAt;
           aCreatedAt = a.created_at;
@@ -297,16 +299,41 @@
       return false;
     };
     toggleDisplayedElements = function() {
-      return $(".navbar").toggle();
+      if (navbarShow) {
+        $(".navbar").hide();
+        return navbarShow = false;
+      } else {
+        if (navbarFooterHIdeLocked) {
+          $(".navbar:not(\".navbar-footer\")").show();
+        } else {
+          $(".navbar").show();
+        }
+        return navbarShow = true;
+      }
+    };
+    initializeDisplayedElements = function() {
+      navbarFooterHIdeLocked = false;
+      if (navbarShow) {
+        return $(".navbar").show();
+      } else {
+        return $(".navbar").hide();
+      }
     };
     replaceToolBoxContent = function() {
-      var childContainer, commentCount, commentCountText, commentItem, comments, currentPosition, elems;
-      currentPosition = getCurrentPosition();
+      var childContainer, commentCount, commentCountText, commentItem, comments, currentEntryIndex, elems;
+      currentEntryIndex = getCurrentEntryIndex();
       elems = $(".img-box");
-      childContainer = $($(elems)[currentPosition]).find(".child-container").clone(true);
+      if ($($(elems)[getCurrentPosition()]).hasClass("moreImage")) {
+        $(".navbar-footer").hide();
+        navbarFooterHIdeLocked = true;
+        return;
+      } else {
+        navbarFooterHIdeLocked = false;
+      }
+      childContainer = $($(elems)[currentEntryIndex]).find(".child-container").clone(true);
       $("#child-tag-container").find("ul").html(childContainer.html());
       $("#recent-comment-container").empty();
-      comments = window.entryData.entries[currentPosition].comments;
+      comments = window.entryData.entries[currentEntryIndex].comments;
       if (comments && comments.length > 0) {
         comments.sort(function(a, b) {
           var aCreatedAt, bCreatedAt;
@@ -330,7 +357,8 @@
         $("#recent-comment-container").hide();
       }
       commentCountText = createCommentNavigation(commentCount);
-      return $("#comment-count").text(commentCountText);
+      $("#comment-count").text(commentCountText);
+      return initializeDisplayedElements();
     };
     createCommentNavigation = function(comment_count) {
       return "コメント" + comment_count + "件";
@@ -343,10 +371,9 @@
       return $(".navbar-footer").show();
     };
     showComments = function() {
-      var comment, comments, container, currentPosition, item, list, tmpl;
+      var comment, comments, container, item, list, tmpl;
       container = $("#all-comment-container");
-      currentPosition = getCurrentPosition();
-      comments = window.entryData.entries[currentPosition].comments;
+      comments = window.entryData.entries[getCurrentEntryIndex()].comments;
       comments.sort(function(a, b) {
         var aCreatedAt, bCreatedAt;
         aCreatedAt = a.created_at;
@@ -424,11 +451,11 @@
       });
     };
     initEditChild = function() {
-      var child, childHash, currentPosition, _base3, _i, _len, _ref;
-      currentPosition = getCurrentPosition();
-      (_base3 = window.entryData.entries[currentPosition]).child || (_base3.child = []);
+      var child, childHash, currentEntryIndex, _base3, _i, _len, _ref;
+      currentEntryIndex = getCurrentEntryIndex();
+      (_base3 = window.entryData.entries[currentEntryIndex]).child || (_base3.child = []);
       childHash = {};
-      _ref = window.entryData.entries[currentPosition].child;
+      _ref = window.entryData.entries[currentEntryIndex].child;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         child = _ref[_i];
         childHash[child.child_id] = true;
@@ -446,20 +473,29 @@
       $("#child-edit-container").find("ul").listview("refresh");
       if ($(".child-attach-item").length < 1) {
         $("#child-edit-container,#child-tag-container").hide();
-        return $("#child-message-container").show();
+        $("#child-message-container").show();
       }
+      return adjustHeightOfChildEditContainer();
+    };
+    adjustHeightOfChildEditContainer = function() {
+      var height, modalHeight, navbarHeight, tagContainerHeight;
+      navbarHeight = parseInt($(".navbar.navbar-default").css("height").replace(/px/, ""), 10);
+      modalHeight = parseInt($("#modal-header").css("height").replace(/px/, ""), 10);
+      tagContainerHeight = parseInt($("#child-tag-container").css("height").replace(/px/, ""), 10);
+      height = innerHeight - navbarHeight - modalHeight - tagContainerHeight - 20;
+      return $("#child-edit-container").css("height", height + "px");
     };
     setupGlobalFooter = function() {
       return $("#global-footer").hide();
     };
-    setChildAttachList = function(related_children) {
+    setChildAttachList = function(related_child) {
       var child, child_id, child_name, icon_url, item, itemObj, tmpl, _i, _len, _results;
-      if (!related_children || related_children.length < 1) {
+      if (!related_child || related_child.length < 1) {
         return;
       }
       _results = [];
-      for (_i = 0, _len = related_children.length; _i < _len; _i++) {
-        child = related_children[_i];
+      for (_i = 0, _len = related_child.length; _i < _len; _i++) {
+        child = related_child[_i];
         icon_url = child.icon_url;
         child_id = child.child_id;
         child_name = child.child_name;
@@ -475,11 +511,10 @@
       return _results;
     };
     attachChildToImage = function() {
-      var childElem, childId, childName, currentPosition, imageElem, imageId, token;
+      var childElem, childId, childName, imageElem, imageId, token;
       childId = $(this).attr("data-child-id");
       childName = $(this).find(".child-name").text();
-      currentPosition = getCurrentPosition();
-      imageElem = $(".img-box")[currentPosition];
+      imageElem = $(".img-box")[getCurrentEntryIndex()];
       imageId = $(imageElem).attr("image-id");
       token = getXSRFToken();
       childElem = createChild(childId, childName);
@@ -542,7 +577,7 @@
       return _results;
     };
     removeAttachedChild = function(childId) {
-      var child, childTags, children, currentPosition, index, length, tag, _i, _j, _len, _ref, _results;
+      var child, childList, childTags, currentEntryIndex, index, length, tag, _i, _j, _len, _ref, _results;
       childTags = $("#child-tag-container").find(".child-tag-li");
       for (_i = 0, _len = childTags.length; _i < _len; _i++) {
         tag = childTags[_i];
@@ -550,19 +585,19 @@
           $(tag).remove();
         }
       }
-      currentPosition = getCurrentPosition();
-      $($(".img-box")[currentPosition]).find(".child-tag-li").each(function() {
+      currentEntryIndex = getCurrentEntryIndex();
+      $($(".img-box")[currentEntryIndex]).find(".child-tag-li").each(function() {
         if (childId === $(this).attr("data-child-id")) {
           return $(this).remove();
         }
       });
-      children = window.entryData.entries[currentPosition].child;
-      length = children.length;
+      childList = window.entryData.entries[currentEntryIndex].child;
+      length = childList.length;
       _results = [];
       for (index = _j = _ref = length - 1; _ref <= 0 ? _j <= 0 : _j >= 0; index = _ref <= 0 ? ++_j : --_j) {
-        child = children[index];
+        child = childList[index];
         if (child.child_id === childId) {
-          _results.push(children.splice(index, 1));
+          _results.push(childList.splice(index, 1));
         } else {
           _results.push(void 0);
         }
@@ -570,36 +605,35 @@
       return _results;
     };
     alreadyAttachedChild = function(childId) {
-      var child, children, currentPosition, index, _base3, _i, _len;
-      currentPosition = getCurrentPosition();
-      (_base3 = window.entryData.entries[currentPosition]).child || (_base3.child = []);
-      children = window.entryData.entries[currentPosition].child;
-      for (index = _i = 0, _len = children.length; _i < _len; index = ++_i) {
-        child = children[index];
+      var child, childList, currentEntryIndex, index, _base3, _i, _len;
+      currentEntryIndex = getCurrentEntryIndex();
+      (_base3 = window.entryData.entries[currentEntryIndex]).child || (_base3.child = []);
+      childList = window.entryData.entries[currentEntryIndex].child;
+      for (index = _i = 0, _len = childList.length; _i < _len; index = ++_i) {
+        child = childList[index];
         if (child.child_id === childId) {
           return true;
         }
       }
     };
     addChildToEntryData = function(childId, childName) {
-      var currentPosition, _base3;
-      currentPosition = getCurrentPosition();
-      (_base3 = window.entryData.entries[currentPosition]).child || (_base3.child = []);
+      var currentEntryIndex, _base3;
+      currentEntryIndex = getCurrentEntryIndex();
+      (_base3 = window.entryData.entries[currentEntryIndex]).child || (_base3.child = []);
       if (alreadyAttachedChild(childId)) {
         return false;
       }
-      window.entryData.entries[currentPosition].child.push({
+      window.entryData.entries[currentEntryIndex].child.push({
         "child_id": childId,
         "child_name": childName
       });
       return true;
     };
     detachChildFromImage = function() {
-      var childId, childName, currentPosition, imageElem, imageId, token;
+      var childId, childName, imageElem, imageId, token;
       childId = $(this).attr("data-child-id");
       childName = $(this).find(".child-name").text();
-      currentPosition = getCurrentPosition();
-      imageElem = $(".img-box")[currentPosition];
+      imageElem = $(".img-box")[getCurrentEntryIndex()];
       imageId = $(imageElem).attr("image-id");
       token = getXSRFToken();
       hideAttachedChild(childId);
@@ -628,11 +662,11 @@
       });
     };
     refreshChildAttachedMark = function() {
-      var attachedChildren, child, childId, currentPosition, _base3, _i, _len, _ref;
-      currentPosition = getCurrentPosition();
-      (_base3 = window.entryData.entries[currentPosition]).child || (_base3.child = []);
+      var attachedChildren, child, childId, currentEntryIndex, _base3, _i, _len, _ref;
+      currentEntryIndex = getCurrentEntryIndex();
+      (_base3 = window.entryData.entries[currentEntryIndex]).child || (_base3.child = []);
       attachedChildren = {};
-      _ref = window.entryData.entries[currentPosition].child;
+      _ref = window.entryData.entries[currentEntryIndex].child;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         child = _ref[_i];
         childId = child.child_id;
@@ -670,13 +704,16 @@
       }
       return getData(offset, initial, addOnCallback);
     };
-    return getCurrentPosition = function() {
+    getCurrentEntryIndex = function() {
       var position;
       position = parseInt(owlObject.currentPosition(), 10);
       if ($($(".img-box")[0]).hasClass("moreImage")) {
         position = position - 1;
       }
       return position;
+    };
+    return getCurrentPosition = function() {
+      return parseInt(owlObject.currentPosition(), 10);
     };
   };
 
