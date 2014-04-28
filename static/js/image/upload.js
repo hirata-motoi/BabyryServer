@@ -1,5 +1,5 @@
 (function() {
-  var $form, console, getXSRFToken, pickedSharedRelatives, pickedTargetChild, redirectToWall, showErrorMessage, showLoadingImage, submit;
+  var $form, console, getXSRFToken, pickedSharedRelatives, pickedTargetChild, redirectToWall, showErrorMessage, showLoadingImage, submit, toggleCheckMark;
 
   if (typeof window.console === "undefined") {
     console = {};
@@ -71,19 +71,19 @@
   };
 
   submit = function() {
-    var filenames, relatives, target_child, token;
+    var filenames, relatives, targetChild, token;
     filenames = [];
     $(".js-uploaded-image-box").each(function() {
       return filenames.push($(this).attr("filename"));
     });
     token = getXSRFToken();
     relatives = pickedSharedRelatives();
-    target_child = pickedTargetChild();
+    targetChild = pickedTargetChild();
     return $.ajax("/image/web/submit.json", {
       type: "post",
       data: {
         "shared_user_ids": relatives,
-        "target_child_ids": target_child,
+        "target_child_ids": targetChild,
         "image_tmp_names": filenames,
         "XSRF-TOKEN": token
       },
@@ -120,34 +120,46 @@
   };
 
   pickedSharedRelatives = function() {
-    var elem, _i, _len, _ref, _results;
-    _ref = $(".js-shared-relatives");
-    _results = [];
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      elem = _ref[_i];
-      if ($(elem).prop("checked") !== true) {
-        continue;
+    var elem, relativeIds;
+    return relativeIds = (function() {
+      var _i, _len, _ref, _results;
+      _ref = $(".relative-checked-mark.checked");
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        elem = _ref[_i];
+        _results.push($(elem).parent(".relative-list").attr("data-relative-id"));
       }
-      _results.push($(elem).val());
-    }
-    return _results;
+      return _results;
+    })();
   };
 
   pickedTargetChild = function() {
-    var elem, _i, _len, _ref, _results;
-    _ref = $(".js-target-child");
-    _results = [];
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      elem = _ref[_i];
-      if ($(elem).prop("checked") !== true) {
-        continue;
+    var childIds, elem;
+    return childIds = (function() {
+      var _i, _len, _ref, _results;
+      _ref = $(".child-checked-mark.checked");
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        elem = _ref[_i];
+        _results.push($(elem).parent(".child-list").attr("data-child-id"));
       }
-      _results.push($(elem).val());
+      return _results;
+    })();
+  };
+
+  toggleCheckMark = function() {
+    var checkedMark;
+    checkedMark = $(this).find(".checked-mark");
+    if ($(checkedMark).hasClass("checked")) {
+      return $(checkedMark).removeClass("checked");
+    } else {
+      return $(checkedMark).addClass("checked");
     }
-    return _results;
   };
 
   $("#submit-button").on("click", submit);
+
+  $(".relative-list,.child-list").on("click", toggleCheckMark);
 
 }).call(this);
 

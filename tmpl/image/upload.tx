@@ -56,6 +56,33 @@
     display: none;
     text-align: center;
   }
+  .modal-body {
+    height: 320px;
+    overflow: scroll;
+  }
+  .relative-img {
+    width: 44px;
+  }
+  .relative-checked-mark span {
+    display: none;
+  }
+  .child-img {
+    width: 44px;
+  }
+  .child-checked-mark span {
+    display: none;
+  }
+  .checked span {
+    display: block;
+  }
+  .abbreviation p {
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    -webkit-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    width: 150px;
+    white-space: nowrap;
+  }
 </style>
 : }
 
@@ -98,13 +125,37 @@
       </div>
       <div class="modal-body">
         <h4>誰に共有？</h4>
+        <ul style="list-style-type: none;" data-role="listview">
         : for $relatives.keys() -> $key {
-          <input type="checkbox" class="js-shared-relatives" value=<: $key :>> <: $key :> : <: $relatives[$key].email :><br>
+          <li class="relative-list" data-relative-id="<: $key :>">
+            <div style="display: table-cell; width: 44px;">
+              <img class="relative-img" src="<: $relatives[$key].icon_url :>">
+            </div>
+            <div class="relative-name abbreviation" style="display: table-cell; width: 150px; padding-left: 10px;">
+              <p><: $relatives[$key].user_name :></p>
+            </div>
+            <div class="relative-checked-mark checked-mark" style="display: table-cell; width: 30px;">
+              <span style="color: lightgreen; font-size: 25px;">&#x2713</span>
+            </div>
+          </li>
         : }
+        </ul>
         <h4>どの子が映っている？</h4>
+        <ul style="list-style-type: none;" data-role="listview">
         : for $child.keys() -> $key {
-          <input type="checkbox" class="js-target-child" value=<: $key :>> <: $key :> : <: $child[$key].name :><br>
+          <li class="child-list" data-child-id="<: $key :>">
+            <div style="display: table-cell; width: 44px;">
+              <img class="child-img" src="<: $child[$key].icon_url :>">
+            </div>
+            <div class="child-name abbreviation" style="display: table-cell; width: 150px; padding-left: 10px;">
+              <p><: $child[$key].child_name :></p>
+            </div>
+            <div class="child-checked-mark checked-mark" style="display: table-cell; width: 30px;">
+              <span style="color: lightgreen; font-size: 25px;">&#x2713</span>
+            </div>
+          </li>
         : }
+        </ul>
       </div>
       <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal" data-ajax="false">Close</a>

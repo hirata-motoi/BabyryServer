@@ -7,8 +7,6 @@ use utf8;
 use parent qw/Babyry::Service::Base/;
 use Log::Minimal;
 
-#sub get_icon_urls_by_user_ids {
-
 # icon_urlを取得
 # user_info_list(get_by_user_idsの結果)とuser_idsどちらをparamに入れてもOK
 # 両方あった場合はuser_info_listが優先される

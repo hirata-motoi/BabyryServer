@@ -4,8 +4,9 @@ use warnings;
 use utf8;
 
 use parent qw/Babyry::Service::Base/;
-use Log::Minimal;
+use Babyry::Service::User;
 
+use Log::Minimal;
 use SQL::Abstract;
 
 sub show {
@@ -14,25 +15,26 @@ sub show {
     my $teng = $self->teng('BABYRY_MAIN_R');
 
     # get relatives
-    my $relatives = $self->model('Relatives')->get_by_user_id ($teng, $user_id );
-    my $user      = $self->model('UserAuth')->get_by_ids( $teng, [ keys %$relatives ] );
-    my $child = $self->model('Child')->new();
+    my $relatives = $self->model('Relatives')->get_by_user_id($teng, $user_id );
+    my $user      = $self->model('User')->get_by_user_ids( $teng, [ keys %$relatives ] );
+    my $icon_urls = Babyry::Service::User->new->get_icon_urls({ user_info_list => $user });
     my %relatives_info = ();
-    my %child_info = ();
     for my $relative_id ( keys %$relatives ) {
-        $relatives_info{$relative_id} = {
+        $relatives_info{$relative_id} = +{
             %{ $relatives->{$relative_id} },
-            email => $user->{$relative_id}{email},
+            user_name => $user->{$relative_id}{user_name},
+            icon_url  => $icon_urls->{$relative_id},
         };
-        # add child info by relative_id
-        my $_child_array = $child->get_by_created_by($teng, $relative_id);
-        for my $_child (@{$_child_array}) {
-            $child_info{$_child->child_id} = {
-                id => $_child->child_id,
-                name => $_child->child_name,
-                parent_id => $relative_id,
-            };
-        }
+    }
+
+    my %child_info = ();
+    my $child_list = Babyry::Service::Child->new->get_related_child_list($user_id);
+    for my $child ( @$child_list ) {
+        $child_info{ $child->{child_id} } = +{
+            child_id   => $child->{child_id},
+            child_name => $child->{child_name},
+            icon_url   => $child->{icon_url},
+        };
     }
 
     return { relatives => \%relatives_info, child => \%child_info };
