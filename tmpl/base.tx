@@ -95,9 +95,24 @@
     : else {
     <div class="navbar navbar-default navbar-fixed-top" role="navigation">
       <div class="navbar-inner">
-        <div class="container">
-          <a class="navbar-brand" href="/" data-ajax="false" style="color: white;">Babyry</a>
-          <a id="group_by_stamp" data-ajax="false" style="float: right; display: none; margin-right: 10px;"><img src="/static/img/menu/icon_star_alt.png"></a>
+        <div class="container" style="height: 44px;">
+          <ul style="display: table; table-layout: fixed; padding-left: 0px; height: 44px; width: 100%;">
+            <li style="display: table-cell; width: 20%;">
+              <div style="display: inline-block; height: 44px; position: absolute;">
+                <a  data-ajax="false" id="header-back-button" style="line-height: 44px;"></a>
+              </div>
+            </li>
+            <li style="display: table-cell; width: 60%; text-align: center;">
+              <div style="display: inline-block; height: 44px;">
+                <a class="navbar-brand" href="/" data-ajax="false" style="color: white;">Babyry</a>
+              </div>
+            </li>
+            <li style="display: table-cell; width: 20%;">
+              <div style="display: inline-block; height: 44px;">
+                <span id="album-view">Album</span>
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
     </div>

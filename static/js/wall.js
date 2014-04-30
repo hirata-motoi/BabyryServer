@@ -1,5 +1,5 @@
 (function() {
-  var child_ids_hash, console, count, page, stamp_ids_hash;
+  var child_ids_hash, console, count, stamp_ids_hash;
 
   if (typeof window.console === "undefined") {
     console = {};
@@ -10,7 +10,7 @@
     window.entryData = {};
   }
 
-  page = 1;
+  window.pageForEntrySearch = 1;
 
   count = 10;
 
@@ -25,11 +25,12 @@
   child_ids_hash = [];
 
   $(function() {
-    var grid, load_contents, tmpl, tmpl_child, tmpl_stamp;
-    tmpl = _.template($('#template-item').html());
-    grid = $('.timeline').get(0);
+    var load_contents, tmpl_child, tmpl_stamp;
     $("#group_by_stamp").show();
     load_contents = function(stamp_ids, child_ids) {
+      var grid, tmpl;
+      tmpl = _.template($('#template-item').html());
+      grid = $('.timeline').get(0);
       return $.ajax({
         url: '/entry/search.json',
         dataType: "json",
@@ -38,7 +39,7 @@
           stamp_id: stamp_ids,
           child_id: child_ids,
           count: count,
-          page: page
+          page: window.pageForEntrySearch
         },
         success: function(data) {
           var i, item, _i, _j, _ref, _ref1;
@@ -49,25 +50,28 @@
           for (i = _i = 0, _ref = data.data.entries.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
             item.push(document.createElement('article'));
           }
+          window.console.log(grid);
+          window.console.log(item);
           salvattore.append_elements(grid, item);
+          window.console.log("append_elements OK");
           for (i = _j = 0, _ref1 = data.data.entries.length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
             item[i].outerHTML = tmpl({
               stamp_num: data.data.entries[i].stamps.length,
               comment_num: data.data.entries[i].comments.length,
               fullsize_image_url: data.data.entries[i].fullsize_image_url,
-              entryIndex: i + (page - 1) * count
+              entryIndex: i + (window.pageForEntrySearch - 1) * count
             });
           }
           if (count > data.data.entries.length + 1) {
             $('#load-more').hide();
           }
-          page++;
+          window.pageForEntrySearch++;
           if (window.entryData.entries === "undefined") {
             window.entryData.entries = [];
           }
           window.entryData.entries = window.entryData.entries.concat(data.data.entries);
           window.entryData.metadata = data.metadata;
-          window.entryData.related_children = data.data.related_children;
+          window.entryData.related_child = data.data.related_child;
           return window.util.showImageDetail();
         },
         error: function() {
@@ -151,8 +155,8 @@
         }
       });
     };
-    return $("#groupByStampModalSubmit").on('click', function() {
-      var key;
+    $("#groupByStampModalSubmit").on('click', function() {
+      var key, page;
       $("#groupByStampModal").modal('hide');
       $(".column.size-1of2").empty();
       window.entryData.entries = [];
@@ -171,6 +175,7 @@
       }
       return load_contents(window.stamp_ids, window.child_ids);
     });
+    return window.load_contents = load_contents;
   });
 
 }).call(this);

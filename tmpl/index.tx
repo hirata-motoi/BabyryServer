@@ -71,6 +71,7 @@
 </script>
 <script type="text/javascript" src="<: uri_for('/static/js/wall.js') :>"></script>
 <script type="text/javascript" src="<: uri_for('/static/js/detail.js') :>"></script>
+<script type="text/javascript" src="<: uri_for('/static/js/album.js') :>"></script>
 : }
 
 : around content -> {
@@ -84,5 +85,7 @@
 : include wall::include
 
 : include detail::include
+
+: include album::include
 
 : }
