@@ -84,6 +84,9 @@
         vertical-align: middle;
         text-align: center;
       }
+      .selected-footer-menu {
+        border-bottom: solid;
+      }
     </style>
     : block head -> {}
   </head>
@@ -132,11 +135,23 @@
     : }
     : else {
     <div id="global-footer" data-role="footer" data-position="fixed" data-theme="a" data-tap-toggle="false">
-      <div data-role="navbar">
+      <div data-role="navbar" style="box-shadow: 0px -1px 2px 1px rgba(155, 155, 155, 0.3);">
         <ul>
-          <li><a href="/" data-ajax="false" style="background-color: silver;"><img src="/static/img/menu/icon_home.png" style="width: 32px; height: 32px; -webkit-filter: invert();"></a></li>
-          <li><a href="/image/web/upload" data-ajax="false" style="background-color: silver;"><img src="/static/img/menu/icon_folder_upload.png"></a></li>
-          <li><a href="/menu" data-ajax="false" style="background-color: silver;"><img src="/static/img/menu/icon_cog.png"></a></li>
+          <li id="footer-home">
+            <a href="/" data-ajax="false" style="background-color: #FAFAFA;">
+              <img src="/static/img/menu/icon_home.png" style="width: 32px; height: 32px; -webkit-filter: invert(60%);">
+            </a>
+          </li>
+          <li id="footer-upload">
+            <a href="/image/web/upload" data-ajax="false" style="background-color: #FAFAFA;">
+              <img src="/static/img/menu/icon_folder_upload.png" style="-webkit-filter: invert(40%);">
+            </a>
+          </li>
+          <li id="footer-other">
+            <a href="/menu" data-ajax="false" style="background-color: #FAFAFA;">
+              <img src="/static/img/menu/icon_cog.png" style="-webkit-filter: invert(40%);">
+            </a>
+          </li>
         </ul>
       </div>
     </div>

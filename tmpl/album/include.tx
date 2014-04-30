@@ -1,0 +1,41 @@
+<style>
+  /* salvattore */
+  .timeline[data-columns]::before {
+    content: '2 .column.size-1of2';
+  }
+  .column {
+    float: left;
+  }
+  .size-1of2 {
+    width: 50%;
+  }
+  [data-columns]::before {
+    display: none;
+  }
+</style>
+
+<!-- listview用のcontent -->
+<div id="template-album-list-content">
+  <div>
+    <ul data-role="listview">
+    </ul>
+  </div>
+</div>
+
+<!-- listview用のli -->
+<script id="template-album-list">
+  <li class="child-elem" data-child-id="<%= child_id %>">
+    <div style="display: table-cell; width: 44px;">
+      <img class="child-img" src="<%= icon_url %>" style="width: 44px;">
+    </div>
+    <div class="child-name abbreviation" style="display: table-cell; width: 200px; padding-left: 10px;">
+      <p><%= child_name %></p>
+    </div>
+  </li>
+</script>
+<script id="template-album-content">
+  <div class="timeline row" data-columns style="content: '2 .column.size-1of2';"></div>
+  <div id="load-more" style="text-align:center"><img src="/static/img/arrow_carrot-2down_alt2.png"></div>
+</script>
+
+

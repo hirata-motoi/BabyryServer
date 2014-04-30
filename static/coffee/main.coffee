@@ -32,9 +32,26 @@ showPageLoading = () ->
 hidePageLoading = () ->
   $.mobile.loading("hide")
 
+showFooterEffect = () ->
+  path = location.pathname
+  $(".navbar .selected-footer-menu").each () ->
+    $(this).removeClass "selected-footer-menu"
+
+  target = if path == "/"
+    $("#footer-home")
+  else if path == "/image/web/upload"
+    $("#footer-upload")
+  else
+    $("#footer-other")
+
+  window.console.log target
+  target.find("a").css "border-bottom", "solid 3px rgba(246, 172, 23, 1.0)"
+  target.find("img").css "margin-bottom", "-3px"
+
+
 setXSRFTokenToForm()
 window.util ||= {}
 window.util.showPageLoading = showPageLoading
 window.util.hidePageLoading = hidePageLoading
-
+$(document).on "DOMContentLoaded", showFooterEffect
 
