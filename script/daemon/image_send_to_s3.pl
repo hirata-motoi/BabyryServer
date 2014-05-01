@@ -93,6 +93,11 @@ sub send_to_s3 {
             if($size != $tmp_size) {
                 critf("size not match!");
                 return;
+            } elsif ($param->{key} !~ /thumb/) {
+                $teng->txn_begin;
+                $image->update_size($teng, $image_id, $size);
+                $teng->txn_commit;
+                $teng->disconnect;
             }
         }
     }
