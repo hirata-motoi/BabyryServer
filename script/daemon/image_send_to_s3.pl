@@ -43,18 +43,25 @@ while(1) {
 sub send_to_s3 {
     my $image_id = shift;
     my $image_name = shift;
+    my $user_id = "";
+
+    if ($image_name =~ /^(\d+)_\d+$/) {
+        $user_id = $1;
+    } else {
+        return;
+    }
     
     my $queue = $image->get_by_image_id($teng_r, $image_id);
     my $format = $queue->format;
 
     my $params = [
         {
-            key => "${image_id}.${format}",
+            key => "${user_id}/${image_id}.${format}",
             bucket => $BUCKET,
             'copy-source' => "${TMP_BUCKET}/${image_name}.${format}",
         },
         {
-            key => "${image_id}_thumb.${format}",
+            key => "${user_id}/${image_id}_thumb.${format}",
             bucket => $BUCKET,
             'copy-source' => "${TMP_BUCKET}/${image_name}_thumb.${format}",
         }
