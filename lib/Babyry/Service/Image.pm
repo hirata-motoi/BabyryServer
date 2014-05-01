@@ -48,6 +48,12 @@ sub get_authorized_image_ids {
 sub web_upload_execute {
     my ($self, $params) = @_;
 
+    # get total size
+    my $model = $self->model('image');
+    my $teng = $self->teng('BABYRY_MAIN_R');
+    my $total_size = $model->get_total_size($teng, $params->{'user_id'});
+    die "size full" if (Babyry::Common->config->{upload_size_max} < $total_size);
+
     # make thumbnail
     my $img_file   = Babyry::Model::ImageFile->factory($params);
     my $ret = $self->model('temp_image_upload')->make_thumbnail($img_file, $params);

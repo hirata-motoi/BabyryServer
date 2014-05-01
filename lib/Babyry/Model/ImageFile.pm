@@ -46,6 +46,17 @@ sub write_with_scale {
     return $scaled;
 }
 
+sub getwidth {
+    my ($self) = @_;
+
+    $self->{img}->getwidth() or croak($self->img->errstr);
+}
+
+sub getheight {
+    my ($self) = @_;
+
+    $self->{img}->getheight() or croak($self->img->errstr);
+}
 
 1;
 

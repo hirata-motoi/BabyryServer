@@ -106,12 +106,36 @@ QUERY
     return (\@records);
 }
 
+sub get_total_size {
+    my ($self, $teng, $user_id) = @_;
+    my $sql = <<QUERY;
+        select sum(size) as sum from image where uploaded_by = ?;
+QUERY
+    my @records =$teng->search_by_sql(
+        $sql,
+        [$user_id]
+    );
+    return $records[0]->sum;
+}
+
 sub update_url {
     my ($self, $teng, $id, $url, $time) = @_;
     $teng->update(
         'image' => {
             'url' => $url,
             'updated_at' => $time,
+        }, {
+            'image_id' => $id,
+        }
+    );
+    return;
+}
+
+sub update_size {
+    my ($self, $teng, $id, $size) = @_;
+    $teng->update(
+        'image' => {
+            'size' => $size,
         }, {
             'image_id' => $id,
         }
