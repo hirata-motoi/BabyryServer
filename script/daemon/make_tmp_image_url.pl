@@ -37,8 +37,10 @@ while(1) {
     my $urls = {};
     my $unixtime = time();
     for (@{$images}) {
-        my $image_id = $_->{row_data}->{image_id};
-        my $image_name = "${image_id}\.$_->{row_data}->{format}";
+        my $image_id = $_->image_id;
+        my $user_id = $_->uploaded_by;
+        my $format = $_->format;
+        my $image_name = "${user_id}\/${image_id}\.${format}";
         $urls->{$image_id} = get_tmp_image_url($image_name);
     }
     eval {
