@@ -1,5 +1,5 @@
 (function() {
-  var console, getXSRFToken, hidePageLoading, setXSRFTokenToForm, showFooterEffect, showPageLoading;
+  var console, getXSRFToken, hidePageLoading, setHeaderElem, setXSRFTokenToForm, showFooterEffect, showPageLoading;
 
   if (typeof window.console === "undefined") {
     console = {};
@@ -55,8 +55,21 @@
     });
     target = path === "/" ? $("#footer-home") : path === "/image/web/upload" ? $("#footer-upload") : $("#footer-other");
     window.console.log(target);
-    target.find("a").css("border-bottom", "solid 3px rgba(246, 172, 23, 1.0)");
+    target.find("a").css("border-bottom", "solid 3px rgba(255, 230, 62, 1.0)");
     return target.find("img").css("margin-bottom", "-3px");
+  };
+
+  setHeaderElem = function() {
+    var path;
+    path = location.pathname;
+    if (path === "/") {
+      $("#album-view").show();
+    } else {
+      $("#album-view").hide();
+    }
+    return $("#babyry-title-img").on("click", function() {
+      return location.href = "/";
+    });
   };
 
   setXSRFTokenToForm();
@@ -67,7 +80,10 @@
 
   window.util.hidePageLoading = hidePageLoading;
 
-  $(document).on("DOMContentLoaded", showFooterEffect);
+  $(document).on("DOMContentLoaded", function() {
+    showFooterEffect();
+    return setHeaderElem();
+  });
 
 }).call(this);
 
