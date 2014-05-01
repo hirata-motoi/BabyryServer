@@ -20,5 +20,13 @@ sub verify {
     return $service->verify($params);
 }
 
+sub devicetoken {
+    my ($self, $params) = @_;
+
+    my $service = Babyry::Service::Register->new;
+    return $service->devicetoken($params);
+}
+
+
 1;
 

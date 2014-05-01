@@ -17,6 +17,9 @@
     },
     '/logout' => +{
         controller => 'Login', action => 'logout',
+    },
+    '/register/devicetoken' => +{
+        controller => 'Register', action => 'devicetoken',
     }
 }
 

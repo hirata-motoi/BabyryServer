@@ -6,6 +6,7 @@ use utf8;
 use parent qw/Babyry::Service::Base/;
 use Digest::MD5 qw/md5_hex/;
 use Log::Minimal;
+use Data::Dumper;
 
 use Carp;
 
@@ -95,7 +96,7 @@ sub execute {
 
     # TODO subject/body + sendを1つのmethodに任せる
     # TODO evalの中に移動
-    my $domain = $c->stash->{domain};
+    my $domain = $params->{'domain'};
     $mail->set_subject("Babyryにようこそ");
     $mail->set_body(<<"TEXT");
         Babyryにご登録ありがとうございます。
@@ -183,6 +184,22 @@ sub get_expired_at {
 sub create_token {
     my ($self, $user_id) = @_;
     return md5_hex(time . $user_id . Babyry::Common->get_key_vault('register_secret'));
+}
+
+sub devicetoken {
+    my ($self, $params) = @_;
+
+    my $sns = $self->model('AmazonSNS')->set_endpoint($params);
+    return {} if (!$sns>{'EndpointArn'});
+
+    $params->{arn} = $sns->{'EndpointArn'};
+    my $teng = $self->teng('BABYRY_MAIN_W');
+    $teng->txn_begin;
+    $self->model('PushToken')->set($teng, $params);
+    $teng->txn_commit;
+    $teng->disconnect();
+
+    return {};
 }
 
 1;

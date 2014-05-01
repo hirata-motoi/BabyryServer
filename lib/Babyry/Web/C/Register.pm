@@ -20,6 +20,7 @@ sub execute {
         password => $c->req->param('password') || '',
         password_confirm => $c->req->param('password_confirm') || '',
         invite_code => $c->req->param('invite_code') || '',
+        domain => $c->stash->{'domain'} || '',
     };
 
     my $logic = Babyry::Logic::Register->new;
@@ -48,6 +49,31 @@ sub verify {
         return $c->res_500();
     }
     return $c->redirect('/login', +{});
+}
+
+sub devicetoken {
+    my ($self, $c) = @_;
+
+    if (!$c->stash->{'user_id'}) {
+        return $c->render_json({error => "no_user_id"});
+    }
+    if (!$c->req->param('devicetoken')) {
+        return $c->render_json({error => "no_devicetoken"});
+    }
+
+    my $params = {
+        devicetoken => $c->req->param('devicetoken'),
+        user_id => $c->stash->{'user_id'},
+    };
+
+    my $logic = Babyry::Logic::Register->new;
+
+    my $ret = eval { $logic->devicetoken($params); };
+    if ( my $e = $@ ) {
+        critf($e);
+        return $c->render_json({error => "internal_server_error"});
+    }
+    return $c->render_json($ret);
 }
 
 1;
