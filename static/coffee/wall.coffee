@@ -5,7 +5,7 @@ if typeof (window.console) is "undefined"
 if window.entryData is "undefined"
   window.entryData = {}
 
-page = 1
+window.pageForEntrySearch = 1
 count = 10
 
 window.showGroupByModal
@@ -15,13 +15,15 @@ stamp_ids_hash = []
 child_ids_hash = []
 
 $ ->
-  tmpl = _.template $('#template-item').html()
-  grid = $('.timeline').get 0
 
   # setup groupByIcon
   $("#group_by_stamp").show();
 
   load_contents = (stamp_ids, child_ids) ->
+
+    tmpl = _.template $('#template-item').html()
+    grid = $('.timeline').get 0
+
     $.ajax {
       url : '/entry/search.json',
       dataType: "json",
@@ -30,7 +32,7 @@ $ ->
         stamp_id: stamp_ids,
         child_id: child_ids,
         count: count,
-        page: page
+        page: window.pageForEntrySearch
       },
       success : (data) ->
         return if data.data.entries.length < 1
@@ -38,25 +40,28 @@ $ ->
         for i in [0 .. data.data.entries.length - 1]
           item.push document.createElement('article')
 
+        window.console.log grid
+        window.console.log item
         salvattore.append_elements grid, item
+        window.console.log "append_elements OK"
         for i in [0 .. data.data.entries.length - 1]
           item[i].outerHTML = tmpl {
             stamp_num: data.data.entries[i].stamps.length,
             comment_num: data.data.entries[i].comments.length,
             fullsize_image_url: data.data.entries[i].fullsize_image_url,
-            entryIndex: i + (page - 1) * count,
+            entryIndex: i + (window.pageForEntrySearch - 1) * count,
           }
         if count > data.data.entries.length + 1
           $('#load-more').hide()
 
-        page++
+        window.pageForEntrySearch++
 
         if window.entryData.entries is "undefined"
           window.entryData.entries = []
 
         window.entryData.entries = window.entryData.entries.concat data.data.entries
         window.entryData.metadata = data.metadata
-        window.entryData.related_children = data.data.related_children
+        window.entryData.related_child = data.data.related_child
         window.util.showImageDetail()
 
       error : () ->
@@ -136,3 +141,5 @@ $ ->
       if child_ids_hash[key] == 1
         window.child_ids.push key
     load_contents(window.stamp_ids, window.child_ids)
+
+  window.load_contents = load_contents

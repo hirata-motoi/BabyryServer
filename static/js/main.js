@@ -1,5 +1,5 @@
 (function() {
-  var console, getXSRFToken, hidePageLoading, setXSRFTokenToForm, showPageLoading;
+  var console, getXSRFToken, hidePageLoading, setHeaderElem, setXSRFTokenToForm, showFooterEffect, showPageLoading;
 
   if (typeof window.console === "undefined") {
     console = {};
@@ -47,6 +47,31 @@
     return $.mobile.loading("hide");
   };
 
+  showFooterEffect = function() {
+    var path, target;
+    path = location.pathname;
+    $(".navbar .selected-footer-menu").each(function() {
+      return $(this).removeClass("selected-footer-menu");
+    });
+    target = path === "/" ? $("#footer-home") : path === "/image/web/upload" ? $("#footer-upload") : $("#footer-other");
+    window.console.log(target);
+    target.find("a").css("border-bottom", "solid 3px rgba(255, 230, 62, 1.0)");
+    return target.find("img").css("margin-bottom", "-3px");
+  };
+
+  setHeaderElem = function() {
+    var path;
+    path = location.pathname;
+    if (path === "/") {
+      $("#album-view").show();
+    } else {
+      $("#album-view").hide();
+    }
+    return $("#babyry-title-img").on("click", function() {
+      return location.href = "/";
+    });
+  };
+
   setXSRFTokenToForm();
 
   window.util || (window.util = {});
@@ -54,6 +79,11 @@
   window.util.showPageLoading = showPageLoading;
 
   window.util.hidePageLoading = hidePageLoading;
+
+  $(document).on("DOMContentLoaded", function() {
+    showFooterEffect();
+    return setHeaderElem();
+  });
 
 }).call(this);
 
