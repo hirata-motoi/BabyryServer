@@ -14,6 +14,11 @@ sub execute {
 
     my $error = '';
 
+    # username varidation
+    if ($params->{email} !~ /^([^\s]+)@([^\s]+)$/) {
+        return { error => 'INVALID_MAIL_ADDRESS' };
+    }
+
     # password varidation
     $error = $self->varidate_password($params->{password});
     return { error => $error } if ($error);
@@ -22,7 +27,6 @@ sub execute {
     $error = $self->match_password($params->{password}, $params->{password_confirm});
     return { error => $error } if ($error);
 
-    # insert user table
     my $teng   = $self->teng('BABYRY_MAIN_W');
     my $teng_r = $self->teng('BABYRY_MAIN_R');
 
@@ -38,8 +42,15 @@ sub execute {
     my $invite         = $self->model('Invite');
     my $relatives      = $self->model('Relatives');
 
+
+    # duplicate check 'email from user_auth'
+    if ($user_auth->get_by_email($teng_r, {email => $params->{email}})) {
+        return { error => 'DUPLICATE_ENTRY' };
+    }
+
     my $invite_record = $invite->get_by_invite_code($teng_r, $params->{invite_code});
 
+    # insert user table
     $teng->txn_begin;
     eval {
         $user->create(
@@ -156,7 +167,7 @@ sub varidate_password {
     if($password eq '') {
         return 'NO_PASSWRD';
     }
-    if(length($password) < 4 ) {
+    if(length($password) < 8 ) {
         return 'TOO_SHORT_PASSWRD';
     }
     return 0;

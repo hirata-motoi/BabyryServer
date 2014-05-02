@@ -68,13 +68,20 @@ __PACKAGE__->add_trigger(
         my $session_id = $c->session->get('session_id');
 
         # TODO move to config
-        my @session_not_required_paths = qw| /login /login/execute /register /register/execute /register/verify /devicetoken |;
+        my @session_not_required_paths = qw| /top /login/execute /register/execute /register/verify /devicetoken |;
 
         my $path = $c->req->env->{PATH_INFO};
         if ( ! $session_id  ) {
             if ( ! grep { $path =~ m{^$_} } @session_not_required_paths ) {
-                infof('redirect to /login');
-                return $c->redirect('/login');
+                infof('redirect to /top');
+                return $c->render(
+                    'top/index.tx',
+                    {  
+                        no_header => 1,
+                        no_footer => 1,
+                        login     => 1,
+                    }
+                );
             }
             return;
         } else {
@@ -100,8 +107,15 @@ __PACKAGE__->add_trigger(
         # clear session when session is invalid
         if ( ! $c->stash->{user_id} ) {
             $c->session->remove('session_id');
-            infof('redirect to /login');
-            return $c->redirect('/login');
+            infof('redirect to /top');
+            return $c->render(
+                'top/index.tx',
+                {
+                    no_header => 1,
+                    no_footer => 1,
+                    login     => 1,
+                }
+            );
         }
     },
 
