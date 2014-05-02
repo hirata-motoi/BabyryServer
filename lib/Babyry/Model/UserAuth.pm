@@ -54,5 +54,32 @@ sub get_by_ids {
     return \%user_auth;
 }
 
+sub get_by_ids {
+    my ($self, $teng, $user_ids) = @_;
+
+    my $itr = $teng->search(
+        'user_auth',
+        {
+            user_id => $user_ids,
+        }
+    );
+    my %user_auth = ();
+    while ( my $r = $itr->next ) {
+        $user_auth{ $r->user_id } = $r->get_columns;
+    }
+    return \%user_auth;
+}
+
+sub get_by_email {
+    my ($self, $teng, $params) = @_;
+
+    my $row = $teng->single('user_auth', {
+        email => $params->{'email'},
+        disabled => 0,
+    }) or return;
+
+    return $row->email;
+}
+
 1;
 

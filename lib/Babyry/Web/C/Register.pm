@@ -31,7 +31,26 @@ critf($e);
 #        critf('Failed to register params:%s error:%s', $self->dump($params), $e);
 #        $c->render_500();
     }
-    $c->redirect('/login');
+    if ($ret->{error}) {
+        return $c->render(
+            'top/index.tx',
+            {
+                no_header => 1,
+                no_footer => 1,
+                register  => 1,
+                error     => $ret->{error},
+            }
+        );
+    }
+
+    return $c->render(
+        'top/index.tx',
+        {  
+            no_header => 1,
+            no_footer => 1,
+            login     => 1,
+        }
+    );
 }
 
 sub verify {
@@ -48,7 +67,13 @@ sub verify {
         critf('Failed to verify registered email token:%s error:%s', $params->{token}, $e);
         return $c->res_500();
     }
-    return $c->redirect('/login', +{});
+    return $c->render(
+        'top/index.tx',
+        {
+            no_header => 1,
+            no_footer => 1,
+        }
+    );
 }
 
 sub devicetoken {

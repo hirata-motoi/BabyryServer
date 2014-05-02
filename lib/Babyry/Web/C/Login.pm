@@ -9,7 +9,13 @@ use Babyry::Logic::Login;
 sub index {
     my ($class, $c) = @_;
 
-    return $c->render('login/index.tx');
+    return $c->render(
+        'top/index.tx',
+        {  
+            no_header => 1,
+            no_footer => 1,
+        }
+    );
 }
 
 sub execute {
@@ -39,7 +45,15 @@ critf($ret->{error});
         $c->session->session_cookie->{expires} = time() + 9*60*60 + 31*24*60*60;
         return $c->redirect('/');
     } else {
-        return $c->render('/login/index.tx', {error => 'INVALID_PASSWORD'});
+        return $c->render(
+            'top/index.tx',
+            {  
+                no_header => 1,
+                no_footer => 1,
+                login     => 1,
+                error => 'INVALID_PASSWORD',
+            }
+        );
     }
 }
 
@@ -47,7 +61,13 @@ sub logout {
     my ($class, $c) = @_;
 
     $c->session->remove('session_id');
-    $c->redirect('/login');
+    return $c->render(
+        'top/index.tx',
+        {  
+            no_header => 1,
+            no_footer => 1,
+        }
+    );
 }
 
 1;
