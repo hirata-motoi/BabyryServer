@@ -29,7 +29,7 @@ sub send_mail {
     die 'there is no subject or body or address.' if (!$self->{body} || !$self->{address} || !$self->{subject});
 
     my $aws = AWS::CLIWrapper->new(
-        region => 'us-west-2',
+        region => 'us-east-1',
     );
 
     my $mail_subject = jcode($self->{subject})->jis;
@@ -38,7 +38,7 @@ sub send_mail {
     $mail_to = jcode($mail_to)->mime_encode;
     my $mail_from = jcode('meaning.sys@gmail.com')->jis;
     $mail_from = jcode($mail_from)->mime_encode;
-    my $mail_body = jcode($self->{body})->jis;
+    my $mail_body = $self->{body};
 
     my $params = {
         from => $mail_from,

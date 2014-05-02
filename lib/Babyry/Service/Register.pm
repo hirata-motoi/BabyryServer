@@ -7,7 +7,6 @@ use parent qw/Babyry::Service::Base/;
 use Digest::MD5 qw/md5_hex/;
 use Log::Minimal;
 use Data::Dumper;
-
 use Carp;
 
 sub execute {
@@ -97,13 +96,9 @@ sub execute {
     # TODO subject/body + sendを1つのmethodに任せる
     # TODO evalの中に移動
     my $domain = $params->{'domain'};
-    $mail->set_subject("Babyryにようこそ");
-    $mail->set_body(<<"TEXT");
-        Babyryにご登録ありがとうございます。
-        以下のURLをクリックするとアカウントが有効になります。
+    $mail->set_subject(Babyry::Common->config->{verify}{mail}{subject});
+    $mail->set_body( sprintf(Babyry::Common->config->{verify}{mail}{body}, $domain, $token) );
 
-        https://$domain/register/verify?token=$token
-TEXT
     if ($ENV{APP_ENV} eq 'production') {
         $mail->set_address($params->{email});
     } else {

@@ -25,18 +25,18 @@ sub execute {
         croakf($e);
     }
 
-    return $self->_create_invite_mail_params( @{$row}{qw/invite_code user_id/} );
+    return $self->_create_invite_mail_params( @{$row}{qw/invite_code user_id/}, $params->{domain} );
 }
 
 sub _create_invite_mail_params {
-    my ($self, $invite_code, $user_id) = @_;
+    my ($self, $invite_code, $user_id, $domain) = @_;
 
     my %mail_params = (
         subject => uri_escape( Babyry::Common->config->{invite}{mail}{subject} ),
     );
 
     my $body_tmpl = Babyry::Common->config->{invite}{mail}{body};
-    $mail_params{body} = uri_escape( sprintf($body_tmpl, $invite_code) );
+    $mail_params{body} = uri_escape( sprintf($body_tmpl, $invite_code, $domain) );
 
     return \%mail_params;
 }

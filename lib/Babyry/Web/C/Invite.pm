@@ -20,6 +20,7 @@ sub execute {
 
     my $params = {
         user_id       => $c->stash->{user_id},
+        domain        => $c->stash->{domain},
         invite_method => $c->req->param('invite_method') || '',
     };
     my $logic = Babyry::Logic::Invite->new;
