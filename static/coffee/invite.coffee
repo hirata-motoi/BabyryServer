@@ -42,7 +42,7 @@ inviteLineSubmit = () ->
     },
     "dataType": "json"
     "success": (data) ->
-      window.open 'http://line.me/R/msg/text/?' + data.body, '_blank', 'menubar=yes,location=yes,status=yes,resizable=yes,scrollbars=yes'
+      locatin.href 'http://line.me/R/msg/text/?' + data.body
     "error": () ->
       # エラーメッセージを表示
   })

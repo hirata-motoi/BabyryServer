@@ -60,7 +60,7 @@
       },
       "dataType": "json",
       "success": function(data) {
-        return window.open('http://line.me/R/msg/text/?' + data.body, '_blank', 'menubar=yes,location=yes,status=yes,resizable=yes,scrollbars=yes');
+        return locatin.href('http://line.me/R/msg/text/?' + data.body);
       },
       "error": function() {}
     });
