@@ -26,7 +26,24 @@ inviteSubmit = () ->
       mailto = "mailto:" + query
       location.href = mailto;
     "error": () ->
-      # エラーメッセージを表示
+      window.console.log "error"
   })
 $("#invite-submit").on("click", inviteSubmit)
 
+inviteLineSubmit = () ->
+  window.console.log "test"
+  token = getXSRFToken()
+  $.ajax({
+    "url": "/invite/execute",
+    "type": "post",
+    "data": {
+      "XSRF-TOKEN": token,
+      "aaaa": "bbbbbbbb",
+    },
+    "dataType": "json"
+    "success": (data) ->
+      location.href = 'http://line.me/R/msg/text/?' + data.body
+    "error": () ->
+      # エラーメッセージを表示
+  })
+$("#invite-line-submit").on("click", inviteLineSubmit)
