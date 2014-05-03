@@ -42,7 +42,7 @@ inviteLineSubmit = () ->
     },
     "dataType": "json"
     "success": (data) ->
-      locatin.href 'http://line.me/R/msg/text/?' + data.body
+      locatin.href = 'http://line.me/R/msg/text/?' + data.body
     "error": () ->
       # エラーメッセージを表示
   })
