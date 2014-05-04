@@ -45,8 +45,6 @@
       window.util.showPageLoading();
       innerWidth = window.innerWidth;
       innerHeight = window.innerHeight;
-      $(".container.content-body").css("width", innerWidth);
-      $(".container.content-body").css("height", innerHeight);
       imageId = $(this).parents(".item").attr("image_id");
       tappedEntryIndex = $(this).attr("entryIndex");
       return showCarousel({
@@ -123,6 +121,8 @@
         },
         "dataType": 'json',
         "success": function(response) {
+          $(".container.content-body").css("width", innerWidth);
+          $(".container.content-body").css("height", innerHeight);
           showEntries(response, initial);
           if (typeof addOnCallback === "function") {
             return addOnCallback();
