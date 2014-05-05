@@ -24,7 +24,7 @@
 
   child_ids_hash = [];
 
-  $(function() {
+  window.setupWall = function() {
     var load_contents, tmpl_child, tmpl_stamp;
     $("#group_by_stamp").show();
     load_contents = function(stamp_ids, child_ids) {
@@ -176,7 +176,7 @@
       return load_contents(window.stamp_ids, window.child_ids);
     });
     return window.load_contents = load_contents;
-  });
+  };
 
 }).call(this);
 

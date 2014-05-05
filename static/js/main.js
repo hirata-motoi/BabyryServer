@@ -63,13 +63,10 @@
     var path;
     path = location.pathname;
     if (path === "/") {
-      $("#album-view").show();
+      return $("#album-view").show();
     } else {
-      $("#album-view").hide();
+      return $("#album-view").hide();
     }
-    return $("#babyry-title-img").on("click", function() {
-      return location.href = "/";
-    });
   };
 
   setXSRFTokenToForm();

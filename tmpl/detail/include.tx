@@ -47,7 +47,7 @@
   }
   .cover {
     display: inline-block;
-    background-color: #ccc;
+    background-color: #FAFAFA;
     background-position: center center;
     background-repeat: no-repeat;
     background-size: contain;
@@ -224,7 +224,7 @@
 
 <div>
   <div id="item-tmpl" style="display:none">
-    <div class="img-box cover" style="position: relative; background-color: white;">
+    <div class="img-box cover" style="position: relative;">
       <div class="child-container"></div>
     </div>
   </div>

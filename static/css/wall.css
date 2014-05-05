@@ -1,0 +1,43 @@
+#wall {
+  /* salvattore */
+}
+#wall .image {
+  margin: 0 auto;
+  margin-bottom: 4px;
+  max-width: 360px;
+  padding: 0px;
+}
+#wall .image img {
+  width: 100%;
+  max-width: 360px;
+}
+#wall .item {
+  border: 1px solid #eee;
+  border-radius: 2px;
+  padding: 4px;
+  margin: 4px;
+  background-color: white;
+}
+#wall .timeline[data-columns]::before {
+  content: '2 .column.size-1of2';
+}
+#wall .column {
+  float: left;
+}
+#wall .size-1of2 {
+  width: 50%;
+}
+#wall [data-columns]::before {
+  display: none;
+}
+#wall .img-thumbnail {
+  padding: 0px 0px 0px 0px;
+  border: none;
+  border-radius: 4px;
+}
+#wall .img-icon-small {
+  width: 10%;
+}
+#wall .btn-top {
+  width: 49.5%;
+}

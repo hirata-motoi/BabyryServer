@@ -31,11 +31,8 @@ showImageDetail = () ->
 
     window.util.showPageLoading()
 
-    # screenサイズを取得
-    innerWidth = window.innerWidth
+    innerWidth  = window.innerWidth
     innerHeight = window.innerHeight
-    $(".container.content-body").css "width", innerWidth
-    $(".container.content-body").css "height", innerHeight
 
     imageId   = $(this).parents(".item").attr("image_id")
     tappedEntryIndex = $(this).attr "entryIndex"
@@ -105,7 +102,6 @@ showImageDetail = () ->
     nextPage = if window.entryData.metadata.page then parseInt(window.entryData.metadata.page, 10) + 1 else 1
     countPerPage = window.entryData.metadata.count || 10
     $.mobile.loading("show")
-    # ajax
     $.ajax({
       "url" : "/entry/search.json",
       "processData": true,
@@ -118,6 +114,10 @@ showImageDetail = () ->
       },
       "dataType": 'json',
       "success" : (response) ->
+        # screenサイズを取得
+        $(".container.content-body").css "width", innerWidth
+        $(".container.content-body").css "height", innerHeight
+
         showEntries response, initial
         addOnCallback() if typeof(addOnCallback) == "function"
       "error"   : showErrorMessage
@@ -636,6 +636,7 @@ showImageDetail = () ->
 
   getCurrentPosition = () ->
     return parseInt owlObject.currentPosition(), 10
+
 
 window.util ||= {}
 window.util.showImageDetail = showImageDetail

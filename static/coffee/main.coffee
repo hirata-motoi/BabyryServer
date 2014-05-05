@@ -55,11 +55,7 @@ setHeaderElem = () ->
   else
     $("#album-view").hide()
 
-
-  $("#babyry-title-img").on "click", () ->
-    location.href = "/"
-
-
+  
 setXSRFTokenToForm()
 window.util ||= {}
 window.util.showPageLoading = showPageLoading

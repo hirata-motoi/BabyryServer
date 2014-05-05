@@ -14,7 +14,7 @@ window.child_ids = []
 stamp_ids_hash = []
 child_ids_hash = []
 
-$ ->
+window.setupWall = () ->
 
   # setup groupByIcon
   $("#group_by_stamp").show();
