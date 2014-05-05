@@ -1,0 +1,42 @@
+#menu {
+  /* salvattore */
+}
+#menu .item {
+  border: 1px solid #eee;
+  border-radius: 2px;
+  padding: 4px;
+  margin: 4px;
+  background-color: #FFFFFF;
+}
+#menu .timeline[data-columns]::before {
+  content: '2 .column.size-1of2';
+}
+#menu .column {
+  float: left;
+}
+#menu .size-1of2 {
+  width: 50%;
+}
+#menu [data-columns]::before {
+  display: none;
+}
+#menu .img-menu-icon {
+  height: 64px;
+  width: 64px;
+  padding: 0px 0px 0px 0px;
+  border: none;
+  border-radius: 4px;
+}
+#menu .table-item {
+  border: 1px solid #eee;
+  border-radius: 2px;
+  padding: 4px;
+  background-color: #FFFFFF;
+}
+#menu .table-item-inner {
+  text-align: center;
+}
+#menu .table-item-inner a {
+  display: block;
+  color: #6E6E6E;
+}

@@ -637,5 +637,6 @@ showImageDetail = () ->
   getCurrentPosition = () ->
     return parseInt owlObject.currentPosition(), 10
 
+
 window.util ||= {}
 window.util.showImageDetail = showImageDetail
