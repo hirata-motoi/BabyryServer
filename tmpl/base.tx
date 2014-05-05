@@ -118,8 +118,6 @@
 
   <body style="background-color: #EEEEEE">
 
-    <div data-role="page">
-
     : if $no_header {
     : }
     : else {
@@ -198,6 +196,5 @@
     </script>
     : }
 
-    </div>
   </body>
 </html>
