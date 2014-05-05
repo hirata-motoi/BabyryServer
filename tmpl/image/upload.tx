@@ -110,7 +110,6 @@
   <a href="#relativesModal" class="btn btn-default btn-lg btn-block" id="post-button" data-toggle="modal" role="button" data-backdrop="true" data-ajax="false">
     投稿
   </a>
-  <a href="/relatives">relatives</a>
 
   <form method="post" action="/image/web/upload_execute.json" enctype="multipart/form-data" target="next-ajax-post-Image" id="image-post-form">
     <input type="file" name="file">
