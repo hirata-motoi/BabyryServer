@@ -53,11 +53,6 @@
 
 : around javascript -> {
 <script type="text/javascript" src="<: uri_for('/static/backbone/js/backbone-min.js') :>"></script>
-<!-- grid layout
-  http://salvattore.com/
-  http://suprb.com/apps/nested/
-<script type="text/javascript" src="<: uri_for('/static/salvattore/js/salvattore.min.js') :>"></script>
--->
 
 <!-- for owl -->
 <script src="<: uri_for('/static/jquery/plugin/owl/owl-carousel/owl.carousel.js') :>"></script>
@@ -76,12 +71,13 @@
 
 : around content -> {
 
-<div class="dynamic-container">
+  <div class="dynamic-container">
 
-  <div class="timeline row" data-columns style="content: '2 .column.size-1of2';"></div>
+    <div class="timeline row" data-columns style="content: '2 .column.size-1of2';"></div>
 
-  <div id="load-more" style="text-align:center"><img src="/static/img/arrow_carrot-2down_alt2.png"></div>
-</div>
+    <div id="load-more" style="text-align:center"><img src="/static/img/arrow_carrot-2down_alt2.png"></div>
+
+  </div>
 
 : include wall::include
 
@@ -89,9 +85,13 @@
 
 : include album::include
 
-<script type="text/javascript" src="<: uri_for('/static/salvattore/js/salvattore.js') :>"></script>
+<!--<script type="text/javascript" src="<: uri_for('/static/salvattore/js/salvattore.js') :>"></script>-->
 <script type="text/javascript">
-  window.setupWall();
+  $(document).on("pagechange", function(){
+    var script = $("<script>").attr("src", "<: uri_for('/static/salvattore/js/salvattore.js') :>");
+    $("body").append(script);
+    window.setupWall();
+  });
 </script>
 
 : }

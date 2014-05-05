@@ -1,0 +1,45 @@
+#wall {
+  .image {
+    margin: 0 auto;
+    margin-bottom: 4px;
+    max-width: 360px;
+    padding: 0px;
+  }
+  .image img {
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .item {
+    border: 1px solid #eee;
+    border-radius: 2px;
+    padding: 4px;
+    margin: 4px;
+    background-color: #FFFFFF
+  }
+
+  /* salvattore */
+  .timeline[data-columns]::before {
+    content: '2 .column.size-1of2';
+  }
+  .column {
+    float: left;
+  }
+  .size-1of2 {
+    width: 50%;
+  }
+  [data-columns]::before {
+    display: none;
+  }
+  .img-thumbnail {
+    padding: 0px 0px 0px 0px;
+    border: none;
+    border-radius: 4px;
+  }
+  .img-icon-small {
+    width: 10%;
+  }
+  .btn-top {
+    width: 49.5%;
+  }
+}
