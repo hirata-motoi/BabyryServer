@@ -56,10 +56,10 @@ setHeaderElem = () ->
     $("#album-view").hide()
 
   
-setXSRFTokenToForm()
 window.util ||= {}
 window.util.showPageLoading = showPageLoading
 window.util.hidePageLoading = hidePageLoading
+$(document).on "pagechange", setXSRFTokenToForm
 $(document).on "DOMContentLoaded", () ->
   showFooterEffect()
   setHeaderElem()

@@ -69,13 +69,13 @@
     }
   };
 
-  setXSRFTokenToForm();
-
   window.util || (window.util = {});
 
   window.util.showPageLoading = showPageLoading;
 
   window.util.hidePageLoading = hidePageLoading;
+
+  $(document).on("pagechange", setXSRFTokenToForm);
 
   $(document).on("DOMContentLoaded", function() {
     showFooterEffect();

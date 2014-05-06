@@ -3,38 +3,6 @@ if typeof (window.console) is "undefined"
   console.log = console.warn = console.error = (a) ->
 $ ->
 
-$("#add-image-icon").on("click", () ->
-  $("#image-post-form").find("[type=file]").trigger("click")
-  return false
-)
-
-$form = $("#image-post-form")
-$form.find("[type=file]").on("change", () ->
-
-  $(".error").hide()
-
-  box = showLoadingImage()
-
-  fd = new FormData( $form[0] )
-  $.ajax( $form.attr("action"), {
-    type: 'post',
-    processData: false,
-    contentType: false,
-    data: fd,
-    dataType: 'json',
-    success: (data) ->
-      box.find("img").attr "src", ""
-      box.attr "filename", data.image_tmp_name
-      box.find("img").attr "src", data.image_tmp_url
-      # TODO trim 
-      box.find("img").css "width", "80"
-      box.find("img").css "height", "80"
-    error: (xhr) ->
-      showErrorMessage xhr, box
-  })
-  return false
-)
-
 showLoadingImage = () ->
   box = $("<div>").addClass "js-uploaded-image-box"
   box.css "display", "table-cell"
@@ -125,6 +93,43 @@ toggleCheckMark = () ->
   else
     $(checkedMark).addClass "checked"
 
+openAttachChildToImages = () ->
+  window.attachedChildToImages = []
+  $("#childModal").modal()
 
-$("#submit-button").on("click", submit)
-$(".relative-list,.child-list").on "click", toggleCheckMark
+
+$(document).on "pagechange", () ->
+  $form = $("#image-post-form")
+  $form.find("[type=file]").on("change", () ->
+
+    $(".error").hide()
+
+    box = showLoadingImage()
+
+    fd = new FormData( $form[0] )
+    $.ajax( $form.attr("action"), {
+      type: 'post',
+      processData: false,
+      contentType: false,
+      data: fd,
+      dataType: 'json',
+      success: (data) ->
+        box.find("img").attr "src", ""
+        box.attr "filename", data.image_tmp_name
+        box.find("img").attr "src", data.image_tmp_url
+        # TODO trim 
+        box.find("img").css "width", "80"
+        box.find("img").css "height", "80"
+      error: (xhr) ->
+        showErrorMessage xhr, box
+    })
+    return false
+  )
+  $("#submit-button").on "click", submit
+  $(".relative-list,.child-list").on "click", toggleCheckMark
+  $("#image-upload-child-mapping").on "click", openAttachChildToImages
+
+  $("#add-image-icon").on "click", () ->
+    $("#image-post-form").find("[type=file]").trigger("click")
+    return false
+

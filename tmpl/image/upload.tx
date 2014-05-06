@@ -87,13 +87,11 @@
 : }
 
 : around javascript -> {
-<script type="text/javascript" src="<: uri_for('/static/backbone/js/backbone-min.js') :>"></script>
 <!-- grid layout
   http://salvattore.com/
   http://suprb.com/apps/nested/
--->
-<script type="text/javascript" src="<: uri_for('/static/salvattore/js/salvattore.min.js') :>"></script>
 <script type="text/javascript" src="<: uri_for('/static/js/image/upload.js') :>"></script>
+-->
 : }
 
 : around content -> {
@@ -107,40 +105,19 @@
   </div>
 
   <div class="error">アップロードにに失敗しました</div>
-  <a href="#relativesModal" class="btn btn-default btn-lg btn-block" id="post-button" data-toggle="modal" role="button" data-backdrop="true" data-ajax="false">
-    投稿
-  </a>
 
   <form method="post" action="/image/web/upload_execute.json" enctype="multipart/form-data" target="next-ajax-post-Image" id="image-post-form">
     <input type="file" name="file">
     <input type="submit" value="hoge">
   </form>
 
-  <div id="relativesModal" class="modal fade" style="top: 20px; margin: 0 auto 20px; max-width: 100%; height: 500px;">
+  <div id="childModal" class="modal fade" style="top: 20px; margin: 0 auto 20px; max-width: 100%; height: 500px;">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-          <h3>共有先を設定しましょう</h3>
+          <h3>こどもをタグ付けしよう</h3>
         </div>
         <div class="modal-body">
-          <h4>誰に共有？</h4>
-          <ul style="list-style-type: none;" data-role="listview">
-          : for $relatives.keys() -> $key {
-            <li class="relative-list" data-relative-id="<: $key :>">
-              <div style="display: table-cell; width: 44px;">
-                <img class="relative-img" src="<: $relatives[$key].icon_url :>">
-              </div>
-              <div class="relative-name abbreviation" style="display: table-cell; width: 150px; padding-left: 10px;">
-                <p><: $relatives[$key].user_name :></p>
-              </div>
-              <div class="relative-checked-mark checked-mark" style="display: table-cell; width: 30px;">
-                <span style="color: lightgreen; font-size: 25px;">&#x2713</span>
-              </div>
-            </li>
-          : }
-          </ul>
-          <h4>どの子が映っている？</h4>
           <ul style="list-style-type: none;" data-role="listview">
           : for $child.keys() -> $key {
             <li class="child-list" data-child-id="<: $key :>">
@@ -157,12 +134,58 @@
           : }
           </ul>
         </div>
-        <div class="modal-footer">
-          <a href="#" class="btn" data-dismiss="modal" data-ajax="false">Close</a>
-          <a href="#" class="btn btn-primary" id="submit-button" data-ajax="false">Save changes</a>
+        <div class="modal-footer" id="image-upload-child-modal-footer">
+          <a href="#" class="btn btn-primary" data-dismiss="modal" id="image-upload-child-complete">完了</a>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="relativesModal" class="modal fade" style="top: 20px; margin: 0 auto 20px; max-width: 100%; height: 500px;">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>共有先を設定しましょう</h3>
+        </div>
+        <div class="modal-body">
+          <ul style="list-style-type: none;" data-role="listview">
+          : for $relatives.keys() -> $key {
+            <li class="relative-list" data-relative-id="<: $key :>">
+              <div style="display: table-cell; width: 44px;">
+                <img class="relative-img" src="<: $relatives[$key].icon_url :>">
+              </div>
+              <div class="relative-name abbreviation" style="display: table-cell; width: 150px; padding-left: 10px;">
+                <p><: $relatives[$key].user_name :></p>
+              </div>
+              <div class="relative-checked-mark checked-mark" style="display: table-cell; width: 30px;">
+                <span style="color: lightgreen; font-size: 25px;">&#x2713</span>
+              </div>
+            </li>
+          : }
+          </ul>
+        </div>
+        <div class="modal-footer" id="image-upload-modal-footer">
+          <a href="#" class="btn" data-dismiss="modal" id="image-upload-modal-footer-close">閉じる</a>
+          <a href="#" class="btn btn-primary" id="image-upload-submit-button">送信</a>
         </div>
       </div>
     </div>
   </div>
 </div>
+<div style="display: table; width: 100%; height: 44px;" data-role="footer" data-id="image-upload-footer" id="image-upload-footer" data-theme="a" data-tap-toggle="false">
+  <div style="display: table-cell; padding-left: 10px;" id="image-upload-child-mapping">
+    <img src="/static/img/baby-icon.png" style="height: 40px;">
+  </div>
+  <div style="display: table-cell;">
+    <span></span>
+  </div>
+  <div style="display: table-cell; width: 80px; text-align: center;">
+    <a href="#relativesModal" style="margin-right: 10px; width: 80px; display: inline-block; line-height: 44px;" id="post-button" data-toggle="modal" data-backdrop="true">
+      投稿
+    </a>
+    <!--class="btn btn-default btn-lg btn-block" -->
+  </div>
+</div>
+<script type="text/javascript" src="<: uri_for('/static/js/image/upload.js') :>"></script>
 : }

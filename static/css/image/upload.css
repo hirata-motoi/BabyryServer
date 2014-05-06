@@ -79,3 +79,22 @@
   width: 150px;
   white-space: nowrap;
 }
+#image-upload #image-upload-footer {
+  background-color: silver;
+}
+#image-upload #image-upload-modal-footer a {
+  text-shadow: none;
+}
+#image-upload #image-upload-modal-footer-close {
+  color: #38c;
+}
+#image-upload #image-upload-submit-button {
+  background-color: #38c;
+  color: white;
+}
+#image-upload #image-upload-child-modal-footer a {
+  text-shadow: none;
+}
+#image-upload #image-upload-child-complete {
+  color: white;
+}

@@ -1,5 +1,5 @@
 (function() {
-  var $form, console, getXSRFToken, pickedSharedRelatives, pickedTargetChild, redirectToWall, showErrorMessage, showLoadingImage, submit, toggleCheckMark;
+  var console, getXSRFToken, openAttachChildToImages, pickedSharedRelatives, pickedTargetChild, redirectToWall, showErrorMessage, showLoadingImage, submit, toggleCheckMark;
 
   if (typeof window.console === "undefined") {
     console = {};
@@ -7,38 +7,6 @@
   }
 
   $(function() {});
-
-  $("#add-image-icon").on("click", function() {
-    $("#image-post-form").find("[type=file]").trigger("click");
-    return false;
-  });
-
-  $form = $("#image-post-form");
-
-  $form.find("[type=file]").on("change", function() {
-    var box, fd;
-    $(".error").hide();
-    box = showLoadingImage();
-    fd = new FormData($form[0]);
-    $.ajax($form.attr("action"), {
-      type: 'post',
-      processData: false,
-      contentType: false,
-      data: fd,
-      dataType: 'json',
-      success: function(data) {
-        box.find("img").attr("src", "");
-        box.attr("filename", data.image_tmp_name);
-        box.find("img").attr("src", data.image_tmp_url);
-        box.find("img").css("width", "80");
-        return box.find("img").css("height", "80");
-      },
-      error: function(xhr) {
-        return showErrorMessage(xhr, box);
-      }
-    });
-    return false;
-  });
 
   showLoadingImage = function() {
     var box, image, innerBox;
@@ -157,9 +125,46 @@
     }
   };
 
-  $("#submit-button").on("click", submit);
+  openAttachChildToImages = function() {
+    window.attachedChildToImages = [];
+    return $("#childModal").modal();
+  };
 
-  $(".relative-list,.child-list").on("click", toggleCheckMark);
+  $(document).on("pagechange", function() {
+    var $form;
+    $form = $("#image-post-form");
+    $form.find("[type=file]").on("change", function() {
+      var box, fd;
+      $(".error").hide();
+      box = showLoadingImage();
+      fd = new FormData($form[0]);
+      $.ajax($form.attr("action"), {
+        type: 'post',
+        processData: false,
+        contentType: false,
+        data: fd,
+        dataType: 'json',
+        success: function(data) {
+          box.find("img").attr("src", "");
+          box.attr("filename", data.image_tmp_name);
+          box.find("img").attr("src", data.image_tmp_url);
+          box.find("img").css("width", "80");
+          return box.find("img").css("height", "80");
+        },
+        error: function(xhr) {
+          return showErrorMessage(xhr, box);
+        }
+      });
+      return false;
+    });
+    $("#submit-button").on("click", submit);
+    $(".relative-list,.child-list").on("click", toggleCheckMark);
+    $("#image-upload-child-mapping").on("click", openAttachChildToImages);
+    return $("#add-image-icon").on("click", function() {
+      $("#image-post-form").find("[type=file]").trigger("click");
+      return false;
+    });
+  });
 
 }).call(this);
 

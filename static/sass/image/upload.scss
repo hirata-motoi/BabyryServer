@@ -90,5 +90,28 @@
       white-space: nowrap;
     }
   }
+  #image-upload-footer {
+    background-color: silver;
+  }
+  #image-upload-modal-footer {
+    a {
+      text-shadow: none;
+    }
+  }
+  #image-upload-modal-footer-close {
+    color: #38c;
+  }
+  #image-upload-submit-button {
+    background-color: #38c;
+    color: white;
+  }
+  #image-upload-child-modal-footer {
+    a {
+      text-shadow: none;
+    }
+  }
+  #image-upload-child-complete {
+    color: white;
+  }
 }
 
