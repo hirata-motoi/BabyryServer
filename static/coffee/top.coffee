@@ -7,9 +7,13 @@ $ ->
     $('#top_choice').hide()
     $('#top_login').show()
     $('#top_register').hide()
-    window.console.log location.href
+    $('#top_activate').hide()
 
   $('.register').on 'click', () ->
     $('#top_choice').hide()
     $('#top_login').hide()
     $('#top_register').show()
+    $('#top_activate').hide()
+
+  $('.logout').on 'click', () ->
+    location.href = '/logout'

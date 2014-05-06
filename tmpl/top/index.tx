@@ -26,6 +26,11 @@
     margin-right: 15%;
     margin-left: 15%;
   }
+  .activate_form {
+    margin-top: 0%;
+    margin-right: 15%;
+    margin-left: 15%;
+  }
   .login_button {
     margin-right: 10%;
     margin-left: 10%;
@@ -59,7 +64,7 @@
 </div>
 
 <div class="bottom_view">
-: if ($login || $register) {
+: if ($login || $register || $activate) {
   <div id="top_choice" style="display:none">
 : } else {
   <div id="top_choice">
@@ -81,21 +86,21 @@
     <div style="color:red">ユーザー名かパスワードが正しくありません</div>
 : }
     <div class="login_form">
-        <form action="/login/execute" role="form" method="post" data-ajax="false">
-          <div class="form-group">
-            <input id="email" type="email" name="email" class="form-control" placeholder="メールアドレス"/>
-          </div>
-          <div class="form-group">
-            <input id="password" type="password" name="password" class="form-control" placeholder="パスワード"/>
-          </div>
-          <div class="login_button">
-            <input type="submit" value="ログイン" class="btn btn-default"/>
-          </div>
-        </form>
-        <div class="login_button">
-          <input type="submit" value="やっぱり新規登録" class="btn btn-default register"/>
+      <form action="/login/execute" role="form" method="post" data-ajax="false">
+        <div class="form-group">
+          <input id="email" type="email" name="email" class="form-control" placeholder="メールアドレス"/>
         </div>
+        <div class="form-group">
+          <input id="password" type="password" name="password" class="form-control" placeholder="パスワード"/>
+        </div>
+        <div class="login_button">
+          <input type="submit" value="ログイン" class="btn btn-default"/>
+        </div>
+      </form>
+      <div class="login_button">
+        <input type="submit" value="やっぱり新規登録" class="btn btn-default register"/>
       </div>
+    </div>
   </div>
 : if ($register) {
   <div id="top_register">
@@ -113,8 +118,6 @@
 : } elsif $error == 'DUPLICATE_ENTRY' {
     <div style="color:red">既に登録済みのメールアドレスです</div>
 : }
-
-
     <form action="/register/execute" role="form" data-ajax="false">
       <div class="register_form">
         <div class="form-group">
@@ -136,6 +139,28 @@
     </form>
     <div class="register_button">
       <input type="submit" value="登録済みの方はコチラ" class="btn btn-default login"/>
+    </div>
+  </div>
+: if ($activate) {
+  <div id="top_activate">
+: } else {
+  <div id="top_activate" style="display:none">
+:}
+: if $error == 'INVALID_KEY' {
+    <div style="color:red">認証キーが一致しません</div>
+: }
+    <div class="activate_form">
+      <form action="/activate/execute" role="form" method="post" data-ajax="false">
+        <div class="form-group">
+          <input id="activate_key" name="activate_key" class="form-control" placeholder="認証キーを入力してください"/>
+        </div>
+        <div class="login_button">
+          <input type="submit" value="送信" class="btn btn-default"/>
+        </div>
+      </form>
+      <div class="login_button">
+        <input type="submit" value="ログアウト" class="btn btn-default logout"/>
+      </div>
     </div>
   </div>
 </div>

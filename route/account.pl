@@ -6,9 +6,6 @@
         controller => 'Register', action => 'execute',
         filter => [qw/validate_password/],
     },
-    '/register/verify' => +{
-        controller => 'Register', action => 'verify',
-    },
     '/login' => +{
         controller => 'Login', action => 'index',
     },
