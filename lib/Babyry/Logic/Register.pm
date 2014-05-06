@@ -13,11 +13,19 @@ sub execute {
     return $service->execute($params);
 }
 
+=pot
 sub verify {
     my ($self, $params) = @_;
 
     my $service = Babyry::Service::Register->new;
     return $service->verify($params);
+}
+=cut
+
+sub activate {
+    my ($self, $params) = @_;
+    my $service = Babyry::Service::Register->new;
+    return $service->activate($params);
 }
 
 sub devicetoken {
@@ -25,6 +33,12 @@ sub devicetoken {
 
     my $service = Babyry::Service::Register->new;
     return $service->devicetoken($params);
+}
+
+sub is_verified {
+    my ($self, $user_id) = @_;
+
+    return Babyry::Service::Register->new->is_verified($user_id);
 }
 
 

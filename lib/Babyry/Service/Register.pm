@@ -34,10 +34,11 @@ sub execute {
     my $unixtime   = time();
     my $expired_at = $self->get_expired_at($unixtime);
     my $token      = $self->create_token($user_id);
+    my $key        = $self->create_activate_key();
 
     my $user           = $self->model('User');
     my $user_auth      = $self->model('UserAuth');
-    my $register_token = $self->model('RegisterToken');
+    my $activate_key   = $self->model('ActivateKey');
     my $mail           = $self->model('AmazonSES');
     my $invite         = $self->model('Invite');
     my $relatives      = $self->model('Relatives');
@@ -73,11 +74,11 @@ sub execute {
             }
         );
 
-        $register_token->create(
+        $activate_key->create(
             $teng,
             {
                 user_id    => $user_id,
-                token      => $token,
+                key        => $key,
                 expired_at => $expired_at,
             }
         );
@@ -106,9 +107,8 @@ sub execute {
 
     # TODO subject/body + sendを1つのmethodに任せる
     # TODO evalの中に移動
-    my $domain = $params->{'domain'};
     $mail->set_subject(Babyry::Common->config->{verify}{mail}{subject});
-    $mail->set_body( sprintf(Babyry::Common->config->{verify}{mail}{body}, $domain, $token) );
+    $mail->set_body( sprintf(Babyry::Common->config->{verify}{mail}{body}, $key) );
 
     if ($ENV{APP_ENV} eq 'production') {
         $mail->set_address($params->{email});
@@ -118,6 +118,43 @@ sub execute {
     $mail->send_mail();
 }
 
+sub activate {
+    my ($self, $params) = @_;
+
+    my $teng = $self->teng('BABYRY_MAIN_W');
+    $teng->txn_begin;
+
+    my $activate_key = $self->model('ActivateKey');
+    my $user         = $self->model('User');
+    my $relatives    = $self->model('Relatives');
+    my $invite       = $self->model('Invite');
+
+    eval {
+        my $deleted_key = $activate_key->delete($teng, $params)
+            or croak("register_key is invalid key:%s", $params->{key});
+        $user->update_to_verified($teng, { user_id => $params->{user_id} })
+            or croak( sprintf('Failed to update_to_verified user_id:%d', $params->{user_id}) );
+
+        my $invite_record = $invite->get_by_invited_user($teng, $params->{user_id});
+        if ($invite_record) {
+            $invite->admit($teng, $invite_record);
+            $relatives->admit($teng, $params->{user_id}, $invite_record );
+        }
+
+        $teng->txn_commit;
+
+        # logging
+        infof('register_key was deleted : %s', $self->dump($deleted_key));
+    };
+    if ( my $e = $@ ) {
+        $teng->txn_rollback;
+        infof($e);
+        return {error => 'INVALID_KEY'};
+    }
+    return {};
+}
+
+=pot
 # TODO tokenのverifyをvalidatorでやる
 # 基本的にはerror messageを返すのはvalidationで検知したerrorに対して。
 # Service以下で起きたexceptionは本当の例外なのでcroakしてOK
@@ -160,6 +197,7 @@ sub verify {
         croak($e);
     }
 }
+=cut
 
 
 sub varidate_password {
@@ -192,6 +230,11 @@ sub create_token {
     return md5_hex(time . $user_id . Babyry::Common->get_key_vault('register_secret'));
 }
 
+sub create_activate_key {
+    my ($self) = @_;
+    return sprintf("%04d", int(rand(10000)));
+}
+
 sub devicetoken {
     my ($self, $params) = @_;
 
@@ -206,6 +249,13 @@ sub devicetoken {
     $teng->disconnect();
 
     return {};
+}
+
+sub is_verified {
+    my ($self, $user_id) = @_;
+    my $teng_r = $self->teng('BABYRY_MAIN_R');
+
+   return $self->model('User')->is_verified($teng_r, {user_id => $user_id});
 }
 
 1;

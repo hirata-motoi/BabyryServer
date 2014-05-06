@@ -117,6 +117,25 @@ __PACKAGE__->add_trigger(
                 }
             );
         }
+
+        # if user is not verified and has session_id
+        # redirect to /activate
+        my $tmp_id = $c->stash->{user_id};
+        if ($c->stash->{user_id} && $path ne '/logout' && $path ne '/activate/execute') {
+            my $is_verified = Babyry::Web::Root->new->is_verified($c->stash->{user_id});
+            if (!$is_verified) {
+                return $c->render(
+                    'top/index.tx',
+                    {  
+                        no_header => 1,
+                        no_footer => 1,
+                        login     => 0,
+                        register  => 0,
+                        activate  => 1,
+                    }
+                );
+            }
+        }
     },
 
     AFTER_DISPATCH => sub {

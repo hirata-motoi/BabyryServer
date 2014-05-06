@@ -6,6 +6,7 @@ use Log::Minimal;
 use parent qw/Babyry/;
 
 use Babyry::Logic::Session;
+use Babyry::Logic::Register;
 
 sub certify {
     my ($self, $session_id) = @_;
@@ -31,6 +32,11 @@ sub update_session {
     return $session_id;
 }
 
+sub is_verified {
+    my ($self, $user_id) = @_;
+
+    return Babyry::Logic::Register->new->is_verified($user_id);
+}
 
 1;
 
