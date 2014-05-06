@@ -5,6 +5,7 @@ use warnings;
 use parent qw/Babyry::Web::C/;
 use Log::Minimal;
 use Babyry::Logic::Register;
+use Babyry::Logic::Login;
 
 sub index {
     my ($self, $c) = @_;
@@ -31,7 +32,7 @@ critf($e);
 #        critf('Failed to register params:%s error:%s', $self->dump($params), $e);
 #        $c->render_500();
     }
-    if ($ret->{error}) {
+    if ($ret eq 'HASH' and $ret->{error}) {
         return $c->render(
             'top/index.tx',
             {
@@ -43,16 +44,11 @@ critf($e);
         );
     }
 
-    return $c->render(
-        'top/index.tx',
-        {  
-            no_header => 1,
-            no_footer => 1,
-            login     => 1,
-        }
-    );
+    my $email = $c->req->param('email');
+    my $password = $c->req->param('password');
+    return $c->redirect("/login/execute?email=$email&password=$password"); 
 }
-
+=pot
 sub verify {
     my ($self, $c, $p, $v) = @_;
 
@@ -75,6 +71,7 @@ sub verify {
         }
     );
 }
+=cut
 
 sub devicetoken {
     my ($self, $c) = @_;

@@ -26,9 +26,6 @@ sub execute {
             $teng_r,
             { user_id => $user_id },
         );
-        if ( ! $is_verified ) {
-            return { error => 'USER_NOT_VERIFIED' };
-        }
         $teng_r->disconnect();
 
         my $teng_w = $self->teng('BABYRY_MAIN_W');
@@ -43,6 +40,12 @@ sub execute {
         );
         $teng_w->txn_commit;
         $teng_w->disconnect();
+
+        # 認証済みでなくてもsessionは渡す
+        # 認証キー入力画面に進むため
+        if ( ! $is_verified ) {
+            return { user_id => $user_id, session_id => $session_id, not_verified => 1};
+        }
         return { user_id => $user_id, session_id => $session_id };
     } else {
         # unless user_id redirect to index with error message

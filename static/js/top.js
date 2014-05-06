@@ -12,12 +12,16 @@
       $('#top_choice').hide();
       $('#top_login').show();
       $('#top_register').hide();
-      return window.console.log(location.href);
+      return $('#top_activate').hide();
     });
-    return $('.register').on('click', function() {
+    $('.register').on('click', function() {
       $('#top_choice').hide();
       $('#top_login').hide();
-      return $('#top_register').show();
+      $('#top_register').show();
+      return $('#top_activate').hide();
+    });
+    return $('.logout').on('click', function() {
+      return location.href = '/logout';
     });
   });
 
