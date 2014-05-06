@@ -38,7 +38,7 @@
     </div>
     <div class="ui-block-b table-item">
       <div class="table-item-inner">
-        <a href="/">
+        <a href="mailto:support-babyry@meaning.co.jp?subject=Babyryお問い合わせ&body=いつもBabyryをご利用頂き、ありがとうございます。こちらにお問い合わせ内容をご記入ください。%0D%0A%0D%0A%0D%0A%0D%0A******************%0D%0A下記はご使用端末の情報です。お問い合わせ対応の際に使用させていただくため、内容修正せず、そのまま送信してください。%0D%0A以下の情報はお問い合わせ対応のみに使用し、対応後は破棄させていただきます。上記に同意の上送信してください。%0D%0AUSER_ID : <: $user_id :> %0D%0A%0D%0A(株)Meaning">
           <img src="/static/img/menu/form.png">
           <p>お問い合わせ</p>
         </a>
