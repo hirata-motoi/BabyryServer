@@ -98,3 +98,30 @@
 #image-upload #image-upload-child-complete {
   color: white;
 }
+#image-upload .cancel-icon {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  top: -7px;
+  right: -12px;
+}
+#image-upload .js-uploaded-image-box {
+  display: table-cell;
+  width: 100px;
+  height: 100px;
+  text-align: center;
+  vertical-align: middle;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+#image-upload .js-uploaded-image-box .js-uploaded-image-box-inner {
+  display: table-cell;
+  width: 88px;
+  height: 88px;
+  text-align: center;
+  vertical-align: middle;
+  position: relative;
+  border: solid 1px gray;
+  padding: 1px;
+  margin: 2px;
+}
