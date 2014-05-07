@@ -5,34 +5,30 @@ $ ->
 
 showLoadingImage = () ->
   box = $("<div>").addClass "js-uploaded-image-box"
-  box.css "display", "table-cell"
-  box.css "width", "100"
-  box.css "height", "100"
-  box.css "text-align", "center"
-  box.css "vertical-align", "middle"
-  box.css "padding-left", "6px"
-  box.css "padding-right", "6px"
 
-  innerBox = $("<div>")
-  innerBox.css "display", "table-cell"
-  innerBox.css "width", "88"
-  innerBox.css "height", "88"
-  innerBox.css "text-align", "center"
-  innerBox.css "vertical-align", "middle"
-
-  innerBox.css "border", "solid 1px gray"
-  innerBox.css "padding", "1px"
-  innerBox.css "margin", "2px"
+  innerBox = $("<div>").addClass "js-uploaded-image-box-inner"
   innerBox.addClass "inner-box"
 
   image = $("<img>")
   image.attr "src", "/static/img/ajax-loader.gif"
+  image.addClass "image-elem"
 
   # TODO trim 
   image.css "width", "30"
   image.css "height", "30"
 
   innerBox.append image
+
+  cancelIcon = $("<img>").attr "src", "/static/img/cancel-selected-image.png"
+  cancelIcon.addClass "cancel-icon"
+  cancelIcon.css {
+    "width"  : "20px",
+    "height" : "20px"
+  }
+  innerBox.append cancelIcon
+  cancelIcon.hide()
+  cancelIcon.on "click", cancelSelecteImage
+
   box.append innerBox
   $(".js-image-container").append box
   return box
@@ -67,8 +63,7 @@ submit = () ->
 redirectToWall = (data) ->
   location.href = "/"
 
-showErrorMessage = (xhr, box) ->
-  box.remove() if box
+showErrorMessage = (xhr) ->
   $(".error").show()
 
 getXSRFToken = ->
@@ -120,20 +115,22 @@ setupImageUpload = () ->
 
     fd = new FormData( $form[0] )
     $.ajax( $form.attr("action"), {
-      type: 'post',
-      processData: false,
-      contentType: false,
-      data: fd,
-      dataType: 'json',
-      success: (data) ->
-        box.find("img").attr "src", ""
+      type        : 'post',
+      processData : false,
+      contentType : false,
+      data        : fd,
+      dataType    : 'json',
+      success     : (data) ->
+        box.find(".image-elem").attr "src", ""
         box.attr "filename", data.image_tmp_name
-        box.find("img").attr "src", data.image_tmp_url
+        box.find(".image-elem").attr "src", data.image_tmp_url
         # TODO trim 
-        box.find("img").css "width", "80"
-        box.find("img").css "height", "80"
-      error: (xhr) ->
-        showErrorMessage xhr, box
+        box.find(".image-elem").css "width", "80"
+        box.find(".image-elem").css "height", "80"
+        box.find(".cancel-icon").show()
+      error       : (xhr) ->
+        box.remove()
+        showErrorMessage xhr
     })
     return false
   )
@@ -145,6 +142,9 @@ setupImageUpload = () ->
   $("#add-image-icon").on "click", () ->
     $("#image-post-form").find("[type=file]").trigger("click")
     return false
+
+cancelSelecteImage = () ->
+  $(this).parents(".js-uploaded-image-box").remove()
 
 $(document).off "pagechange"
 $(document).on "pagechange", setupImageUpload

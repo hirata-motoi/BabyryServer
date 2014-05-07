@@ -22,11 +22,11 @@
     <input type="submit" value="hoge">
   </form>
 
-  <div id="childModal" class="modal fade" style="top: 20px; margin: 0 auto 20px; max-width: 100%; height: 500px;">
+  <div id="childModal" class="modal fade" style="top: 20px; margin: 0 auto 20px; max-width: 100%; height: 330px;">
     <div class="modal-dialog">
-      <div class="modal-content">
+      <div class="modal-content" style="height: 320px;">
         <div class="modal-header">
-          <h3>こどもをタグ付けしよう</h3>
+          <p>こどもをタグ付けしよう</p>
         </div>
         <div class="modal-body">
           <ul style="list-style-type: none;" data-role="listview">
@@ -52,11 +52,11 @@
     </div>
   </div>
 
-  <div id="relativesModal" class="modal fade" style="top: 20px; margin: 0 auto 20px; max-width: 100%; height: 500px;">
+  <div id="relativesModal" class="modal fade" style="top: 20px; margin: 0 auto 20px; max-width: 100%; height: 330px;">
     <div class="modal-dialog">
-      <div class="modal-content">
+      <div class="modal-content" style="height: 320px;">
         <div class="modal-header">
-          <h3>共有先を設定しましょう</h3>
+          <p>共有先を設定しましょう</p>
         </div>
         <div class="modal-body">
           <ul style="list-style-type: none;" data-role="listview">
