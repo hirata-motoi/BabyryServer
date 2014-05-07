@@ -56,7 +56,7 @@
   height: 40px;
 }
 #image-upload .modal-body {
-  height: 200px;
+  height: 320px;
   overflow: scroll;
 }
 #image-upload .modal-footer {
