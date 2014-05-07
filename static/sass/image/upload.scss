@@ -55,9 +55,16 @@
     display: none;
     text-align: center;
   }
+  .modal-header {
+    height: 40px;
+  }
   .modal-body {
-    height: 230px;
+    height: 200px;
     overflow: scroll;
+  }
+  .modal-footer {
+    padding-top: 5px;
+    padding-bottom: 5px;
   }
   .relative-img {
     width: 44px;

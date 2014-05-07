@@ -52,9 +52,16 @@
   display: none;
   text-align: center;
 }
+#image-upload .modal-header {
+  height: 40px;
+}
 #image-upload .modal-body {
-  height: 230px;
+  height: 200px;
   overflow: scroll;
+}
+#image-upload .modal-footer {
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 #image-upload .relative-img {
   width: 44px;
