@@ -1,5 +1,5 @@
 (function() {
-  var console, getXSRFToken, openAttachChildToImages, pickedSharedRelatives, pickedTargetChild, redirectToWall, showErrorMessage, showLoadingImage, submit, toggleCheckMark;
+  var console, getXSRFToken, openAttachChildToImages, pickedSharedRelatives, pickedTargetChild, redirectToWall, setXSRFTokenToForm, setupImageUpload, showErrorMessage, showLoadingImage, submit, toggleCheckMark;
 
   if (typeof window.console === "undefined") {
     console = {};
@@ -130,7 +130,24 @@
     return $("#childModal").modal();
   };
 
-  $(document).on("pagechange", function() {
+  setXSRFTokenToForm = function() {
+    var token;
+    token = getXSRFToken;
+    return $("form").each(function(i, form) {
+      var $input, method;
+      method = $(form).attr("method");
+      if (method === "get" || method === "GET") {
+        return;
+      }
+      $input = $("<input>");
+      $input.attr("type", "hidden");
+      $input.attr("name", "XSRF-TOKEN");
+      $input.attr("value", token);
+      return $(form).append($input);
+    });
+  };
+
+  setupImageUpload = function() {
     var $form;
     $form = $("#image-post-form");
     $form.find("[type=file]").on("change", function() {
@@ -157,14 +174,19 @@
       });
       return false;
     });
-    $("#submit-button").on("click", submit);
+    setXSRFTokenToForm();
+    $("#image-upload-submit-button").on("click", submit);
     $(".relative-list,.child-list").on("click", toggleCheckMark);
     $("#image-upload-child-mapping").on("click", openAttachChildToImages);
     return $("#add-image-icon").on("click", function() {
       $("#image-post-form").find("[type=file]").trigger("click");
       return false;
     });
-  });
+  };
+
+  $(document).off("pagechange");
+
+  $(document).on("pagechange", setupImageUpload);
 
 }).call(this);
 

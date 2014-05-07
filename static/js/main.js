@@ -1,5 +1,5 @@
 (function() {
-  var console, getXSRFToken, hidePageLoading, setHeaderElem, setXSRFTokenToForm, showFooterEffect, showPageLoading;
+  var console, getXSRFToken, hidePageLoading, setHeaderElem, showFooterEffect, showPageLoading;
 
   if (typeof window.console === "undefined") {
     console = {};
@@ -20,23 +20,6 @@
       }
     }
     return token;
-  };
-
-  setXSRFTokenToForm = function() {
-    var token;
-    token = getXSRFToken;
-    return $("form").each(function(i, form) {
-      var $input, method;
-      method = $(form).attr("method");
-      if (method === "get" || method === "GET") {
-        return;
-      }
-      $input = $("<input>");
-      $input.attr("type", "hidden");
-      $input.attr("name", "XSRF-TOKEN");
-      $input.attr("value", token);
-      return $(form).append($input);
-    });
   };
 
   showPageLoading = function() {
@@ -74,8 +57,6 @@
   window.util.showPageLoading = showPageLoading;
 
   window.util.hidePageLoading = hidePageLoading;
-
-  $(document).on("pagechange", setXSRFTokenToForm);
 
   $(document).on("DOMContentLoaded", function() {
     showFooterEffect();

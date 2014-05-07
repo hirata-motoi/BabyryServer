@@ -97,8 +97,20 @@ openAttachChildToImages = () ->
   window.attachedChildToImages = []
   $("#childModal").modal()
 
+setXSRFTokenToForm = () ->
+  token = getXSRFToken
+  $("form").each (i, form) ->
+    method = $(form).attr "method"
+    return if method is "get" or method is "GET"
 
-$(document).on "pagechange", () ->
+    $input = $("<input>")
+    $input.attr "type", "hidden"
+    $input.attr "name", "XSRF-TOKEN"
+    $input.attr "value", token
+
+    $(form).append $input
+
+setupImageUpload = () ->
   $form = $("#image-post-form")
   $form.find("[type=file]").on("change", () ->
 
@@ -125,7 +137,8 @@ $(document).on "pagechange", () ->
     })
     return false
   )
-  $("#submit-button").on "click", submit
+  setXSRFTokenToForm()
+  $("#image-upload-submit-button").on "click", submit
   $(".relative-list,.child-list").on "click", toggleCheckMark
   $("#image-upload-child-mapping").on "click", openAttachChildToImages
 
@@ -133,3 +146,6 @@ $(document).on "pagechange", () ->
     $("#image-post-form").find("[type=file]").trigger("click")
     return false
 
+$(document).off "pagechange"
+$(document).on "pagechange", setupImageUpload
+  

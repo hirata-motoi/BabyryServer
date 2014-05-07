@@ -11,21 +11,6 @@ getXSRFToken = ->
     token = matched[1] if matched?
   return token
 
-
-setXSRFTokenToForm = () ->
-  token = getXSRFToken
-  $("form").each( (i, form) ->
-    method = $(form).attr("method")
-    return if method is "get" or method is "GET"
-
-    $input = $("<input>")
-    $input.attr("type", "hidden")
-    $input.attr("name", "XSRF-TOKEN")
-    $input.attr("value", token)
-
-    $(form).append($input)
-  )
-
 showPageLoading = () ->
   $.mobile.loading("show")
 
@@ -59,7 +44,6 @@ setHeaderElem = () ->
 window.util ||= {}
 window.util.showPageLoading = showPageLoading
 window.util.hidePageLoading = hidePageLoading
-$(document).on "pagechange", setXSRFTokenToForm
 $(document).on "DOMContentLoaded", () ->
   showFooterEffect()
   setHeaderElem()

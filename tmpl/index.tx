@@ -87,6 +87,7 @@
 
 <!--<script type="text/javascript" src="<: uri_for('/static/salvattore/js/salvattore.js') :>"></script>-->
 <script type="text/javascript">
+  $(document).off("pagechange");
   $(document).on("pagechange", function(){
     var script = $("<script>").attr("src", "<: uri_for('/static/salvattore/js/salvattore.js') :>");
     $("body").append(script);
