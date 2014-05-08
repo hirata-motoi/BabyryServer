@@ -10,7 +10,7 @@ use parent qw/Babyry::Model::Base/;
 use Babyry::Common;
 
 sub tmp_upload {
-    my ($self, $dir, $images) = @_;
+    my ($self, $dir, $images, $format) = @_;
     
     my $bucket = Babyry::Common->config->{tmp_bucket};
 
@@ -22,6 +22,7 @@ sub tmp_upload {
             body => $full_path,
             key => $img,
             bucket => $bucket,
+            'content-type' => "image/${format}",
         };
         for (1 .. 2) {
             my $res = $aws->s3api('put-object', $params);

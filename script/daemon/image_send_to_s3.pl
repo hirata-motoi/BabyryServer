@@ -59,11 +59,13 @@ sub send_to_s3 {
             key => "${user_id}/${image_id}.${format}",
             bucket => $BUCKET,
             'copy-source' => "${TMP_BUCKET}/${image_name}.${format}",
+            'content-type' => "image/${format}",
         },
         {
             key => "${user_id}/${image_id}_thumb.${format}",
             bucket => $BUCKET,
             'copy-source' => "${TMP_BUCKET}/${image_name}_thumb.${format}",
+            'content-type' => "image/${format}",
         }
     ];
 
