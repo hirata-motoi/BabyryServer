@@ -49,7 +49,6 @@
 
   inviteLineSubmit = function() {
     var token;
-    window.console.log("test");
     token = getXSRFToken();
     return $.ajax({
       "url": "/invite/execute",

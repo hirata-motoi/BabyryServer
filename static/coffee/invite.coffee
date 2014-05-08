@@ -31,7 +31,6 @@ inviteSubmit = () ->
 $("#invite-submit").on("click", inviteSubmit)
 
 inviteLineSubmit = () ->
-  window.console.log "test"
   token = getXSRFToken()
   $.ajax({
     "url": "/invite/execute",
