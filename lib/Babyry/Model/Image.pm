@@ -6,7 +6,6 @@ use strict;
 use warnings;
 use utf8;
 
-#class method
 sub get_by_image_id {
     my ($self, $teng, $image_id) = @_;
 
@@ -20,17 +19,19 @@ sub get_by_image_id {
 }
 
 sub get_by_image_ids {
-    my ($self, $teng, $image_ids) = @_;
+    my ($self, $teng, $image_ids, $opt) = @_;
+
+    $opt ||= {};
 
     return if ! @$image_ids;
 
-    my $itr = $teng->search(
-        'image',
-        {
-            image_id => $image_ids,
-            disabled => 0,
-        }
-    );
+    my $creteria = {
+        image_id => $image_ids,
+        disabled => 0,
+        map { $_ => $opt->{$_} } keys %$opt
+    };
+
+    my $itr = $teng->search('image', $creteria);
     my %images = ();
     while ( my $r = $itr->next ) {
         $images{ $r->image_id } = $r->get_columns;
@@ -88,6 +89,20 @@ sub set_new_image {
             created_at   => $params->{created_at},
             updated_at   => $params->{updated_at},
             format       => $params->{format},
+        }
+    );
+}
+
+sub remove {
+    my ($self, $teng, $image_id) = @_;
+
+    $teng->update(
+        'image',
+        {
+            disabled => 1,
+        },
+        {
+            image_id => $image_id
         }
     );
 }
