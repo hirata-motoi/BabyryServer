@@ -18,7 +18,6 @@ GetOptions(
     'env|e=s' => \my $env,
 );
 $env ||= 'development';
-$ENV{APP_ENV} ||= $env;
 $ENV{DEBUG}   = 1 if $env eq 'local' || $env eq 'development';
 
 my $service_base = Babyry::Service::Base->new;
@@ -37,6 +36,7 @@ my $TRASH_BUCKET = Babyry::Common->config->{trash_bucket};
 # queueの多重処理が行われないような対応はしてないので、daemonは1プロセスでしか動かせない
 # 複数プロセス使う時はqueue select時に処理中statusにupdateするか、Q4Mを使う
 
+infof "delete_image_from_s3.pl started";
 while (1) {
     my $image_ids = get_target_images();
     delete_images_from_s3($image_ids);
@@ -125,6 +125,9 @@ sub move_to_trash {
             return;
         }
     }
+
+    infof 'delete image succeeded. image_id:%d user_id:$d format:$s', $image_id, $user_id, $format;
+
     return 1;
 }
 
