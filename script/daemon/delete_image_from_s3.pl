@@ -45,7 +45,7 @@ while (1) {
 
 sub get_target_images {
 
-    my $queues = $queue_model->dequeue( $teng, { count => $QUEUE_COUNT } ) || [];
+    my $queues = $queue_model->dequeue( $teng, { limit => $QUEUE_COUNT } ) || [];
     my $image_ids = [
         map { $_->{image_id} } @$queues
     ];
