@@ -19,13 +19,13 @@ use parent qw/Amon2/;
     my $base_dir = __PACKAGE__->base_dir;
     my $fh = File::Stamped->new(pattern => $base_dir . "/log/babyry.log.%Y%m%d");
     my $hostname = hostname;
-    if ( ! $ENV{DEBUG} ) {
-        $Log::Minimal::ESCAPE_WHITESPACE = 0; # enable to separete log by tab
-        $Log::Minimal::PRINT = sub {
-            my ($time, $type, $message, $trace) = @_;
-            print {$fh} decode_utf8(sprintf("(%s) %s [%s] %s at %s\n", $hostname, $time, $type, $message, $trace));
-        };
-    }
+
+    $Log::Minimal::ESCAPE_WHITESPACE = 0; # enable to separete log by tab
+    $Log::Minimal::PRINT = sub {
+        my ($time, $type, $message, $trace) = @_;
+        print {$fh} decode_utf8(sprintf("(%s) %s [%s] %s at %s\n", $hostname, $time, $type, $message, $trace));
+        print decode_utf8(sprintf("(%s) %s [%s] %s at %s\n", $hostname, $time, $type, $message, $trace)) if $ENV{DEBUG};
+    };
 }
 
 
