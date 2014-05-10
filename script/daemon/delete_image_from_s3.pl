@@ -59,7 +59,7 @@ sub delete_images_from_s3 {
 
     my $image_info = $image_model->get_by_image_ids($teng, $image_ids, { disabled => 1 });
 
-    for my $image_id (@$image_ids) {
+    for my $image_id (keys %$image_info) {
 
         my $user_id  = $image_info->{$image_id}{uploaded_by};
         my $format   = $image_info->{$image_id}{format};
