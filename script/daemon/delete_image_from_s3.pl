@@ -18,7 +18,7 @@ GetOptions(
     'env|e=s' => \my $env,
 );
 $env ||= 'development';
-$ENV{APP_ENV} = $env;
+$ENV{APP_ENV} ||= $env;
 $ENV{DEBUG}   = 1 if $env eq 'local' || $env eq 'development';
 
 my $service_base = Babyry::Service::Base->new;
