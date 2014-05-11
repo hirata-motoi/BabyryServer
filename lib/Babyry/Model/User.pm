@@ -37,6 +37,18 @@ sub is_verified {
     return $res->is_verified;
 }
 
+sub is_disabled {
+    my ($self, $teng, $params) = @_;
+
+    my $res = $teng->single(
+        'user',
+        {  
+            user_id => $params->{user_id},
+        }
+    );
+    return $res->disabled;
+}
+
 sub update_to_verified {
     my ($self, $teng, $params) = @_;
 

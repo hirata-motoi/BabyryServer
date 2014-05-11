@@ -42,6 +42,7 @@ while(1) {
                 print "remove image : " . $img->image_id . "\n";
                 $image->remove($teng, $img->image_id);
                 $image_delete_queue->enqueue($teng, $img->image_id);
+                $image_user_map->make_disable($teng, {image_id => $img->image_id});
             }
             $teng->txn_commit;
             sleep 1;
