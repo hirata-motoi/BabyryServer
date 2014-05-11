@@ -17,6 +17,12 @@
     },
     '/register/devicetoken' => +{
         controller => 'Register', action => 'devicetoken',
+    },
+    '/withdraw' => +{
+        controller => 'Register', action => 'withdraw',
+    },
+    '/withdraw/execute' => +{
+        controller => 'Register', action => 'withdraw_execute',
     }
 }
 

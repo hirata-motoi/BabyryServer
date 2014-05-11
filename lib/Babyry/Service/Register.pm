@@ -258,5 +258,21 @@ sub is_verified {
    return $self->model('User')->is_verified($teng_r, {user_id => $user_id});
 }
 
+sub withdraw_execute {
+    my ($self, $params) = @_;
+    my $teng = $self->teng('BABYRY_MAIN_W');
+
+    my $unixtime = time();
+    $params->{unixtime} = $unixtime;
+    $teng->txn_begin;
+    $self->model('User')->make_disable($teng, $params);
+    $self->model('WithdrawComment')->create($teng, $params) if ($params->{withdraw_comment});
+    $self->model('WithdrawQueue')->enqueue($teng, $params);
+    $teng->txn_commit;
+    $teng->disconnect();
+
+    return {};
+}
+
 1;
 
