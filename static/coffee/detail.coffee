@@ -40,7 +40,7 @@ showImageDetail = () ->
     imageId   = $(this).parents(".item").attr("image_id")
     tappedEntryIndex = $(this).attr "entryIndex"
 
-    toggleDisplayedElements()
+    toggleDisplayedElementsWithHeader()
 
     showCarousel {offset: tappedEntryIndex}, () ->
       window.util.hidePageLoading()
@@ -270,6 +270,14 @@ showImageDetail = () ->
     return false
 
   toggleDisplayedElements = () ->
+    if $("#operation-container").hasClass "slidedown-out"
+      $("#operation-container").removeClass "slidedown-out"
+      $("#operation-container").addClass "slideup-in"
+    else
+      $("#operation-container").removeClass "slideup-in"
+      $("#operation-container").addClass "slidedown-out"
+
+  toggleDisplayedElementsWithHeader = () ->
     if $("#global-header").hasClass "in"
       $("#operation-container").removeClass "slidedown-out"
       $("#operation-container").addClass "slideup-in"

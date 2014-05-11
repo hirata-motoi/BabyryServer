@@ -37,7 +37,7 @@
   navbarFooterHIdeLocked = false;
 
   showImageDetail = function() {
-    var addChildToEntryData, adjustHeightOfChildEditContainer, alreadyAttachedChild, attachChildToImage, closeComments, confirmRemoveImage, createChild, createCommentNavigation, createImageBox, createOwlElementsWithResponse, detachChildFromImage, editChild, getCurrentEntryIndex, getCurrentPosition, getData, getXSRFToken, hasElem, hideAttachedChild, initEditChild, initializeDisplayedElements, pickData, preserveResponseData, refreshChildAttachedMark, removeAttachedChild, removeImage, replaceToolBoxContent, setChildAttachList, setUpScreenSize, setupGlobalFooter, showAttachedChild, showCarousel, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements;
+    var addChildToEntryData, adjustHeightOfChildEditContainer, alreadyAttachedChild, attachChildToImage, closeComments, confirmRemoveImage, createChild, createCommentNavigation, createImageBox, createOwlElementsWithResponse, detachChildFromImage, editChild, getCurrentEntryIndex, getCurrentPosition, getData, getXSRFToken, hasElem, hideAttachedChild, initEditChild, initializeDisplayedElements, pickData, preserveResponseData, refreshChildAttachedMark, removeAttachedChild, removeImage, replaceToolBoxContent, setChildAttachList, setUpScreenSize, setupGlobalFooter, showAttachedChild, showCarousel, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements, toggleDisplayedElementsWithHeader;
     $(".img-thumbnail").on("click", function() {
       var imageId, tappedEntryIndex;
       $("#global-header").toolbar({
@@ -51,7 +51,7 @@
       innerHeight = window.innerHeight;
       imageId = $(this).parents(".item").attr("image_id");
       tappedEntryIndex = $(this).attr("entryIndex");
-      toggleDisplayedElements();
+      toggleDisplayedElementsWithHeader();
       return showCarousel({
         offset: tappedEntryIndex
       }, function() {
@@ -276,6 +276,15 @@
       return false;
     };
     toggleDisplayedElements = function() {
+      if ($("#operation-container").hasClass("slidedown-out")) {
+        $("#operation-container").removeClass("slidedown-out");
+        return $("#operation-container").addClass("slideup-in");
+      } else {
+        $("#operation-container").removeClass("slideup-in");
+        return $("#operation-container").addClass("slidedown-out");
+      }
+    };
+    toggleDisplayedElementsWithHeader = function() {
       if ($("#global-header").hasClass("in")) {
         $("#operation-container").removeClass("slidedown-out");
         return $("#operation-container").addClass("slideup-in");
