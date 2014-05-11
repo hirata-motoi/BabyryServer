@@ -17,6 +17,9 @@
     '/image/web/submit.json' => +{
         controller => 'Image', action => 'web_submit',
     },
+    '/image/web/remove.json' => +{
+        controller => 'Image', action => 'web_remove',
+    },
     '/image/comment.json' => +{
         controller => 'Image', action => 'comment',
     },

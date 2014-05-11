@@ -60,7 +60,6 @@
 <script id="template-item">
   <div class="item">
     <div class="image"><img src="<%= fullsize_image_url %>" class="img-thumbnail" entryIndex="<%= entryIndex %>" /></div>
-      <img src="/static/img/stamp_icon.png" class="img-icon-small"/><%= stamp_num %>
       <img src="/static/img/comment_icon.png" class="img-icon-small"/><%= comment_num %>
   </div>
 </script>
@@ -78,8 +77,6 @@
     <div id="load-more" style="text-align:center"><img src="/static/img/arrow_carrot-2down_alt2.png"></div>
 
   </div>
-
-: include wall::include
 
 : include detail::include
 

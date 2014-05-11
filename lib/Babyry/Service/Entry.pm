@@ -16,20 +16,19 @@ use Babyry::Common;
 use Babyry::Service::Child;
 
 #params
-# stamp_id:    int(default: [])
 # uploaded_by: int(default: 0)
 # count:       int(default: 10)
 # page:        int(default: 1)
 # searchの条件は今後増えるかもしれないので、search自体は、dispatchするだけにする。
 sub search {
     my ($self, $params) = @_;
-    my ($stamp_id, $child_id, $uploaded_by, $count, $page, $offset, $user_id)
-        = @$params{qw/stamp_id child_id uploaded_by count page offset user_id/};
+    my ($child_id, $uploaded_by, $count, $page, $offset, $user_id)
+        = @$params{qw/child_id uploaded_by count page offset user_id/};
 
     my $teng = $self->teng('BABYRY_MAIN_R');
     my $from = defined $offset ? $offset : ($page - 1) * $count || 0;
 
-    my ($images, $found_row_count)  = Babyry::Model::ImageUserMap::get_by_user_id_stamp_id_child_id($teng, $uploaded_by, $stamp_id, $child_id, $from, $count);
+    my ($images, $found_row_count)  = Babyry::Model::ImageUserMap::get_by_conditions($teng, $uploaded_by, $child_id, $from, $count);
 
     # imagesを他の経路から取ってきたときも、get_entries_by_imagesを使い回せる用にしておく。
     my $entries = $self->get_entries_by_images($images);
@@ -45,12 +44,11 @@ sub get_entries_by_images {
     my $teng = $self->teng('BABYRY_MAIN_R');
 
     my $image_ids   = Babyry::Model::Image::get_image_ids_by_rows($images);
-    my $child_info  = $self->get_child_info($images) || {};
+    my $child_info  = $self->get_child_info( $image_ids ) || {};
     
     my @entries;
 
-    for my $image (@$images) {
-        my $columns = $image->get_columns;
+    for my $image ( @$images ) {
 
         # temporary url
         my $url = $self->get_url_by_image_id($image->image_id);
@@ -63,16 +61,15 @@ sub get_entries_by_images {
         my $users = $self->model('user')->get_by_user_ids($teng, \@uniq_user_ids);
 
         # user_icon_url
-        my $images = $self->model('image')->get_by_image_ids(
+        my $user_images = $self->model('image')->get_by_image_ids(
             $teng,
             [ map { $users->{$_}{icon_image_id} } keys %$users ]
         ) || {};
 
-        my @cmt_array = map { comment_info($_, $users, $images) } @$comments;
+        my @cmt_array = map { comment_info($_, $users, $user_images) } @$comments;
 
         push @entries, {
-            %$columns,
-            stamps             => [],
+            %{ $image->get_columns },
             child              => $child_info->{ $image->image_id },
             comments           => \@cmt_array,
             fullsize_image_url => $url,
@@ -115,19 +112,18 @@ sub get_url_by_image_id {
     my ($self, $id) = @_;
 
     my $teng = $self->teng('BABYRY_MAIN_R');
+    warnf "id : $id";
     my $url = Babyry::Model::Image->new()->get_by_image_id($teng, $id);
 
     return $url->url;
 }
 
 sub get_child_info {
-    my ($self, $images) = @_;
+    my ($self, $image_ids) = @_;
 
-    return unless $images && ref $images eq 'ARRAY' && scalar @$images;
+    return unless $image_ids && ref $image_ids eq 'ARRAY' && scalar @$image_ids;
 
-    my @image_ids = map { $_->image_id } @$images;
-
-    return Babyry::Service::Child->new->get_child_info_by_image_ids(\@image_ids);
+    return Babyry::Service::Child->new->get_child_info_by_image_ids($image_ids);
 }
 
 1;

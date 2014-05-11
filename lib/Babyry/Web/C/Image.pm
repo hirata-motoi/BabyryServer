@@ -77,7 +77,18 @@ sub web_submit {
 
     my $logic = Babyry::Logic::Image->new;
     my $ret = eval { $logic->web_submit($params) } || {};
-    infof($@) if($@);
+    $self->output_response_json($c, $ret, $@);
+}
+
+sub web_remove {
+    my ($self, $c) = @_;
+
+    my $params = {
+        image_id => $c->req->param('image_id')
+    };
+
+    my $logic = Babyry::Logic::Image->new;
+    my $ret = eval { $logic->web_remove($params) } || {};
     $self->output_response_json($c, $ret, $@);
 }
 
