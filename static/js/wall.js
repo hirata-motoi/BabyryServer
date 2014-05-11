@@ -16,8 +16,6 @@
 
   window.showGroupByModal;
 
-  window.stamp_ids = [];
-
   window.child_ids = [];
 
   stamp_ids_hash = [];
@@ -27,7 +25,7 @@
   window.setupWall = function() {
     var load_contents, tmpl_child, tmpl_stamp;
     $("#group_by_stamp").show();
-    load_contents = function(stamp_ids, child_ids) {
+    load_contents = function(child_ids) {
       var grid, tmpl;
       tmpl = _.template($('#template-item').html());
       grid = $('.timeline').get(0);
@@ -36,7 +34,6 @@
         dataType: "json",
         traditional: true,
         data: {
-          stamp_id: stamp_ids,
           child_id: child_ids,
           count: count,
           page: window.pageForEntrySearch
@@ -79,9 +76,9 @@
         }
       });
     };
-    load_contents(window.stamp_ids, window.child_ids);
+    load_contents(window.child_ids);
     $('#load-more').on('click', function() {
-      return load_contents(window.stamp_ids, window.child_ids);
+      return load_contents(window.child_ids);
     });
     $('#image_upload').on('click', function() {
       return location.href = '/image/web/upload';
@@ -155,26 +152,6 @@
         }
       });
     };
-    $("#groupByStampModalSubmit").on('click', function() {
-      var key, page;
-      $("#groupByStampModal").modal('hide');
-      $(".column.size-1of2").empty();
-      window.entryData.entries = [];
-      page = 1;
-      window.stamp_ids = [];
-      for (key in stamp_ids_hash) {
-        if (stamp_ids_hash[key] === 1) {
-          window.stamp_ids.push(key);
-        }
-      }
-      window.child_ids = [];
-      for (key in child_ids_hash) {
-        if (child_ids_hash[key] === 1) {
-          window.child_ids.push(key);
-        }
-      }
-      return load_contents(window.stamp_ids, window.child_ids);
-    });
     return window.load_contents = load_contents;
   };
 

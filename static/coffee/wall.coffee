@@ -9,7 +9,6 @@ window.pageForEntrySearch = 1
 count = 10
 
 window.showGroupByModal
-window.stamp_ids = []
 window.child_ids = []
 stamp_ids_hash = []
 child_ids_hash = []
@@ -19,7 +18,7 @@ window.setupWall = () ->
   # setup groupByIcon
   $("#group_by_stamp").show();
 
-  load_contents = (stamp_ids, child_ids) ->
+  load_contents = (child_ids) ->
 
     tmpl = _.template $('#template-item').html()
     grid = $('.timeline').get 0
@@ -29,7 +28,6 @@ window.setupWall = () ->
       dataType: "json",
       traditional: true,
       data: {
-        stamp_id: stamp_ids,
         child_id: child_ids,
         count: count,
         page: window.pageForEntrySearch
@@ -67,9 +65,9 @@ window.setupWall = () ->
       error : () ->
         window.console.log "error"
     }
-  load_contents(window.stamp_ids, window.child_ids)
+  load_contents(window.child_ids)
   $('#load-more').on 'click', () ->
-    load_contents(window.stamp_ids, window.child_ids)
+    load_contents(window.child_ids)
   $('#image_upload').on 'click', () ->
     location.href = '/image/web/upload'
   $('#group_by_stamp').on 'click', (e) ->
@@ -126,20 +124,5 @@ window.setupWall = () ->
               $(this).attr 'class', 'listed-stamp'
               stamp_ids_hash[$(this).attr('id')] = 1
     }
-
-  $("#groupByStampModalSubmit").on 'click', () ->
-    $("#groupByStampModal").modal('hide')
-    $(".column.size-1of2").empty()
-    window.entryData.entries = []
-    page = 1
-    window.stamp_ids = []
-    for key of stamp_ids_hash
-      if stamp_ids_hash[key] == 1
-        window.stamp_ids.push key
-    window.child_ids = []
-    for key of child_ids_hash
-      if child_ids_hash[key] == 1
-        window.child_ids.push key
-    load_contents(window.stamp_ids, window.child_ids)
 
   window.load_contents = load_contents
