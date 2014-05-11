@@ -89,6 +89,7 @@ sub set_new_image {
             created_at   => $params->{created_at},
             updated_at   => $params->{updated_at},
             format       => $params->{format},
+            url          => $params->{url},
         }
     );
 }
@@ -130,7 +131,11 @@ QUERY
         $sql,
         [$user_id]
     );
-    return $records[0]->sum;
+    if ($records[0]->sum) {
+        return $records[0]->sum;
+    } else {
+        return 0;
+    }
 }
 
 sub update_url {
