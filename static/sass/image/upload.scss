@@ -55,8 +55,11 @@
     display: none;
     text-align: center;
   }
+  .modal-content {
+    height: 300px;
+  }
   .modal-body {
-    height: 230px;
+    height: 160px;
     overflow: scroll;
   }
   .relative-img {

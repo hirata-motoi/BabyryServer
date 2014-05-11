@@ -26,7 +26,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h3>こどもをタグ付けしよう</h3>
+          <p>こどもをタグ付けしよう</p>
         </div>
         <div class="modal-body">
           <ul style="list-style-type: none;" data-role="listview">
@@ -56,7 +56,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h3>共有先を設定しましょう</h3>
+          <p>共有先を設定しましょう</p>
         </div>
         <div class="modal-body">
           <ul style="list-style-type: none;" data-role="listview">
