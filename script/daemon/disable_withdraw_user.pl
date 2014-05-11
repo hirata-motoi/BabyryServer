@@ -36,6 +36,7 @@ while(1) {
         print "withdraw user : $user_id\n";
         while(1) {
             my @image_ids = $image->get_by_uploaded_by($teng_r, $user_id, 0, 10);
+            last if (!scalar(@{$image_ids[0]}));
             $teng->txn_begin;
             for my $img (@{$image_ids[0]}) {
                 print "remove image : " . $img->image_id . "\n";
@@ -45,6 +46,9 @@ while(1) {
             $teng->txn_commit;
             sleep 1;
         }
+        $teng->txn_begin;
+        $withdraw_queue->delete_queue_by_id($teng, $user_id);
+        $teng->txn_commit;
     }
     sleep 1;
 }
