@@ -71,7 +71,9 @@ sub get_by_user_ids {
     my $itr = $teng->search(
         'user',
         {
-            user_id => $user_ids
+            user_id => $user_ids,
+            is_verified => 1,
+            disabled    => 0,
         }
     );
 
@@ -126,6 +128,20 @@ sub update_icon_image {
             icon_image_id => $params->{image_id},
         },
         {
+            user_id => $params->{user_id},
+        }
+    );
+}
+
+sub make_disable {
+    my ($self, $teng, $params) = @_;
+    return $teng->update(
+        'user',
+        {  
+            disabled => 1,
+            updated_at => $params->{unixtime},
+        },
+        {  
             user_id => $params->{user_id},
         }
     );

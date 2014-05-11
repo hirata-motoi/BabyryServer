@@ -39,7 +39,7 @@ sub get_by_image_ids {
 }
 
 sub get_by_uploaded_by{
-    my ($teng, $uploaded_by, $from, $limit) = @_;
+    my ($self, $teng, $uploaded_by, $from, $limit) = @_;
 
     $limit ||= 10;
 

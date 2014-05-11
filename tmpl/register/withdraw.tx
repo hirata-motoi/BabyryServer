@@ -1,0 +1,21 @@
+: cascade base
+: around content -> {
+<br>
+Babyryをお使い頂きましてありがとうございました。
+<br>
+以下の各項目をご確認いただき全てのチェックボックスを選択されたをされた上で、退会ボタンを押してください。
+: if $error == 'UNCHECKED_BOX_EXIST' {
+<div style="color:red">全てのチェックボックスを選択してください</div>
+: } elsif $error == 'UNKNOWN_ERRIR' {
+<div style="color:red">エラーが発生しました。少し間を置いて再度お試しください。</div>
+:}
+<form action="<: uri_for('/withdraw/execute') :>" role="form" data-ajax="false">
+  <input type="checkbox" name="check1" value="checked">退会後は、これまでBabyryで保存されておりました画像などの全てのデータにアクセスが出来なくなります。
+  <input type="checkbox" name="check2" value="checked">退会後は、これまでBabyryで保管されておりました全てのデータは保管対象外となるため、任意のタイミングで削除されます。
+  <input type="checkbox" name="check3" value="checked">退会処理実行後は取り消しが出来ません。
+  <br><br>
+  Babyryのサービス向上の参考にさせていただきたいので、差し支えなければ退会理由をご記入ください(任意)。
+  <textarea cols="30" rows="5" name="withdraw_comment"></textarea>
+  <input data-ajax="false" type="submit" value="退会する" class="btn btn-default"/>
+</form>
+: }
