@@ -32,6 +32,13 @@ sub web_submit {
     return $service->web_submit($params);
 }
 
+sub web_remove {
+    my ($self, $params) = @_;
+
+    my $service = Babyry::Service::Image->new;
+    return $service->web_remove($params);
+}
+
 sub comment {
     my ($self, $params) = @_;
 

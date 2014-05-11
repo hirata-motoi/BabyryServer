@@ -20,7 +20,7 @@ defaultTextareaHeight = "30px"
 innerWidth  = 0
 innerHeight = 0
 navbarShow  = true
-navbarFooterHIdeLocked  = false
+navbarFooterHIdeLocked = false
 
 showImageDetail = () ->
   $(".img-thumbnail").on("click", () ->
@@ -43,16 +43,16 @@ showImageDetail = () ->
       showNavBarFooter()
       # child
       data = pickData()
-      setChildAttachList(data.related_child)
+      setChildAttachList data.related_child
   )
 
-  $("#comment-submit").on("click", () ->
+  $("#comment-submit").on "click", () ->
     token = getXSRFToken()
     comment = $("#comment-textarea").val()
     imageElem = $(".img-box")[ getCurrentPosition() ]
     imageId = $(imageElem).attr("image-id")
 
-    $.ajax({
+    $.ajax {
       "type": "post",
       "url" : "/image/comment.json",
       "data": {
@@ -64,12 +64,12 @@ showImageDetail = () ->
       "success" : (data) ->
         tmpl = _.template $('#template-comment-item').html()
         item = tmpl
-          commenter_icon_url: data.commented_by_icon_url,
-          commenter_name: data.commented_by_name,
-          comment_text: data.comment
+          commenter_icon_url : data.commented_by_icon_url,
+          commenter_name     : data.commented_by_name,
+          comment_text       : data.comment
         $("#all-comment-container").find("ul").append item
 
-        window.entryData.entries[ getCurrentEntryIndex() ].comments.push {"comment": comment}
+        window.entryData.entries[ getCurrentEntryIndex() ].comments.push data 
 
         # textareaを空にする
         $("#comment-textarea").val("")
@@ -79,11 +79,8 @@ showImageDetail = () ->
 
         # コメント件数を変更
         commentCount = window.entryData.entries[ getCurrentEntryIndex() ].comments.length
-        $(imageElem).find(".comment-notice").text createCommentNavigation(commentCount)
-
-    })
-    
-  )
+        $("#comment-count").text createCommentNavigation(commentCount)
+    }
 
   preserveResponseData = (response) ->
     window.entryData.entries  =  response.data.entries
@@ -107,7 +104,6 @@ showImageDetail = () ->
       "processData": true,
       "contentType": false,
       "data": {
-        "child_id": window.child_ids,
         "page"    : nextPage,
         "count"   : countPerPage,
         "offset"  : offset
@@ -138,31 +134,6 @@ showImageDetail = () ->
     owlElem.addClass("unloaded") if !image_url
     owlElem.find(".img-box").on "click", toggleDisplayedElements
 
-    owlElem.find(".comment-notice").on "click", () ->
-      $(".comment-container").empty()
-
-      comments = window.entryData.entries[ getCurrentEntryIndex() ].comments
-
-      comments.sort( (a, b) ->
-        aCreatedAt = a.created_at
-        bCreatedAt = b.created_at
-        if aCreatedAt < bCreatedAt
-          return -1
-        if aCreatedAt > bCreatedAt
-          return 1
-        return 0
-      )
-
-      tmpl = _.template $('#template-comment-item').html()
-      if comments
-        for comment in comments
-          item = tmpl
-            commenter_icon_url: comment.commented_by_icon_url,
-            commenter_name: comment.commented_by_name,
-            comment_text: comment.comment
-
-          $(".comment-container").prepend item
-      $("#commentModal").modal("show")
     owlElem.show()
     return owlElem
 
@@ -200,6 +171,9 @@ showImageDetail = () ->
 
     # 初期位置
     owlObject.jumpTo(initialIndex)
+
+    # tool boxの初期化
+    replaceToolBoxContent()
 
 
   # WithResponseとかいいつつresopnseを直接取得してるわけではない
@@ -353,6 +327,8 @@ showImageDetail = () ->
     $("#comment-edit-icon").on "click", showComments
     $("#child-edit-icon").on "click", editChild
     $("#modal-header").on "click", closeComments
+    $("#remove-image-icon").on "click", confirmRemoveImage
+    $("#remove-image-submit").on "click", removeImage
     $(".navbar-footer").show()
 
   showComments = () ->
@@ -371,9 +347,9 @@ showImageDetail = () ->
       tmpl = _.template $('#template-comment-item').html()
       list = for comment in comments
         item = tmpl
-          commenter_icon_url: comment.commented_by_icon_url,
-          commenter_name: comment.commented_by_name,
-          comment_text: comment.comment
+          commenter_icon_url : comment.commented_by_icon_url,
+          commenter_name     : comment.commented_by_name,
+          comment_text       : comment.comment
 
     container.find("ul").empty()
     container.find("ul").append list
@@ -444,7 +420,7 @@ showImageDetail = () ->
     # child-tag-containerとchild-edit-containerを合わせて画面いっぱいになるように
     # child-edit-containerの高さを調整
     # innerHeight - modal-header - child-tag-container - 20px(余白)
-    navbarHeight       = parseInt $(".navbar.navbar-default").css("height").replace(/px/, ""), 10
+    navbarHeight       = parseInt $("#global-header").css("height").replace(/px/, ""), 10
     modalHeight        = parseInt $("#modal-header").css("height").replace(/px/, ""), 10
     tagContainerHeight = parseInt $("#child-tag-container").css("height").replace(/px/, ""), 10
     height = innerHeight - navbarHeight - modalHeight - tagContainerHeight - 20
@@ -637,6 +613,54 @@ showImageDetail = () ->
   getCurrentPosition = () ->
     return parseInt owlObject.currentPosition(), 10
 
+  confirmRemoveImage = () ->
+    currentPosition = getCurrentPosition()
+    currentImgBox = $( $(".img-box")[currentPosition] )
+    return if currentImgBox.hasClass "moreImage"
+
+    $("#remove-image-modal").modal {"data-backdrop": true}
+
+  removeImage = () ->
+    currentPosition = getCurrentPosition()
+    currentImgBox = $( $(".img-box")[currentPosition] )
+    return if currentImgBox.hasClass "moreImage"
+
+    imageId = currentImgBox.attr "image-id"
+    token = getXSRFToken()
+    $.ajax {
+      type : "post",
+      url  : "image/web/remove.json"
+      data : {
+        image_id     : imageId,
+        "XSRF-TOKEN" : token
+      },
+      dataType: "json",
+      success : (data) ->
+        # owlから削除
+        owlObject.removeItem currentPosition
+
+        # 画像を消した後その次の画像が表示されるべき
+        # しかし、表示されている画像のうち最後のものを消した場合は
+        # 残った画像の最後を表示する
+        imgBoxes = $(".img-box")
+        afterIndex = if $(".img-box")[currentPosition]?
+          if $( $(".img-box")[currentPosition] ).hasClass "moreImage"
+            currentPosition - 1
+          else
+            currentPosition
+        else
+          currentPosition
+
+        owlObject.jumpTo(afterIndex)
+
+        # global objectからデータを削除
+        window.entryData.entries.splice currentPosition, 1
+
+        # modalを閉じる
+        $("#remove-image-modal").modal("hide");
+      error   : () ->
+        #TODO implement
+    }
 
 window.util ||= {}
 window.util.showImageDetail = showImageDetail

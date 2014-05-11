@@ -1,134 +1,46 @@
-#image-upload {
-  /* salvattore */
-}
-#image-upload .image {
-  margin: 0 auto;
-  max-width: 320px;
-  padding: 10px;
-}
-#image-upload .image img {
-  width: 100%;
-  max-width: 320px;
-}
-#image-upload .item {
-  border: 1px solid #eee;
-  border-radius: 2px;
-  padding: 4px;
-  margin: 4px;
-}
-#image-upload .timeline[data-columns]::before {
-  content: '2 .column.size-1of2';
-}
-#image-upload .column {
-  float: left;
-}
-#image-upload .size-1of2 {
-  width: 50%;
-}
-#image-upload [data-columns]::before {
-  display: none;
-}
-#image-upload #add-image-icon {
-  width: 80px;
-  height: 80px;
-  margin-top: 10px;
-}
-#image-upload .disabled-iframe {
-  display: none;
-}
-#image-upload #image-post-form {
-  display: none;
-}
-#image-upload .js-image-container {
-  float: left;
-}
-#image-upload .inner-box {
-  box-shadow: 3px 3px 3px gray;
-  -webkit-box-shadow: 3px 3px 3px gray;
-  -moz-box-shadow: 3px 3px 3px gray;
-}
-#image-upload .error {
-  color: red;
-  display: none;
-  text-align: center;
-}
-#image-upload .modal-header {
-  height: 40px;
-}
-#image-upload .modal-body {
-  height: 200px;
-  overflow: scroll;
-}
-#image-upload .modal-footer {
-  padding-top: 5px;
-  padding-bottom: 5px;
-}
-#image-upload .relative-img {
-  width: 44px;
-}
-#image-upload .relative-checked-mark span {
-  display: none;
-}
-#image-upload .child-img {
-  width: 44px;
-}
-#image-upload .child-checked-mark span {
-  display: none;
-}
-#image-upload .checked span {
-  display: block;
-}
-#image-upload .abbreviation p {
-  overflow: hidden;
-  -o-text-overflow: ellipsis;
-  -webkit-text-overflow: ellipsis;
-  text-overflow: ellipsis;
-  width: 150px;
-  white-space: nowrap;
-}
-#image-upload #image-upload-footer {
-  background-color: silver;
-}
-#image-upload #image-upload-modal-footer a {
-  text-shadow: none;
-}
-#image-upload #image-upload-modal-footer-close {
-  color: #38c;
-}
-#image-upload #image-upload-submit-button {
-  background-color: #38c;
-  color: white;
-}
-#image-upload #image-upload-child-modal-footer a {
-  text-shadow: none;
-}
-#image-upload #image-upload-child-complete {
-  color: white;
-}
-#image-upload .cancel-icon {
-  width: 20px;
-  height: 20px;
-  position: absolute;
-  top: -7px;
-  right: -12px;
-}
-#image-upload .js-uploaded-image-box {
-  display: table-cell;
-  width: 100px;
-  height: 100px;
-  text-align: center;
-  vertical-align: middle;
-  padding-left: 6px;
-  padding-right: 6px;
-}
-#image-upload .js-uploaded-image-box .js-uploaded-image-box-inner {
-  display: table-cell;
-  width: 88px;
-  height: 88px;
-  text-align: center;
-  vertical-align: middle;
-  position: relative;
-  border: solid 1px gray;
-  padding: 1px;
-  margin: 2px;
-}
+/*
+Syntax error: Invalid CSS after "}": expected "}", was ""
+        on line 158 of /Users/hirata.motoi/project/BabyryServer/static/sass/image/upload.scss
+
+Backtrace:
+/Users/hirata.motoi/project/BabyryServer/static/sass/image/upload.scss:158
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/sass-3.2.14/lib/sass/scss/parser.rb:1147:in `expected'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/sass-3.2.14/lib/sass/scss/parser.rb:1085:in `expected'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/sass-3.2.14/lib/sass/scss/parser.rb:1080:in `tok!'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/sass-3.2.14/lib/sass/scss/parser.rb:536:in `block'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/sass-3.2.14/lib/sass/scss/parser.rb:529:in `ruleset'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/sass-3.2.14/lib/sass/scss/parser.rb:553:in `block_child'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/sass-3.2.14/lib/sass/scss/parser.rb:543:in `block_contents'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/sass-3.2.14/lib/sass/scss/parser.rb:82:in `stylesheet'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/sass-3.2.14/lib/sass/scss/parser.rb:27:in `parse'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/sass-3.2.14/lib/sass/engine.rb:342:in `_to_tree'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/sass-3.2.14/lib/sass/engine.rb:315:in `_render'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/sass-3.2.14/lib/sass/engine.rb:262:in `render'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/compass-0.12.3/lib/compass/compiler.rb:140:in `block (2 levels) in compile'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/compass-0.12.3/lib/compass/compiler.rb:126:in `timed'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/compass-0.12.3/lib/compass/compiler.rb:139:in `block in compile'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/compass-0.12.3/lib/compass/logger.rb:45:in `red'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/compass-0.12.3/lib/compass/compiler.rb:138:in `compile'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/compass-0.12.3/lib/compass/compiler.rb:118:in `compile_if_required'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/compass-0.12.3/lib/compass/compiler.rb:103:in `block (2 levels) in run'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/compass-0.12.3/lib/compass/compiler.rb:101:in `each'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/compass-0.12.3/lib/compass/compiler.rb:101:in `block in run'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/compass-0.12.3/lib/compass/compiler.rb:126:in `timed'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/compass-0.12.3/lib/compass/compiler.rb:100:in `run'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/compass-0.12.3/lib/compass/commands/update_project.rb:45:in `perform'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/compass-0.12.3/lib/compass/commands/base.rb:18:in `execute'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/compass-0.12.3/lib/compass/commands/project_base.rb:19:in `execute'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/compass-0.12.3/lib/compass/exec/sub_command_ui.rb:43:in `perform!'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/compass-0.12.3/lib/compass/exec/sub_command_ui.rb:15:in `run!'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/compass-0.12.3/bin/compass:30:in `block in <top (required)>'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/compass-0.12.3/bin/compass:44:in `call'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/gems/compass-0.12.3/bin/compass:44:in `<top (required)>'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/bin/compass:23:in `load'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/bin/compass:23:in `<main>'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/bin/ruby_executable_hooks:15:in `eval'
+/Users/hirata.motoi/.rvm/gems/ruby-2.0.0-p353/bin/ruby_executable_hooks:15:in `<main>'
+*/
+body:before {
+  white-space: pre;
+  font-family: monospace;
+  content: "Syntax error: Invalid CSS after \"}\": expected \"}\", was \"\"\A         on line 158 of /Users/hirata.motoi/project/BabyryServer/static/sass/image/upload.scss"; }

@@ -37,7 +37,7 @@
   navbarFooterHIdeLocked = false;
 
   showImageDetail = function() {
-    var addChildToEntryData, adjustHeightOfChildEditContainer, alreadyAttachedChild, attachChildToImage, closeComments, createChild, createCommentNavigation, createImageBox, createOwlElementsWithResponse, detachChildFromImage, editChild, getCurrentEntryIndex, getCurrentPosition, getData, getXSRFToken, hasElem, hideAttachedChild, initEditChild, initializeDisplayedElements, pickData, preserveResponseData, refreshChildAttachedMark, removeAttachedChild, replaceToolBoxContent, setChildAttachList, setUpScreenSize, setupGlobalFooter, showAttachedChild, showCarousel, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements;
+    var addChildToEntryData, adjustHeightOfChildEditContainer, alreadyAttachedChild, attachChildToImage, closeComments, confirmRemoveImage, createChild, createCommentNavigation, createImageBox, createOwlElementsWithResponse, detachChildFromImage, editChild, getCurrentEntryIndex, getCurrentPosition, getData, getXSRFToken, hasElem, hideAttachedChild, initEditChild, initializeDisplayedElements, pickData, preserveResponseData, refreshChildAttachedMark, removeAttachedChild, removeImage, replaceToolBoxContent, setChildAttachList, setUpScreenSize, setupGlobalFooter, showAttachedChild, showCarousel, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements;
     $(".img-thumbnail").on("click", function() {
       var imageId, tappedEntryIndex;
       setUpScreenSize();
@@ -81,13 +81,11 @@
             comment_text: data.comment
           });
           $("#all-comment-container").find("ul").append(item);
-          window.entryData.entries[getCurrentEntryIndex()].comments.push({
-            "comment": comment
-          });
+          window.entryData.entries[getCurrentEntryIndex()].comments.push(data);
           $("#comment-textarea").val("");
           $("#comment-textarea").css("height", defaultTextareaHeight);
           commentCount = window.entryData.entries[getCurrentEntryIndex()].comments.length;
-          return $(imageElem).find(".comment-notice").text(createCommentNavigation(commentCount));
+          return $("#comment-count").text(createCommentNavigation(commentCount));
         }
       });
     });
@@ -114,7 +112,6 @@
         "processData": true,
         "contentType": false,
         "data": {
-          "child_id": window.child_ids,
           "page": nextPage,
           "count": countPerPage,
           "offset": offset
@@ -147,36 +144,6 @@
         owlElem.addClass("unloaded");
       }
       owlElem.find(".img-box").on("click", toggleDisplayedElements);
-      owlElem.find(".comment-notice").on("click", function() {
-        var comment, comments, item, _i, _len;
-        $(".comment-container").empty();
-        comments = window.entryData.entries[getCurrentEntryIndex()].comments;
-        comments.sort(function(a, b) {
-          var aCreatedAt, bCreatedAt;
-          aCreatedAt = a.created_at;
-          bCreatedAt = b.created_at;
-          if (aCreatedAt < bCreatedAt) {
-            return -1;
-          }
-          if (aCreatedAt > bCreatedAt) {
-            return 1;
-          }
-          return 0;
-        });
-        tmpl = _.template($('#template-comment-item').html());
-        if (comments) {
-          for (_i = 0, _len = comments.length; _i < _len; _i++) {
-            comment = comments[_i];
-            item = tmpl({
-              commenter_icon_url: comment.commented_by_icon_url,
-              commenter_name: comment.commented_by_name,
-              comment_text: comment.comment
-            });
-            $(".comment-container").prepend(item);
-          }
-        }
-        return $("#commentModal").modal("show");
-      });
       owlElem.show();
       return owlElem;
     };
@@ -204,7 +171,8 @@
         }
       });
       owlObject = $(".owl-carousel.displayed").data("owlCarousel");
-      return owlObject.jumpTo(initialIndex);
+      owlObject.jumpTo(initialIndex);
+      return replaceToolBoxContent();
     };
     createOwlElementsWithResponse = function(initial) {
       var buttonAfter, buttonBefore, childElem, childInfo, childList, comment_count, count, data, div, elem, entry, image_id, image_url, initialIndex, length, moreImageAfterElem, moreImageBeforeElem, n, offset, owlContainer, _i, _j, _len, _len1, _ref;
@@ -368,6 +336,8 @@
       $("#comment-edit-icon").on("click", showComments);
       $("#child-edit-icon").on("click", editChild);
       $("#modal-header").on("click", closeComments);
+      $("#remove-image-icon").on("click", confirmRemoveImage);
+      $("#remove-image-submit").on("click", removeImage);
       return $(".navbar-footer").show();
     };
     showComments = function() {
@@ -479,7 +449,7 @@
     };
     adjustHeightOfChildEditContainer = function() {
       var height, modalHeight, navbarHeight, tagContainerHeight;
-      navbarHeight = parseInt($(".navbar.navbar-default").css("height").replace(/px/, ""), 10);
+      navbarHeight = parseInt($("#global-header").css("height").replace(/px/, ""), 10);
       modalHeight = parseInt($("#modal-header").css("height").replace(/px/, ""), 10);
       tagContainerHeight = parseInt($("#child-tag-container").css("height").replace(/px/, ""), 10);
       height = innerHeight - navbarHeight - modalHeight - tagContainerHeight - 20;
@@ -712,8 +682,48 @@
       }
       return position;
     };
-    return getCurrentPosition = function() {
+    getCurrentPosition = function() {
       return parseInt(owlObject.currentPosition(), 10);
+    };
+    confirmRemoveImage = function() {
+      var currentImgBox, currentPosition;
+      currentPosition = getCurrentPosition();
+      currentImgBox = $($(".img-box")[currentPosition]);
+      if (currentImgBox.hasClass("moreImage")) {
+        return;
+      }
+      return $("#remove-image-modal").modal({
+        "data-backdrop": true
+      });
+    };
+    return removeImage = function() {
+      var currentImgBox, currentPosition, imageId, token;
+      currentPosition = getCurrentPosition();
+      currentImgBox = $($(".img-box")[currentPosition]);
+      if (currentImgBox.hasClass("moreImage")) {
+        return;
+      }
+      imageId = currentImgBox.attr("image-id");
+      token = getXSRFToken();
+      return $.ajax({
+        type: "post",
+        url: "image/web/remove.json",
+        data: {
+          image_id: imageId,
+          "XSRF-TOKEN": token
+        },
+        dataType: "json",
+        success: function(data) {
+          var afterIndex, imgBoxes;
+          owlObject.removeItem(currentPosition);
+          imgBoxes = $(".img-box");
+          afterIndex = $(".img-box")[currentPosition] != null ? $($(".img-box")[currentPosition]).hasClass("moreImage") ? currentPosition - 1 : currentPosition : currentPosition;
+          owlObject.jumpTo(afterIndex);
+          window.entryData.entries.splice(currentPosition, 1);
+          return $("#remove-image-modal").modal("hide");
+        },
+        error: function() {}
+      });
     };
   };
 

@@ -170,6 +170,12 @@
   #operation-container div,span,p,a,li {
     text-shadow: none;
   }
+  #remove-image-icon {
+    -webkit-filter: invert();
+  }
+  .modal-backdrop.fade {
+    opacity: 0.3;
+  }
 </style>
 <style title="dynamic">
 </style>
@@ -179,7 +185,6 @@
   }
   function closeFooter(e){
     $("#operation-container").hide();
-    console.log("aaaaaaaaaaaaa");
     return false;
   }
 </script>
@@ -209,6 +214,7 @@
           <ul></ul>
         </div>
         <div id="comment-operation-container">
+          <img id="remove-image-icon" src="/static/img/trash-box.png" style="width: 28px; height: 28px;">
           <img id="child-edit-icon" src="/static/img/child-tag-icon.png" style="width: 30px; height: 30px;">
           <img id="comment-edit-icon" src="/static/img/comment-icon.png" style="width: 30px; height: 30px;">
           <span id="comment-count"></span>
@@ -256,3 +262,18 @@
     </li>
   </script>
 </div>
+
+<div id="remove-image-modal" class="modal fade" style="top: 20px; margin: 0 auto 20px; max-width: 100%; height: 500px;">
+  <div class="modal-dialog">
+    <div class="modal-content" style="height: 120px;">
+      <div class="modal-header">
+        <p>画像を削除しますか？</p>
+      </div>
+      <div class="modal-footer" id="image-upload-child-modal-footer" style="margin-top: 0px;">
+        <a href="#" class="btn" data-dismiss="modal" id="">キャンセル</a>
+        <a href="#" class="btn btn-primary" id="remove-image-submit" style="color: white;">削除</a>
+      </div>
+    </div>
+  </div>
+</div>
+

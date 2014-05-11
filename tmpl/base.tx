@@ -121,7 +121,7 @@
     : if $no_header {
     : }
     : else {
-    <div data-id="common_header" data-role="header" data-position="fixed" style="height: 44px; background-color:  rgba(255, 230, 62, 1.0);">
+    <div id="global-header" data-id="common_header" data-role="header" data-position="fixed" style="height: 44px; background-color:  rgba(255, 230, 62, 1.0);">
       <ul style="display: table; table-layout: fixed; padding-left: 0px; height: 44px; width: 100%;">
         <li style="display: table-cell; width: 20%;">
           <div style="display: inline-block; height: 44px; position: absolute;">

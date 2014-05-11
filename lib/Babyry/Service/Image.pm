@@ -172,10 +172,20 @@ sub web_submit {
         }
     }
     $teng->txn_commit;
+}
 
-    # return json
+sub web_remove {
+    my ($self, $params) = @_;
 
-    return;
+    my $image_id = $params->{image_id};
+    my $teng     = $self->teng('BABYRY_MAIN_W');
+
+    $teng->txn_begin;
+
+    $self->model('image')->remove($teng, $image_id);
+    $self->model('image_delete_queue')->enqueue($teng, $image_id);
+
+    $teng->txn_commit;
 }
 
 # Service/Commentに切り出し

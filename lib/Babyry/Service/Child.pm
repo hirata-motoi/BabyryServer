@@ -37,14 +37,18 @@ sub get_child_info_by_image_ids {
 }
 
 sub get_related_child_list {
-    my ($self, $user_id) = @_;
+    my ($self, $user_id, $opt) = @_;
+
+    $opt ||= {};
 
     my $teng = $self->teng('BABYRY_MAIN_R');
 
     my @relative_ids = keys %{ $self->model('relatives')->get_by_user_id($teng, $user_id) || {} };
+    my @target_user_ids = @relative_ids;
+    push @target_user_ids, $user_id if ! $opt->{relatives_only};
 
     # TODO modelの返り値をhashに統一したい
-    my $child = $self->model('child')->get_by_created_by($teng, \@relative_ids) || [];
+    my $child = $self->model('child')->get_by_created_by($teng, \@target_user_ids) || [];
 
     # TODO このmethodはService::Imageに移すべきな気がする
     my $icon_image_urls = Babyry::Service::User->new->get_icon_urls(+{
