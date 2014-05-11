@@ -201,5 +201,20 @@ QUERY
     return (\@records, $found_row_count);
 }
 
+sub make_disable {
+    my ($self, $teng, $params) = @_;
+    $params->{unixtime} ||= time();
+    return $teng->update(
+        'image_user_map',
+        {
+            disabled => 1,
+            updated_at => $params->{unixtime},
+        },
+        {
+            image_id => $params->{image_id},
+        }
+    );
+}
+
 
 1;
