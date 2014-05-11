@@ -15,6 +15,7 @@ use Babyry::Common;
 use Babyry::Model::WithdrawQueue;
 use Babyry::Model::Image;
 use Babyry::Model::ImageUserMap;
+use Babyry::Model::ImageDeleteQueue;
 
 GetOptions(
     'env|e=s' => \my $env,
@@ -27,16 +28,21 @@ my $teng_r = Babyry::Service::Base->new()->teng('BABYRY_MAIN_R');
 my $withdraw_queue = Babyry::Model::WithdrawQueue->new();
 my $image = Babyry::Model::Image->new();
 my $image_user_map = Babyry::Model::ImageUserMap->new();
+my $image_delete_queue = Babyry::Model::ImageDeleteQueue->new();
 while(1) {
     my $queue = $withdraw_queue->dequeue($teng_r);
     for (@{$queue}) {
         my $user_id = $_->user_id;
-        print "$user_id\n";
+        print "withdraw user : $user_id\n";
         while(1) {
             my @image_ids = $image->get_by_uploaded_by($teng_r, $user_id, 0, 10);
+            $teng->txn_begin;
             for my $img (@{$image_ids[0]}) {
-                print $img->image_id . "\n";
+                print "remove image : " . $img->image_id . "\n";
+                $image->remove($teng, $img->image_id);
+                $image_delete_queue->enqueue($teng, $img->image_id);
             }
+            $teng->txn_commit;
             sleep 1;
         }
     }
