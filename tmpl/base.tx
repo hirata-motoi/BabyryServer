@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="<: static_file('/static/css/wall.css') :>" type="text/css" media="screen">
     <link rel="stylesheet" href="<: static_file('/static/css/image/upload.css') :>" type="text/css" media="screen">
     <link rel="stylesheet" href="<: static_file('/static/css/menu.css') :>" type="text/css" media="screen">
+    <link rel="stylesheet" href="<: static_file('/static/css/detail.css') :>" type="text/css" media="screen">
     <style>
       #footer {
         height: 46px;

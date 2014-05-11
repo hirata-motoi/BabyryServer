@@ -24,6 +24,9 @@ navbarFooterHIdeLocked = false
 
 showImageDetail = () ->
   $(".img-thumbnail").on("click", () ->
+
+    $("#global-header").toolbar({tapToggle: true, fullscreen: true})
+
     # styleに画面の大きさを設定
     setUpScreenSize()
 
@@ -37,6 +40,8 @@ showImageDetail = () ->
     imageId   = $(this).parents(".item").attr("image_id")
     tappedEntryIndex = $(this).attr "entryIndex"
 
+    toggleDisplayedElements()
+
     showCarousel {offset: tappedEntryIndex}, () ->
       window.util.hidePageLoading()
       # footer
@@ -44,6 +49,12 @@ showImageDetail = () ->
       # child
       data = pickData()
       setChildAttachList data.related_child
+
+      # ページの高さを会わせる
+      window.console.log $(".owl-carousel.displayed").parents("[data-role=\"page\"]")[0]
+      $( $(".owl-carousel.displayed").parents("[data-role=\"page\"]")[0] ).css {
+        "cssText" : "padding-top: 0px !important; padding-bottom: 0px !important;",
+      }
   )
 
   $("#comment-submit").on "click", () ->
@@ -259,15 +270,12 @@ showImageDetail = () ->
     return false
 
   toggleDisplayedElements = () ->
-    if navbarShow
-      $(".navbar").hide()
-      navbarShow = false
+    if $("#global-header").hasClass "in"
+      $("#operation-container").removeClass "slidedown-out"
+      $("#operation-container").addClass "slideup-in"
     else
-      if navbarFooterHIdeLocked
-        $(".navbar:not(\".navbar-footer\")").show()
-      else
-        $(".navbar").show()
-      navbarShow = true
+      $("#operation-container").removeClass "slideup-in"
+      $("#operation-container").addClass "slidedown-out"
 
   initializeDisplayedElements = () ->
     navbarFooterHIdeLocked = false
