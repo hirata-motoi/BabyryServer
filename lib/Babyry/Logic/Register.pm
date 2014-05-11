@@ -41,6 +41,11 @@ sub is_verified {
     return Babyry::Service::Register->new->is_verified($user_id);
 }
 
+sub withdraw_execute {
+    my ($self, $params) = @_;
+
+    return Babyry::Service::Register->new->withdraw_execute($params);
+}
 
 1;
 

@@ -60,7 +60,16 @@
   }
   .modal-body {
     height: 160px;
+  .modal-header {
+    height: 40px;
+  }
+  .modal-body {
+    height: 200px;
     overflow: scroll;
+  }
+  .modal-footer {
+    padding-top: 5px;
+    padding-bottom: 5px;
   }
   .relative-img {
     width: 44px;
@@ -115,6 +124,34 @@
   }
   #image-upload-child-complete {
     color: white;
+  }
+  .cancel-icon {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: -7px;
+    right: -12px;
+  }
+  .js-uploaded-image-box {
+    display: table-cell;
+    width: 100px;
+    height: 100px;
+    text-align: center;
+    vertical-align: middle;
+    padding-left: 6px;
+    padding-right: 6px;
+
+    .js-uploaded-image-box-inner {
+      display: table-cell;
+      width: 88px;
+      height: 88px;
+      text-align: center;
+      vertical-align: middle;
+      position: relative;
+      border: solid 1px gray;
+      padding: 1px;
+      margin: 2px;
+    }
   }
 }
 

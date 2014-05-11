@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use parent qw/Babyry::Web::C/;
 use Log::Minimal;
+use Data::Dumper;
 use Babyry::Logic::Register;
 use Babyry::Logic::Login;
 
@@ -96,6 +97,35 @@ sub devicetoken {
         return $c->render_json({error => "internal_server_error"});
     }
     return $c->render_json($ret);
+}
+
+sub withdraw {
+    my ($self, $c) = @_;
+
+    return $c->render('/register/withdraw.tx');
+}
+
+sub withdraw_execute {
+    my ($self, $c) = @_;
+
+   if (!$c->req->param('check1') || !$c->req->param('check2') || !$c->req->param('check3')) {
+       return $c->render('/register/withdraw.tx', {error => 'UNCHECKED_BOX_EXIST'});
+   }
+
+    my $params = {
+        withdraw_comment => $c->req->param('withdraw_comment') || '',
+        user_id => $c->stash->{'user_id'},
+    };
+
+    my $logic = Babyry::Logic::Register->new;
+
+    my $ret = eval { $logic->withdraw_execute($params); };
+    if ( my $e = $@ ) {
+        critf($e);
+        return $c->render('/register/withdraw.tx', {error => 'UNKNOWN_ERRIR'});
+    }
+
+    return $c->redirect('/logout');
 }
 
 1;

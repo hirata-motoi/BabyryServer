@@ -28,6 +28,12 @@ sub execute {
         );
         $teng_r->disconnect();
 
+        my $is_disabled = $user->is_disabled(
+            $teng_r,
+            { user_id => $user_id },
+        );
+        return { error => 'LOGIN_ERROR' } if ($is_disabled);
+
         my $teng_w = $self->teng('BABYRY_MAIN_W');
         $teng_w->txn_begin;
         # if user_id session set

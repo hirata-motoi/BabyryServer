@@ -40,7 +40,7 @@ sub get_by_image_ids {
 }
 
 sub get_by_uploaded_by{
-    my ($teng, $uploaded_by, $from, $limit) = @_;
+    my ($self, $teng, $uploaded_by, $from, $limit) = @_;
 
     $limit ||= 10;
 
@@ -89,6 +89,7 @@ sub set_new_image {
             created_at   => $params->{created_at},
             updated_at   => $params->{updated_at},
             format       => $params->{format},
+            url          => $params->{url},
         }
     );
 }
@@ -130,7 +131,11 @@ QUERY
         $sql,
         [$user_id]
     );
-    return $records[0]->sum;
+    if ($records[0]->sum) {
+        return $records[0]->sum;
+    } else {
+        return 0;
+    }
 }
 
 sub update_url {

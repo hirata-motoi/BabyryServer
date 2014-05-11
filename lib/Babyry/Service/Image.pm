@@ -121,6 +121,8 @@ sub web_submit {
             );
         }
         my $_format = $format{$img};
+        my $tmp_url = 'https://' . Babyry::Common->config->{tmp_bucket} . '.s3.amazonaws.com/' . $img . '.' . $_format;
+        infof($tmp_url);
         $image->set_new_image( $teng,
             {
                 image_id     => $id,
@@ -128,6 +130,7 @@ sub web_submit {
                 created_at   => $unixtime,
                 updated_at   => $unixtime,
                 format       => $_format,
+                url          => $tmp_url,
             }
         );
         # is_icon : ユーザーのicon

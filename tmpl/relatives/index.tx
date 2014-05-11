@@ -74,12 +74,13 @@
 : }
 
 : around javascript -> {
-<script type="text/javascript" src="<: uri_for('/static/backbone/js/backbone-min.js') :>"></script>
-<script type="text/javascript" src="<: uri_for('/static/js/invite.js') :>"></script>
-<script type="text/javascript" src="<: uri_for('/static/js/relatives.js') :>"></script>
 : }
 
 : around content -> {
+<script type="text/javascript" src="<: uri_for('/static/backbone/js/backbone-min.js') :>"></script>
+<script type="text/javascript" src="<: uri_for('/static/js/invite.js') :>"></script>
+<script type="text/javascript" src="<: uri_for('/static/js/relatives.js') :>"></script>
+
 <div data-position="fixed" data-tap-toggle="false">
   <div data-role="navbar">
     <ul>

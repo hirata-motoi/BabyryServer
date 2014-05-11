@@ -45,6 +45,16 @@
       </div>
     </div>
   </div>
+  <div class="ui-grid-a">
+    <div class="ui-block-a table-item">
+      <div class="table-item-inner">
+        <a href="/withdraw">
+          <img src="/static/img/menu/howto.png">
+          <p>退会 > <</p>
+        </a>
+      </div>
+    </div>
+  </div>
 
 </div>
 
