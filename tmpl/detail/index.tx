@@ -1,31 +1,6 @@
 : cascade base { no_header => 1, container_fluid => 1 }
 
 : around head -> {
-<style type="text/css">
-  body {
-    background: #000;
-    margin: 0;
-    padding-bottom: 50px;
-  }
-  .img-box {
-    min-height: 100%;
-    width: 100%;
-  }
-  .img-detail {
-    width: 100%;
-  }
-  .footer {
-    display: -webkit-box;
-    display: box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    background: #eee;
-    padding: 8px 2px 8px;
-  }
-</style>
 : }
 
 : around content -> {

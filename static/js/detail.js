@@ -37,9 +37,13 @@
   navbarFooterHIdeLocked = false;
 
   showImageDetail = function() {
-    var addChildToEntryData, adjustHeightOfChildEditContainer, alreadyAttachedChild, attachChildToImage, closeComments, confirmRemoveImage, createChild, createCommentNavigation, createImageBox, createOwlElementsWithResponse, detachChildFromImage, editChild, getCurrentEntryIndex, getCurrentPosition, getData, getXSRFToken, hasElem, hideAttachedChild, initEditChild, initializeDisplayedElements, pickData, preserveResponseData, refreshChildAttachedMark, removeAttachedChild, removeImage, replaceToolBoxContent, setChildAttachList, setUpScreenSize, setupGlobalFooter, showAttachedChild, showCarousel, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements;
+    var addChildToEntryData, adjustHeightOfChildEditContainer, alreadyAttachedChild, attachChildToImage, closeComments, confirmRemoveImage, createChild, createCommentNavigation, createImageBox, createOwlElementsWithResponse, detachChildFromImage, editChild, getCurrentEntryIndex, getCurrentPosition, getData, getXSRFToken, hasElem, hideAttachedChild, initEditChild, initializeDisplayedElements, pickData, preserveResponseData, refreshChildAttachedMark, removeAttachedChild, removeImage, replaceToolBoxContent, setChildAttachList, setUpScreenSize, setupGlobalFooter, showAttachedChild, showCarousel, showComments, showEntries, showErrorMessage, showLoadingImage, showNavBarFooter, toggleDisplayedElements, toggleDisplayedElementsWithHeader;
     $(".img-thumbnail").on("click", function() {
       var imageId, tappedEntryIndex;
+      $("#global-header").toolbar({
+        tapToggle: true,
+        fullscreen: true
+      });
       setUpScreenSize();
       setupGlobalFooter();
       window.util.showPageLoading();
@@ -47,6 +51,7 @@
       innerHeight = window.innerHeight;
       imageId = $(this).parents(".item").attr("image_id");
       tappedEntryIndex = $(this).attr("entryIndex");
+      toggleDisplayedElementsWithHeader();
       return showCarousel({
         offset: tappedEntryIndex
       }, function() {
@@ -54,7 +59,11 @@
         window.util.hidePageLoading();
         showNavBarFooter();
         data = pickData();
-        return setChildAttachList(data.related_child);
+        setChildAttachList(data.related_child);
+        window.console.log($(".owl-carousel.displayed").parents("[data-role=\"page\"]")[0]);
+        return $($(".owl-carousel.displayed").parents("[data-role=\"page\"]")[0]).css({
+          "cssText": "padding-top: 0px !important; padding-bottom: 0px !important;"
+        });
       });
     });
     $("#comment-submit").on("click", function() {
@@ -267,16 +276,21 @@
       return false;
     };
     toggleDisplayedElements = function() {
-      if (navbarShow) {
-        $(".navbar").hide();
-        return navbarShow = false;
+      if ($("#operation-container").hasClass("slidedown-out")) {
+        $("#operation-container").removeClass("slidedown-out");
+        return $("#operation-container").addClass("slideup-in");
       } else {
-        if (navbarFooterHIdeLocked) {
-          $(".navbar:not(\".navbar-footer\")").show();
-        } else {
-          $(".navbar").show();
-        }
-        return navbarShow = true;
+        $("#operation-container").removeClass("slideup-in");
+        return $("#operation-container").addClass("slidedown-out");
+      }
+    };
+    toggleDisplayedElementsWithHeader = function() {
+      if ($("#global-header").hasClass("in")) {
+        $("#operation-container").removeClass("slidedown-out");
+        return $("#operation-container").addClass("slideup-in");
+      } else {
+        $("#operation-container").removeClass("slideup-in");
+        return $("#operation-container").addClass("slidedown-out");
       }
     };
     initializeDisplayedElements = function() {
