@@ -8,6 +8,7 @@ use Digest::MD5 qw/md5_hex/;
 use Log::Minimal;
 use Data::Dumper;
 use Carp;
+use String::Random;
 
 sub execute {
     my ($self, $params) = @_;
@@ -154,52 +155,6 @@ sub activate {
     return {};
 }
 
-=pot
-# TODO tokenのverifyをvalidatorでやる
-# 基本的にはerror messageを返すのはvalidationで検知したerrorに対して。
-# Service以下で起きたexceptionは本当の例外なのでcroakしてOK
-sub verify {
-    my ($self, $params) = @_;
-
-    my $teng = $self->teng('BABYRY_MAIN_W');
-    $teng->txn_begin;
-
-    # TODO create instances by Service::factory
-    my $register_token  = $self->model('RegisterToken');
-    my $relatives       = $self->model('Relatives');
-    my $invite          = $self->model('Invite');
-    my $user            = $self->model('User');
-
-    eval {
-        my $deleted_register_token = $register_token->delete($teng, $params->{token})
-            or croak('register_token is invalid token:%s', $params->{token});
-
-        # TODO magic number
-        my $user_id = $deleted_register_token->{user_id};
-        $user->update_to_verified($teng, { user_id => $user_id })
-            or croak( sprintf('Failed to update_to_verified user_id:%d', $user_id) );
-
-        # not invited user
-        my $invite_record = $invite->get_by_invited_user($teng, $user_id);
-
-        if ($invite_record) {
-            $invite->admit($teng, $invite_record);
-            $relatives->admit($teng, $user_id, $invite_record );
-        }
-
-        $teng->txn_commit;
-
-        # logging
-        infof('register_token was deleted : %s', $self->dump($deleted_register_token));
-    };
-    if ( my $e = $@ ) {
-        $teng->txn_rollback;
-        croak($e);
-    }
-}
-=cut
-
-
 sub varidate_password {
     my ($self, $password) = @_;
     if($password eq '') {
@@ -273,6 +228,85 @@ sub withdraw_execute {
 
     return {};
 }
+
+sub password_change {
+    my ($self, $params) = @_;
+
+    my $teng_r = $self->teng('BABYRY_MAIN_R');
+    my $teng = $self->teng('BABYRY_MAIN_W');
+    my $user_auth = $self->model('UserAuth');
+    my $mail = $self->model('AmazonSES');
+    return {error => 'ADDRESS_NOT_EXIST'} if (!$user_auth->get_by_email($teng_r, $params));
+
+    my $tmp_password = String::Random->new->randregex(sprintf('[A-Za-z0-9]{%s}',  6));
+    my $tmp_password_hash = $self->model('Common')->enc_password($tmp_password);
+    $params->{tmp_password_hash} = $tmp_password_hash;
+
+    $teng->txn_begin;
+    $user_auth->update_tmp_password($teng, $params);
+    $teng->txn_commit;
+    $teng->disconnect();
+    $mail->set_subject(Babyry::Common->config->{temp_password}{mail}{subject});
+    $mail->set_body( sprintf(Babyry::Common->config->{temp_password}{mail}{body}, $tmp_password) );
+
+    if ($ENV{APP_ENV} eq 'production') {
+        $mail->set_address($params->{email});
+    } else {
+        $mail->set_address('meaning.sys@gmail.com');
+    }
+    $mail->send_mail();
+
+    return {};
+}
+
+sub password_change_execute {
+    my ($self, $params) = @_;
+
+    my $teng_r = $self->teng('BABYRY_MAIN_R');
+    my $teng = $self->teng('BABYRY_MAIN_W');
+    my $user_auth = $self->model('UserAuth');
+    my $common = $self->model('Common');
+
+    # temp password check
+    my $tmp_pass = $user_auth->get_temp_password($teng_r, $params);
+    return {error => 'TMP_PASS_UNMATCH'} if ($tmp_pass ne $common->enc_password($params->{pre_password}));
+    
+    $params->{password_hash} = $common->enc_password($params->{password});
+    # update new password
+    $teng->txn_begin;
+    $user_auth->update_password($teng, $params);
+    $teng->txn_commit;
+    $teng->disconnect();
+}
+
+sub new_password_change_execute {
+    my ($self, $params) = @_;
+
+    my $teng_r = $self->teng('BABYRY_MAIN_R');
+    my $teng = $self->teng('BABYRY_MAIN_W');
+    my $user_auth = $self->model('UserAuth');
+    my $common = $self->model('Common');
+
+    # old password check
+    my $old_pass = $user_auth->get_by_ids($teng_r, [$params->{user_id}]);
+    return { error => 'OLD_PASS_UNMATCH' } if ($old_pass->{$params->{user_id}}->{'password_hash'} ne $common->enc_password($params->{pre_password}));
+
+    # set new password
+    $params->{password_hash} = $common->enc_password($params->{password});
+    eval {
+        $teng->txn_begin;
+        $user_auth->update_password($teng, $params);
+        $teng->txn_commit;
+        $teng->disconnect();
+    };
+    if($@) {
+        critf($@);
+        return {error => 'PASSWORD_UPDATE_FAILED'};
+    }
+
+    return {};
+}
+
 
 1;
 

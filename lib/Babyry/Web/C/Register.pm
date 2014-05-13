@@ -49,30 +49,6 @@ critf($e);
     my $password = $c->req->param('password');
     return $c->redirect("/login/execute?email=$email&password=$password"); 
 }
-=pot
-sub verify {
-    my ($self, $c, $p, $v) = @_;
-
-    my $params = {
-        token => $c->req->param('token') || '',
-    };
-
-    my $logic = Babyry::Logic::Register->new;
-
-    eval { $logic->verify($params) };
-    if ( my $e = $@ ) {
-        critf('Failed to verify registered email token:%s error:%s', $params->{token}, $e);
-        return $c->res_500();
-    }
-    return $c->render(
-        'top/index.tx',
-        {
-            no_header => 1,
-            no_footer => 1,
-        }
-    );
-}
-=cut
 
 sub devicetoken {
     my ($self, $c) = @_;
@@ -127,6 +103,149 @@ sub withdraw_execute {
 
     return $c->redirect('/logout');
 }
+
+sub password_change {
+    my ($self, $c) = @_;
+
+    return $c->render(
+        'top/index.tx',
+        {  
+            no_header => 1,
+            no_footer => 1,
+            login     => 0,
+            register  => 0,
+            activate  => 0,
+            password_forget => 1,
+            error => 'NO_MAILADDRESS',
+        }
+    ) if (!$c->req->param('email'));
+
+    my $params = {
+        email => $c->req->param('email'),
+    };
+
+    my $logic = Babyry::Logic::Register->new;
+
+    my $ret = eval { $logic->password_change($params); };
+    if ( my $e = $@ ) {
+        critf($e);
+    }
+
+    return $c->render(
+        'top/index.tx',
+        {  
+            no_header => 1,
+            no_footer => 1,
+            login     => 0,
+            register  => 0,
+            activate  => 0,
+            password_forget => 1,
+            error => $ret->{error},
+        }
+    ) if ($ret->{error});
+
+    return $c->render(
+        'top/index.tx',
+        {  
+            no_header => 1,
+            no_footer => 1,
+            password_change => 1,
+            temp_password => 1,
+            mail => $c->req->param('email') || '',
+        }
+    );
+}
+
+sub password_change_execute {
+    my ($self, $c) = @_;
+
+    my $error = "";
+
+    $error = 'TOO_SHORT_PASSWORD' if (length($c->req->param('password')) < 8);
+    $error = 'NEW_PASSWORD_NOT_MACH' if ($c->req->param('password') ne $c->req->param('password_confirm'));
+    $error = 'NO_PASSWORD' if (!$c->req->param('pre_password'));
+    $error = 'NO_PASSWORD' if (!$c->req->param('password'));
+
+    return $c->render(
+        'top/index.tx',
+        {
+            no_header => 1,
+            no_footer => 1,
+            password_change => 1,
+            error => $error,
+        }
+    ) if ($error);
+
+    my $params = {
+        email => $c->req->param('email'),
+        pre_password => $c->req->param('pre_password'),
+        password => $c->req->param('password'),
+    };
+    my $logic = Babyry::Logic::Register->new;
+    my $ret = eval { $logic->password_change_execute($params); };
+    if ( my $e = $@ ) {
+        critf($e);
+    }
+
+    return $c->render(
+         'top/index.tx',
+        {
+            no_header => 1,
+            no_footer => 1,
+            login => 1,
+        }
+    );
+}
+
+
+sub new_password_change {
+    my ($self, $c) = @_;
+
+    return $c->render(
+        'profile/new_password.tx',
+        {
+        }
+    );
+}
+
+sub new_password_change_execute {
+    my ($self, $c) = @_;
+
+    my $error = "";
+
+    $error = 'TOO_SHORT_PASSWORD' if (length($c->req->param('password')) < 8);
+    $error = 'NEW_PASSWORD_NOT_MACH' if ($c->req->param('password') ne $c->req->param('password_confirm'));
+    $error = 'NO_PASSWORD' if (!$c->req->param('pre_password'));
+    $error = 'NO_PASSWORD' if (!$c->req->param('password'));
+
+    return $c->render(
+        'profile/new_password.tx',
+        {
+            error => $error,
+        }
+    ) if ($error);
+
+    my $params = {
+        user_id => $c->stash->{'user_id'},
+        pre_password => $c->req->param('pre_password'),
+        password => $c->req->param('password'),
+    };
+    my $logic = Babyry::Logic::Register->new;
+    my $ret = eval { $logic->new_password_change_execute($params); };
+    if ( my $e = $@ ) {
+        critf($e);
+    }
+
+    return $c->render(
+        'profile/new_password.tx',
+        {  
+            error => $ret->{error},
+        }
+    ) if ($ret->{error});
+
+    return $c->redirect('/');
+}
+
 
 1;
 

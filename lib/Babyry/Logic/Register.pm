@@ -47,5 +47,23 @@ sub withdraw_execute {
     return Babyry::Service::Register->new->withdraw_execute($params);
 }
 
+sub password_change {
+    my ($self, $params) = @_;
+
+    return Babyry::Service::Register->new->password_change($params);
+}
+
+sub password_change_execute {
+    my ($self, $params) = @_;
+
+    return Babyry::Service::Register->new->password_change_execute($params);
+}
+
+sub new_password_change_execute {
+    my ($self, $params) = @_;
+
+    return Babyry::Service::Register->new->new_password_change_execute($params);
+}
+
 1;
 

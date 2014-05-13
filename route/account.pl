@@ -23,6 +23,20 @@
     },
     '/withdraw/execute' => +{
         controller => 'Register', action => 'withdraw_execute',
+    },
+    # 分かりづらいけどパスワード忘れた時のエンドポイント
+    '/register/password_change' => +{
+        controller => 'Register', action => 'password_change',
+    },
+    '/register/password_change_execute' => +{
+        controller => 'Register', action => 'password_change_execute',
+    },
+    # 分かりづらいけどパスワード覚えてる偉い人用、その上でパスワード変えたい意識高い人用
+    '/register/new_password_change' => +{
+        controller => 'Register', action => 'new_password_change',
+    },
+    '/register/new_password_change_execute' => +{
+        controller => 'Register', action => 'new_password_change_execute',
     }
 }
 

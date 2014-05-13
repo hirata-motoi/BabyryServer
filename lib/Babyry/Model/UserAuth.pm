@@ -65,5 +65,44 @@ sub get_by_email {
     return $row->email;
 }
 
+sub update_tmp_password {
+    my ($self, $teng, $params) = @_;
+
+    return $teng->update(
+        'user_auth',
+        {  
+            tmp_password_hash => $params->{tmp_password_hash},
+        },
+        {  
+            email => $params->{email},
+        },
+    );
+}
+
+sub update_password {
+    my ($self, $teng, $params) = @_;
+
+    return $teng->update(
+        'user_auth',
+        {  
+            password_hash => $params->{password_hash},
+        },
+        {
+            user_id => $params->{user_id},
+        },
+    );
+}
+
+sub get_temp_password {
+    my ($self, $teng, $params) = @_;
+
+    my $row = $teng->single('user_auth', {
+        email => $params->{'email'},
+        disabled => 0,
+    }) or return '';
+
+    return $row->tmp_password_hash;
+}
+
 1;
 

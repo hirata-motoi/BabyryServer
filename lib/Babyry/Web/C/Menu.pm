@@ -12,6 +12,11 @@ sub index {
     return $c->render('menu/index.tx', {});
 }
 
+sub faq {
+    my ($self, $c) = @_;
+
+    return $c->render('menu/faq.tx', {});
+}
 
 1;
 

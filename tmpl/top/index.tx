@@ -1,165 +1,177 @@
 : cascade base
 
 : around head -> {
-<style type="text/css">
-  .container {
-    text-align: center;
-  }
-  .top_icon {
-    margin-top: 25%;
-    height: 70%;
-  }
-  .bottom_button {
-    margin-top: 25%;
-    width: 50%;
-    text-align: center;
-    margin-right: 25%;
-    margin-left: 25%;
-  }
-  .login_form {
-    margin-top: 10%;
-    margin-right: 15%;
-    margin-left: 15%;
-  }
-  .register_form {
-    margin-top: 0%;
-    margin-right: 15%;
-    margin-left: 15%;
-  }
-  .activate_form {
-    margin-top: 0%;
-    margin-right: 15%;
-    margin-left: 15%;
-  }
-  .login_button {
-    margin-right: 10%;
-    margin-left: 10%;
-  }
-  .register_button {
-    margin-right: 15%;
-    margin-left: 15%;
-  }
-  .top_view {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 50%;
-    left: 0;
-  }
-  .bottom_view {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    left: 0;
-  }
-</style>
+
 : }
 
 : around content -> {
 <script src="<: static_file('/static/jquery/js/jquery.min.js') :>"></script>
 <script type="text/javascript" src="<: uri_for('/static/js/top.js') :>"></script>
 
-<div class="top_view">
-  <img class="top_icon" src="/static/img/babyry_toppage_icon.png">
-</div>
-
-<div class="bottom_view">
-: if ($login || $register || $activate) {
-  <div id="top_choice" style="display:none">
-: } else {
-  <div id="top_choice">
-: }
-    <div class="bottom_button">
-      <input type="submit" value="ログイン" class="btn btn-default login"/>
-      <input type="submit" value="新規登録" class="btn btn-default register"/>
-    </div>
+<div id="top">
+  <div class="top_view">
+    <img class="top_icon" src="/static/img/babyry_toppage_icon.png">
   </div>
-: if ($login) {
-  <div id="top_login">
+
+  <div class="bottom_view">
+: if ($login || $register || $activate || $password_forget || $password_change) {
+    <div id="top_choice" style="display:none">
 : } else {
-  <div id="top_login" style="display:none">
+    <div id="top_choice">
+: }
+      <div class="bottom_button">
+        <input type="submit" value="ログイン" class="btn btn-default login"/>
+        <input type="submit" value="新規登録" class="btn btn-default register"/>
+      </div>
+    </div>
+: if ($login) {
+    <div id="top_login">
+: } else {
+    <div id="top_login" style="display:none">
 :}
 : if $error == 'UNMATCH_CONFIRM' {
-    <div style="color:red">パスワードが一致しません</div>
+      <div style="color:red">パスワードが一致しません</div>
 : }
 : elsif $error == 'INVALID_PASSWORD' {
-    <div style="color:red">ユーザー名かパスワードが正しくありません</div>
+      <div style="color:red">ユーザー名かパスワードが正しくありません</div>
 : }
-    <div class="login_form">
-      <form action="/login/execute" role="form" method="post" data-ajax="false">
-        <div class="form-group">
-          <input id="email" type="email" name="email" class="form-control" placeholder="メールアドレス"/>
-        </div>
-        <div class="form-group">
-          <input id="password" type="password" name="password" class="form-control" placeholder="パスワード"/>
-        </div>
+      <div class="login_form">
+        <form action="/login/execute" role="form" method="post" data-ajax="false">
+          <div class="form-group">
+            <input id="email" type="email" name="email" class="form-control" placeholder="メールアドレス"/>
+          </div>
+          <div class="form-group">
+            <input id="password" type="password" name="password" class="form-control" placeholder="パスワード"/>
+          </div>
+          <div class="login_button">
+            <input type="submit" value="ログイン" class="btn btn-default"/>
+          </div>
+        </form>
         <div class="login_button">
-          <input type="submit" value="ログイン" class="btn btn-default"/>
+          <input type="submit" value="やっぱり新規登録" class="btn btn-default register"/>
         </div>
-      </form>
-      <div class="login_button">
-        <input type="submit" value="やっぱり新規登録" class="btn btn-default register"/>
+      </div>
+      <div style="color:blue" id="password_forget">
+        パスワードをお忘れの方はこちら
       </div>
     </div>
-  </div>
 : if ($register) {
-  <div id="top_register">
+    <div id="top_register">
 : } else {
-  <div id="top_register" style="display:none">
+    <div id="top_register" style="display:none">
 : }
 : if $error == 'INVALID_MAIL_ADDRESS' {
-    <div style="color:red">メールアドレスを確認してください</div>
+      <div style="color:red">メールアドレスを確認してください</div>
 : } elsif $error == 'NO_PASSWRD' {
-    <div style="color:red">パスワードを入力してください</div>
+      <div style="color:red">パスワードを入力してください</div>
 : } elsif $error == 'TOO_SHORT_PASSWRD' {
-    <div style="color:red">パスワードは8文字以上で入力してください</div>
+      <div style="color:red">パスワードは8文字以上で入力してください</div>
 : } elsif $error == 'NOT_MATCH_PASSWORD' {
-    <div style="color:red">確認用のパスワードと一致しません</div>
+      <div style="color:red">確認用のパスワードと一致しません</div>
 : } elsif $error == 'DUPLICATE_ENTRY' {
-    <div style="color:red">既に登録済みのメールアドレスです</div>
+      <div style="color:red">既に登録済みのメールアドレスです</div>
 : }
-    <form action="/register/execute" role="form" data-ajax="false">
-      <div class="register_form">
-        <div class="form-group">
-          <input id="email" type="email" name="email" placeholder="登録するメールアドレス" class="form-control"/>
+      <form action="/register/execute" role="form" data-ajax="false">
+        <div class="register_form">
+          <div class="form-group">
+            <input id="email" type="email" name="email" placeholder="登録するメールアドレス" class="form-control"/>
+          </div>
+          <div class="form-group">
+            <input id="password" type="password" name="password" placeholder="パスワード" class="form-control"/>
+          </div>
+          <div class="form-group">
+            <input id="password_confirm" type="password" name="password_confirm" placeholder="パスワード(確認用)" class="form-control"/>
+          </div>
+          <div class="form-group">
+            <input id="invite_code" type="text" name="invite_code" class="form-control" placeholder="招待コード(招待された方のみ)"/>
+          </div>
         </div>
-        <div class="form-group">
-          <input id="password" type="password" name="password" placeholder="パスワード" class="form-control"/>
-        </div>
-        <div class="form-group">
-          <input id="password_confirm" type="password" name="password_confirm" placeholder="パスワード(確認用)" class="form-control"/>
-        </div>
-        <div class="form-group">
-          <input id="invite_code" type="text" name="invite_code" class="form-control" placeholder="招待コード(招待された方のみ)"/>
-        </div>
-      </div>
-      <div class="register_button">
-        <input data-ajax="false" type="submit" value="登録！" class="btn btn-default"/>
-      </div>
-    </form>
-    <div class="register_button">
-      <input type="submit" value="登録済みの方はコチラ" class="btn btn-default login"/>
-    </div>
-  </div>
-: if ($activate) {
-  <div id="top_activate">
-: } else {
-  <div id="top_activate" style="display:none">
-:}
-: if $error == 'INVALID_KEY' {
-    <div style="color:red">認証キーが一致しません</div>
-: }
-    <div class="activate_form">
-      <form action="/activate/execute" role="form" method="post" data-ajax="false">
-        <div class="form-group">
-          <input id="activate_key" name="activate_key" class="form-control" placeholder="認証キーを入力してください"/>
-        </div>
-        <div class="login_button">
-          <input type="submit" value="送信" class="btn btn-default"/>
+        <div class="register_button">
+          <input data-ajax="false" type="submit" value="登録！" class="btn btn-default"/>
         </div>
       </form>
-      <div class="login_button">
-        <input type="submit" value="ログアウト" class="btn btn-default logout"/>
+      <div class="register_button">
+        <input type="submit" value="登録済みの方はコチラ" class="btn btn-default login"/>
+      </div>
+    </div>
+: if ($activate) {
+    <div id="top_activate">
+: } else {
+    <div id="top_activate" style="display:none">
+:}
+: if $error == 'INVALID_KEY' {
+      <div style="color:red">認証キーが一致しません</div>
+: }
+      <div class="activate_form">
+        <form action="/activate/execute" role="form" method="post" data-ajax="false">
+          <div class="form-group">
+            <input id="activate_key" name="activate_key" class="form-control" placeholder="認証キーを入力してください"/>
+          </div>
+          <div class="login_button">
+            <input type="submit" value="送信" class="btn btn-default"/>
+          </div>
+        </form>
+        <div class="login_button">
+          <input type="submit" value="ログアウト" class="btn btn-default logout"/>
+        </div>
+      </div>
+    </div>
+: if ($password_forget) {
+    <div id="top_password_forget">
+: } else {
+    <div id="top_password_forget" style="display:none">
+: }
+      <div class="login_form">
+        登録したメールアドレス宛に一時パスワードを送ります。
+: if $error == 'NO_MAILADDRESS' {
+        <div style="color:red">メールアドレスを正しく入力してください</div>
+: } elsif $error == 'ADDRESS_NOT_EXIST' {
+        <div style="color:red">存在しないメールアドレスです</div>
+:}
+        <form action="/register/password_change" role="form" method="post" data-ajax="false">
+          <div class="form-group">
+            <input id="email" type="email" name="email" class="form-control" placeholder="登録したメールアドレス"/>
+          </div>
+          <div class="login_button">
+            <input type="submit" value="送信" class="btn btn-default"/>
+          </div>
+        </form>
+        <div class="login_button">
+          <input type="submit" value="戻る" class="btn btn-default login"/>
+        </div>
+      </div>
+    </div>
+: if ($password_change) {
+    <div id="top_password_change">
+: } else {
+    <div id="top_password_change" style="display:none">
+: }
+      <div class="login_form">
+        <form action="/register/password_change_execute" role="form" method="post" data-ajax="false">
+: if $error == 'NO_PASSWORD' {
+          <div style="color:red">パスワードが空です</div>
+: } elsif $error == 'NEW_PASSWORD_NOT_MACH' {
+          <div style="color:red">新規パスワードが一致しません</div>
+: } elsif $error == 'TOO_SHORT_PASSWORD' {
+          <div style="color:red">パスワードは8文字以上で設定してください</div>
+: }
+          <div class="form-group">
+            <input id="email" type="email" name="email" class="form-control" placeholder="メールアドレス" value="<:$mail:>"/>
+            <input id="pre_password" type="password" name="pre_password" placeholder="一時パスワード" class="form-control"/>
+          </div>
+          <div class="form-group">
+            <input id="password" type="password" name="password" placeholder="新規パスワード" class="form-control"/>
+          </div>
+          <div class="form-group">
+            <input id="password_confirm" type="password" name="password_confirm" placeholder="新規パスワード(確認用)" class="form-control"/>
+          </div> 
+          <div class="login_button">
+            <input type="submit" value="送信" class="btn btn-default"/>
+          </div>
+        </form>
+        <div class="login_button">
+          <input type="submit" value="戻る" class="btn btn-default login"/>
+        </div>
       </div>
     </div>
   </div>

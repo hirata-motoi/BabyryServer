@@ -1,0 +1,49 @@
+#top .top_icon {
+  margin-top: 25%;
+  height: 70%;
+}
+#top .bottom_button {
+  margin-top: 25%;
+  width: 50%;
+  text-align: center;
+  margin-right: 25%;
+  margin-left: 25%;
+}
+#top .login_form {
+  margin-top: 10%;
+  margin-right: 15%;
+  margin-left: 15%;
+}
+#top .register_form {
+  margin-top: 0%;
+  margin-right: 15%;
+  margin-left: 15%;
+}
+#top .activate_form {
+  margin-top: 0%;
+  margin-right: 15%;
+  margin-left: 15%;
+}
+#top .login_button {
+  margin-right: 10%;
+  margin-left: 10%;
+}
+#top .register_button {
+  margin-right: 15%;
+  margin-left: 15%;
+}
+#top .top_view {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 50%;
+  left: 0;
+  text-align: center;
+}
+#top .bottom_view {
+  position: absolute;
+  right: 0;
+  bottom: 0%;
+  left: 0;
+  text-align: center;
+}

@@ -13,6 +13,8 @@ sub index {
     $login = 1 if ($c->req->param('login'));
     my $register = 0;
     $register = 1 if ($c->req->param('register'));
+    my $password_forget = 0;
+    $password_forget = 1 if ($c->req->param('password_forget'));
     # 排他処理、起こらないはず
     if ($login) {
         $register = 0;
@@ -26,6 +28,7 @@ sub index {
             login     => $login,
             register  => $register,
             activate  => 0,
+            password_forget => $password_forget,
         }
     );
 }
