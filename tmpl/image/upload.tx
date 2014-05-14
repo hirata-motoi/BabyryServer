@@ -11,9 +11,9 @@
 <div id="image-upload">
   <div style="height: 120px; display: table-cell;">
     <span class="js-image-container"></span>
-    <span class="add-image">
-      <img src="/static/img/add-image-icon.jpg" id="add-image-icon">
-    </span>
+    <div class="add-image">
+      <img src="/static/img/add-image-icon.png" id="add-image-icon">
+    </div>
   </div>
 
   <div class="error">アップロードにに失敗しました</div>

@@ -35,7 +35,7 @@
 </script>
 <script id="template-album-content">
   <div class="timeline row" data-columns style="content: '2 .column.size-1of2';"></div>
-  <div id="load-more" style="text-align:center"><img src="/static/img/arrow_carrot-2down_alt2.png"></div>
+  <div id="load-more" style="text-align:center"><img src="/static/img/thin.png"></div>
 </script>
 
 

@@ -13,7 +13,7 @@
     <div class="ui-block-a table-item">
       <div class="table-item-inner">
         <a href="/profile">
-          <img src="/static/img/menu/profile.png">
+          <img src="/static/img/menu/profile.png" style="height: 72px; -webkit-filter: invert(50%);">
           <p>プロフィール</p>
         </a>
       </div>
@@ -21,7 +21,7 @@
     <div class="ui-block-b table-item">
       <div class="table-item-inner">
         <a href="/relatives">
-          <img src="/static/img/menu/relatives.png">
+          <img src="/static/img/menu/relatives.png" style="height: 72px; -webkit-filter: invert(50%);">
           <p>ともだち</p>
         </a>
       </div>

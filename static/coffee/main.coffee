@@ -29,7 +29,6 @@ showFooterEffect = () ->
   else
     $("#footer-other")
 
-  window.console.log target
   target.find("a").css "border-bottom", "solid 3px rgba(255, 230, 62, 1.0)"
   target.find("img").css "margin-bottom", "-3px"
 

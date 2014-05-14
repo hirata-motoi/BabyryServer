@@ -63,6 +63,4 @@ window.setupWall = () ->
   $('#image_upload').on 'click', () ->
     location.href = '/image/web/upload'
 
-  tmpl_child = _.template $('#template-child').html()
-
   window.load_contents = load_contents

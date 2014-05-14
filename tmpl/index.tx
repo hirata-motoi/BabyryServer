@@ -80,7 +80,7 @@
 
 : include detail::include
 
-: include album::include
+<!--: include album::include-->
 
 <!--<script type="text/javascript" src="<: uri_for('/static/salvattore/js/salvattore.js') :>"></script>-->
 <script type="text/javascript">

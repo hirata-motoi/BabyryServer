@@ -31,10 +31,14 @@
   [data-columns]::before {
     display: none;
   }
-  #add-image-icon {
+  .add-image {
     width: 80px;
+    overflow: hidden;
+  }
+  #add-image-icon {
     height: 80px;
-    margin-top: 10px;
+    margin-left: -19px;
+    -webkit-filter: invert(50%);
   }
   .disabled-iframe {
     display: none;

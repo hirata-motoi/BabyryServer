@@ -163,17 +163,17 @@
         <ul>
           <li id="footer-home">
             <a href="/" style="background-color: #FAFAFA;" data-ajax="false">
-              <img src="/static/img/menu/icon_home.png" style="width: 32px; height: 32px; -webkit-filter: invert(60%);">
+              <img src="/static/img/menu/icon_home.png" style="height: 32px; -webkit-filter: invert(60%);">
             </a>
           </li>
           <li id="footer-upload">
             <a href="/image/web/upload" style="background-color: #FAFAFA;">
-              <img src="/static/img/menu/icon_folder_upload.png" style="-webkit-filter: invert(40%);">
+              <img src="/static/img/menu/icon_folder_upload.png" style="-webkit-filter: invert(60%); height: 32px;">
             </a>
           </li>
           <li id="footer-other">
             <a href="/menu" style="background-color: #FAFAFA;">
-              <img src="/static/img/menu/icon_cog.png" style="-webkit-filter: invert(40%);">
+              <img src="/static/img/menu/icon_cog.png" style="-webkit-filter: invert(60%); height: 32px;">
             </a>
           </li>
         </ul>

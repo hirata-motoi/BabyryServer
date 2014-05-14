@@ -37,7 +37,6 @@
       return $(this).removeClass("selected-footer-menu");
     });
     target = path === "/" ? $("#footer-home") : path === "/image/web/upload" ? $("#footer-upload") : $("#footer-other");
-    window.console.log(target);
     target.find("a").css("border-bottom", "solid 3px rgba(255, 230, 62, 1.0)");
     return target.find("img").css("margin-bottom", "-3px");
   };

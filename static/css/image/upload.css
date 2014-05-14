@@ -28,10 +28,14 @@
 #image-upload [data-columns]::before {
   display: none;
 }
-#image-upload #add-image-icon {
+#image-upload .add-image {
   width: 80px;
+  overflow: hidden;
+}
+#image-upload #add-image-icon {
   height: 80px;
-  margin-top: 10px;
+  margin-left: -19px;
+  -webkit-filter: invert(50%);
 }
 #image-upload .disabled-iframe {
   display: none;

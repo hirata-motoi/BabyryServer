@@ -21,7 +21,7 @@
   child_ids_hash = [];
 
   window.setupWall = function() {
-    var load_contents, tmpl_child;
+    var load_contents;
     load_contents = function(child_ids) {
       var grid, tmpl;
       tmpl = _.template($('#template-item').html());
@@ -76,7 +76,6 @@
     $('#image_upload').on('click', function() {
       return location.href = '/image/web/upload';
     });
-    tmpl_child = _.template($('#template-child').html());
     return window.load_contents = load_contents;
   };
 
